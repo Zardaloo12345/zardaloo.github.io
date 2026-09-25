@@ -1,14 +1,8 @@
 "use strict";
 
-/* =========================================================
-   ZARDALOO
-   Supabase + Products + Cart + Discount + Admin + Passkey
-   ========================================================= */
-
-
-/* =========================================================
-   SUPABASE
-   ========================================================= */
+/* ==============================
+   ZARDALOO CONFIG
+================================ */
 
 const SUPABASE_URL =
     "https://ovqldknqpaiczrddcrxp.supabase.co";
@@ -19,666 +13,847 @@ const SUPABASE_KEY =
 const PRODUCTS_FUNCTION_URL =
     SUPABASE_URL + "/functions/v1/products";
 
-
-const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY,
-        {
-            auth: {
-                experimental: {
-                    passkey: true
-                }
-            }
-        }
-    );
+const ADMIN_FUNCTION_URL =
+    SUPABASE_URL + "/functions/v1/admin-reports";
 
 
-/* =========================================================
-   ADMIN
-   ========================================================= */
+/* ==============================
+   ADMIN PASSWORDS
+================================ */
 
-/*
-   ایمیل حساب مدیر Supabase Auth را اینجا بگذار.
-
-   مثال:
-   const ADMIN_EMAIL = "admin@example.com";
-
-   رمز را هرگز اینجا ننویس.
-*/
-
-const ADMIN_EMAIL =
-    "erfan_city_2014@gmail.com";
+const ADMIN_NUMBER = "0994051777";
+const ADMIN_PASSWORD = "ERFAN";
 
 
-/* =========================================================
-   DATA
-   ========================================================= */
+/* ==============================
+   STORAGE
+================================ */
+
+const CART_KEY = "zardaloo_cart";
+const THEME_KEY = "zardaloo_theme";
+const DISCOUNT_KEY = "zardaloo_discount";
+
 
 let products = [];
-
-let cart =
-    loadJSON(
-        "zardaloo_cart",
-        []
-    );
-
-let activeDiscount =
-    loadJSON(
-        "zardaloo_discount",
-        null
-    );
+let cart = loadCart();
+let activeDiscount = loadDiscount();
 
 
-/* =========================================================
-   DISCOUNTS
-   ========================================================= */
-
-const DEFAULT_DISCOUNTS = {
-    ZARDALOO10: 10,
-    ZARDALOO20: 20
-};
-
-
-/* =========================================================
+/* ==============================
    START
-   ========================================================= */
+================================ */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    async function () {
+document.addEventListener("DOMContentLoaded", () => {
 
-        loadTheme();
+    loadTheme();
 
-        updateCart();
+    renderCart();
 
-        await loadProducts();
+    loadProducts();
 
-        await checkAdminSession();
+    if (sessionStorage.getItem("zardaloo_admin") === "1") {
+        showAdminPanel();
     }
-);
+
+});
 
 
-/* =========================================================
+/* ==============================
    PAGE SYSTEM
-   ========================================================= */
+================================ */
 
-function showPage(pageId) {
+function showPage(pageName) {
 
-    document
-        .querySelectorAll(".page")
-        .forEach(function (page) {
+    document.querySelectorAll(".page").forEach(page => {
+        page.classList.remove("active");
+    });
 
-            page.classList.remove("active");
-        });
-
-
-    const page =
-        document.getElementById(pageId);
-
+    const page = document.getElementById(pageName);
 
     if (page) {
-
         page.classList.add("active");
     }
-
-
-    if (pageId === "cart") {
-
-        renderCart();
-    }
-
-
-    if (pageId === "market") {
-
-        renderProducts();
-    }
-
-
-    if (pageId === "gifts") {
-
-        renderGifts();
-    }
-
-
-    if (pageId === "management") {
-
-        checkAdminSession();
-    }
-
 
     window.scrollTo({
         top: 0,
         behavior: "smooth"
     });
+
+    if (pageName === "market") {
+        loadProducts();
+    }
+
+    if (pageName === "gifts") {
+        renderGifts();
+    }
+
+    if (pageName === "cart") {
+        renderCart();
+    }
+
+    if (pageName === "admin") {
+
+        if (sessionStorage.getItem("zardaloo_admin") === "1") {
+            showAdminPanel();
+        } else {
+            showAdminLogin();
+        }
+
+    }
+
 }
 
 
-/* =========================================================
+/* ==============================
    THEME
-   ========================================================= */
+================================ */
 
 function toggleTheme() {
 
     document.body.classList.toggle("dark");
 
+    const theme =
+        document.body.classList.contains("dark")
+            ? "dark"
+            : "light";
 
-    const dark =
-        document.body.classList.contains("dark");
-
-
-    localStorage.setItem(
-        "zardaloo_theme",
-        dark ? "dark" : "light"
-    );
-
-
-    updateThemeButton();
+    localStorage.setItem(THEME_KEY, theme);
 }
 
 
 function loadTheme() {
 
-    const theme =
-        localStorage.getItem(
-            "zardaloo_theme"
-        );
-
+    const theme = localStorage.getItem(THEME_KEY);
 
     if (theme === "dark") {
-
         document.body.classList.add("dark");
     }
 
-
-    updateThemeButton();
 }
 
 
-function updateThemeButton() {
-
-    const button =
-        document.getElementById(
-            "themeButton"
-        );
-
-
-    if (!button) return;
-
-
-    button.textContent =
-        document.body.classList.contains("dark")
-            ? "☀️"
-            : "🌙";
-}
-
-
-/* =========================================================
+/* ==============================
    PRODUCTS
-   ========================================================= */
+================================ */
 
 async function loadProducts() {
 
     const container =
-        document.getElementById(
-            "productsContainer"
-        );
+        document.getElementById("products");
 
+    if (!container) return;
 
-    if (container) {
-
-        container.innerHTML = `
-            <div class="loading">
-                در حال دریافت کالاها...
-            </div>
-        `;
-    }
-
+    container.innerHTML =
+        `<div class="loading">در حال دریافت کالاها...</div>`;
 
     try {
 
-        const response =
-            await fetch(
-                PRODUCTS_FUNCTION_URL
-            );
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "خطا در دریافت کالاها"
-            );
-        }
-
+        const response = await fetch(
+            PRODUCTS_FUNCTION_URL,
+            {
+                method: "GET",
+                headers: {
+                    "apikey": SUPABASE_KEY
+                }
+            }
+        );
 
         const data =
             await response.json();
 
+        if (!response.ok) {
+            throw new Error(
+                data.error ||
+                data.message ||
+                "دریافت کالاها ناموفق بود."
+            );
+        }
 
         if (Array.isArray(data)) {
-
             products = data;
-
-        } else if (
-            Array.isArray(data.products)
-        ) {
-
-            products =
-                data.products;
-
+        } else if (Array.isArray(data.products)) {
+            products = data.products;
         } else {
-
             products = [];
         }
 
+        renderProducts(products);
+        renderGifts();
 
     } catch (error) {
 
         console.error(error);
 
-        products = [];
-
-
-        if (container) {
-
-            container.innerHTML = `
-                <div class="empty">
-                    دریافت کالاها با خطا مواجه شد.
-                    <br>
-                    اتصال Supabase را بررسی کن.
-                </div>
-            `;
-        }
-
-
-        return;
-    }
-
-
-    renderProducts();
-
-    renderGifts();
-
-    updateAdminStats();
-}
-
-
-/* =========================================================
-   PRODUCT HELPERS
-   ========================================================= */
-
-function getProductName(product) {
-
-    return (
-        product.name ??
-        product.product_name ??
-        product.title ??
-        "کالای بدون نام"
-    );
-}
-
-
-function getProductPrice(product) {
-
-    return Number(
-        product.price ??
-        product.product_price ??
-        0
-    );
-}
-
-
-function getSellerName(product) {
-
-    return (
-        product.seller_name ??
-        product.seller ??
-        product.vendor_name ??
-        "فروشنده"
-    );
-}
-
-
-function getSellerPhone(product) {
-
-    return (
-        product.seller_phone ??
-        product.phone ??
-        product.phone_number ??
-        "ثبت نشده"
-    );
-}
-
-
-function getDescription(product) {
-
-    return (
-        product.description ??
-        product.details ??
-        ""
-    );
-}
-
-
-function isGiftProduct(product) {
-
-    return (
-        product.is_gift === true ||
-        product.gift === true
-    );
-}
-
-
-/* =========================================================
-   PRICE
-   ========================================================= */
-
-function formatPrice(value) {
-
-    return (
-        Number(value || 0)
-            .toLocaleString("fa-IR")
-        + " تومان"
-    );
-}
-
-
-/* =========================================================
-   RENDER PRODUCTS
-   ========================================================= */
-
-function renderProducts() {
-
-    const container =
-        document.getElementById(
-            "productsContainer"
-        );
-
-
-    if (!container) return;
-
-
-    const search =
-        (
-            document.getElementById(
-                "searchInput"
-            )?.value || ""
-        )
-        .trim()
-        .toLowerCase();
-
-
-    const filtered =
-        products.filter(
-            function (product) {
-
-                const text = (
-                    getProductName(product) +
-                    " " +
-                    getSellerName(product) +
-                    " " +
-                    getDescription(product)
-                ).toLowerCase();
-
-
-                return text.includes(search);
-            }
-        );
-
-
-    if (filtered.length === 0) {
-
         container.innerHTML = `
-            <div class="empty">
-                کالایی پیدا نشد.
+            <div class="error">
+                دریافت کالاها انجام نشد.
+                <br>
+                ${escapeHTML(error.message)}
             </div>
         `;
 
-        return;
     }
 
-
-    container.innerHTML =
-        filtered
-            .map(createProductCard)
-            .join("");
 }
 
 
-/* =========================================================
-   PRODUCT CARD
-   ========================================================= */
+/* ==============================
+   PRODUCT RENDER
+================================ */
 
-function createProductCard(product) {
+function renderProducts(list) {
+
+    const container =
+        document.getElementById("products");
+
+    if (!container) return;
+
+    if (!list.length) {
+
+        container.innerHTML =
+            `<div class="empty">کالایی پیدا نشد.</div>`;
+
+        return;
+    }
+
+    container.innerHTML =
+        list.map(productCard).join("");
+
+}
+
+
+function renderGifts() {
+
+    const container =
+        document.getElementById("giftProducts");
+
+    if (!container) return;
+
+    const gifts =
+        products.filter(product =>
+            Boolean(
+                product.is_gift ??
+                product.isGift
+            )
+        );
+
+    if (!gifts.length) {
+
+        container.innerHTML =
+            `<div class="empty">
+                فعلاً اشانتیونی ثبت نشده است.
+            </div>`;
+
+        return;
+    }
+
+    container.innerHTML =
+        gifts.map(productCard).join("");
+
+}
+
+
+function productCard(product) {
+
+    const id =
+        product.id ??
+        product.product_id ??
+        Math.random().toString(36);
 
     const name =
-        escapeHTML(
-            getProductName(product)
-        );
-
+        product.name ??
+        product.product_name ??
+        "کالای بدون نام";
 
     const price =
-        formatPrice(
-            getProductPrice(product)
+        Number(
+            product.price ??
+            product.product_price ??
+            0
         );
-
 
     const seller =
-        escapeHTML(
-            getSellerName(product)
-        );
-
+        product.seller_name ??
+        product.sellerName ??
+        product.seller ??
+        "فروشنده";
 
     const phone =
-        escapeHTML(
-            getSellerPhone(product)
-        );
-
+        product.seller_phone ??
+        product.sellerPhone ??
+        product.phone ??
+        "ثبت نشده";
 
     const description =
-        escapeHTML(
-            getDescription(product)
-        );
-
+        product.description ??
+        "";
 
     const gift =
-        isGiftProduct(product);
-
+        Boolean(
+            product.is_gift ??
+            product.isGift
+        );
 
     return `
         <article class="product-card">
 
-            ${
-                gift
-                    ? `
-                        <span class="gift-badge">
-                            🎁 اشانتیون
-                        </span>
-                    `
-                    : ""
-            }
+            <div class="product-icon">
+                ${gift ? "🎁" : "📦"}
+            </div>
 
             <h3>
-                ${name}
+                ${escapeHTML(String(name))}
             </h3>
 
-            ${
-                description
-                    ? `
-                        <div class="product-description">
-                            ${description}
-                        </div>
-                    `
-                    : ""
-            }
+            <p class="description">
+                ${escapeHTML(String(description))}
+            </p>
 
             <div class="price">
-                ${price}
+                ${formatPrice(price)} تومان
             </div>
 
             <div class="seller">
-                👤 ${seller}
-                <br>
-                📞 ${phone}
+                فروشنده:
+                ${escapeHTML(String(seller))}
             </div>
 
-            <div class="card-actions">
-
-                <button
-                    onclick='addToCart(${JSON.stringify(product)})'
-                >
-                    🛒 افزودن
-                </button>
-
+            <div class="seller">
+                📞
+                ${escapeHTML(String(phone))}
             </div>
+
+            ${
+                gift
+                    ? `<div class="gift-badge">🎁 اشانتیون</div>`
+                    : ""
+            }
+
+            <button
+                class="primary"
+                onclick="addToCart('${escapeAttribute(String(id))}')"
+            >
+                افزودن به سبد
+            </button>
 
         </article>
     `;
 }
 
 
-/* =========================================================
-   GIFTS
-   ========================================================= */
+/* ==============================
+   SEARCH
+================================ */
 
-function renderGifts() {
+function searchProducts() {
+
+    const input =
+        document.getElementById("searchInput");
+
+    if (!input) return;
+
+    const query =
+        input.value.trim().toLowerCase();
+
+    if (!query) {
+        renderProducts(products);
+        return;
+    }
+
+    const result =
+        products.filter(product => {
+
+            const name =
+                String(
+                    product.name ??
+                    product.product_name ??
+                    ""
+                ).toLowerCase();
+
+            const description =
+                String(
+                    product.description ??
+                    ""
+                ).toLowerCase();
+
+            const seller =
+                String(
+                    product.seller_name ??
+                    product.sellerName ??
+                    ""
+                ).toLowerCase();
+
+            return (
+                name.includes(query) ||
+                description.includes(query) ||
+                seller.includes(query)
+            );
+
+        });
+
+    renderProducts(result);
+
+}
+
+
+/* ==============================
+   CART
+================================ */
+
+function loadCart() {
+
+    try {
+
+        return JSON.parse(
+            localStorage.getItem(CART_KEY)
+        ) || [];
+
+    } catch {
+
+        return [];
+
+    }
+
+}
+
+
+function saveCart() {
+
+    localStorage.setItem(
+        CART_KEY,
+        JSON.stringify(cart)
+    );
+
+}
+
+
+function addToCart(id) {
+
+    const product =
+        products.find(product =>
+            String(
+                product.id ??
+                product.product_id
+            ) === String(id)
+        );
+
+    if (!product) {
+        alert("کالا پیدا نشد.");
+        return;
+    }
+
+    const existing =
+        cart.find(item =>
+            String(item.id) === String(id)
+        );
+
+    if (existing) {
+
+        existing.quantity += 1;
+
+    } else {
+
+        cart.push({
+            id: String(id),
+            name:
+                product.name ??
+                product.product_name ??
+                "کالا",
+            price:
+                Number(product.price ?? 0),
+            quantity: 1
+        });
+
+    }
+
+    saveCart();
+
+    renderCart();
+
+    alert("کالا به سبد خرید اضافه شد.");
+
+}
+
+
+function removeFromCart(id) {
+
+    cart =
+        cart.filter(item =>
+            String(item.id) !== String(id)
+        );
+
+    saveCart();
+
+    renderCart();
+
+}
+
+
+function changeQuantity(id, amount) {
+
+    const item =
+        cart.find(item =>
+            String(item.id) === String(id)
+        );
+
+    if (!item) return;
+
+    item.quantity += amount;
+
+    if (item.quantity <= 0) {
+
+        cart =
+            cart.filter(cartItem =>
+                String(cartItem.id) !== String(id)
+            );
+
+    }
+
+    saveCart();
+
+    renderCart();
+
+}
+
+
+function clearCart() {
+
+    cart = [];
+
+    saveCart();
+
+    renderCart();
+
+}
+
+
+/* ==============================
+   CART RENDER
+================================ */
+
+function renderCart() {
 
     const container =
-        document.getElementById(
-            "giftsContainer"
-        );
+        document.getElementById("cartItems");
 
+    const summary =
+        document.getElementById("cartSummary");
 
-    if (!container) return;
+    if (!container || !summary) return;
 
+    if (!cart.length) {
 
-    const gifts =
-        products.filter(
-            isGiftProduct
-        );
+        container.innerHTML =
+            `<div class="empty">
+                سبد خرید خالی است.
+            </div>`;
 
+        summary.innerHTML = "";
 
-    if (gifts.length === 0) {
-
-        container.innerHTML = `
-            <div class="empty">
-                هنوز کالای اشانتیون‌دار ثبت نشده است.
-            </div>
-        `;
+        updateAdminStats();
 
         return;
     }
 
 
     container.innerHTML =
-        gifts
-            .map(createProductCard)
-            .join("");
+        cart.map(item => {
+
+            const total =
+                item.price *
+                item.quantity;
+
+            return `
+                <div class="cart-item">
+
+                    <div>
+                        <strong>
+                            ${escapeHTML(item.name)}
+                        </strong>
+
+                        <div>
+                            قیمت واحد:
+                            ${formatPrice(item.price)}
+                            تومان
+                        </div>
+
+                        <div>
+                            مجموع:
+                            ${formatPrice(total)}
+                            تومان
+                        </div>
+                    </div>
+
+                    <div class="quantity">
+
+                        <button
+                            onclick="changeQuantity('${escapeAttribute(item.id)}', 1)"
+                        >
+                            +
+                        </button>
+
+                        <span>
+                            ${item.quantity}
+                        </span>
+
+                        <button
+                            onclick="changeQuantity('${escapeAttribute(item.id)}', -1)"
+                        >
+                            -
+                        </button>
+
+                    </div>
+
+                    <button
+                        class="danger"
+                        onclick="removeFromCart('${escapeAttribute(item.id)}')"
+                    >
+                        حذف
+                    </button>
+
+                </div>
+            `;
+
+        }).join("");
+
+
+    const subtotal =
+        cart.reduce(
+            (sum, item) =>
+                sum + item.price * item.quantity,
+            0
+        );
+
+
+    let discountAmount = 0;
+
+    if (activeDiscount) {
+
+        discountAmount =
+            subtotal *
+            activeDiscount.percent /
+            100;
+
+    }
+
+
+    const finalPrice =
+        subtotal - discountAmount;
+
+
+    summary.innerHTML = `
+
+        <div>
+            مبلغ کالاها:
+            <strong>
+                ${formatPrice(subtotal)}
+                تومان
+            </strong>
+        </div>
+
+        <div>
+            تخفیف:
+            <strong>
+                ${formatPrice(discountAmount)}
+                تومان
+            </strong>
+        </div>
+
+        <hr>
+
+        <div class="final-price">
+            مبلغ نهایی:
+            ${formatPrice(finalPrice)}
+            تومان
+        </div>
+
+        ${
+            activeDiscount
+                ? `
+                    <div class="discount-success">
+                        کد ${escapeHTML(activeDiscount.code)}
+                        با ${activeDiscount.percent}% تخفیف فعال است.
+                    </div>
+                  `
+                : ""
+        }
+
+    `;
+
+    updateAdminStats();
+
 }
 
 
-/* =========================================================
-   REGISTER PRODUCT
-   ========================================================= */
+/* ==============================
+   DISCOUNTS
+================================ */
 
-document
-    .getElementById("productForm")
-    ?.addEventListener(
-        "submit",
-        registerProduct
-    );
+const discountCodes = {
+
+    ZARDALOO10: 10,
+
+    ZARDALOO20: 20
+
+};
 
 
-async function registerProduct(event) {
+function loadDiscount() {
 
-    event.preventDefault();
+    try {
 
+        return JSON.parse(
+            localStorage.getItem(DISCOUNT_KEY)
+        );
+
+    } catch {
+
+        return null;
+
+    }
+
+}
+
+
+function applyDiscountCode() {
+
+    const input =
+        document.getElementById("discountInput");
 
     const message =
-        document.getElementById(
-            "registerMessage"
-        );
+        document.getElementById("discountMessage");
 
+    if (!input || !message) return;
 
-    const payload = {
+    const code =
+        input.value.trim().toUpperCase();
 
-        name:
-            document
-                .getElementById(
-                    "productName"
-                )
-                .value
-                .trim(),
+    if (!code) {
 
-
-        price:
-            Number(
-                document
-                    .getElementById(
-                        "productPrice"
-                    )
-                    .value
-            ),
-
-
-        seller_name:
-            document
-                .getElementById(
-                    "sellerName"
-                )
-                .value
-                .trim(),
-
-
-        seller_phone:
-            document
-                .getElementById(
-                    "sellerPhone"
-                )
-                .value
-                .trim(),
-
-
-        description:
-            document
-                .getElementById(
-                    "productDescription"
-                )
-                .value
-                .trim(),
-
-
-        is_gift:
-            document
-                .getElementById(
-                    "isGift"
-                )
-                .checked
-    };
-
-
-    if (
-        !payload.name ||
-        !payload.seller_name ||
-        !payload.seller_phone ||
-        !Number.isFinite(payload.price)
-    ) {
-
-        setMessage(
-            message,
-            "لطفاً اطلاعات لازم را کامل کن.",
-            "error"
-        );
+        message.textContent =
+            "کد تخفیف را وارد کنید.";
 
         return;
     }
 
 
-    setMessage(
-        message,
-        "در حال ثبت کالا...",
-        ""
+    const percent =
+        discountCodes[code];
+
+
+    if (!percent) {
+
+        message.textContent =
+            "کد تخفیف معتبر نیست.";
+
+        return;
+    }
+
+
+    activeDiscount = {
+        code: code,
+        percent: percent
+    };
+
+    localStorage.setItem(
+        DISCOUNT_KEY,
+        JSON.stringify(activeDiscount)
     );
+
+
+    message.textContent =
+        `${percent}% تخفیف اعمال شد.`;
+
+    renderCart();
+
+}
+
+
+/* ==============================
+   REGISTER PRODUCT
+================================ */
+
+async function registerProduct() {
+
+    const name =
+        document.getElementById("productName").value.trim();
+
+    const price =
+        Number(
+            document.getElementById("productPrice").value
+        );
+
+    const sellerName =
+        document.getElementById("sellerName").value.trim();
+
+    const sellerPhone =
+        document.getElementById("sellerPhone").value.trim();
+
+    const description =
+        document.getElementById("productDescription").value.trim();
+
+    const isGift =
+        document.getElementById("isGift").checked;
+
+    const message =
+        document.getElementById("registerMessage");
+
+
+    if (!name) {
+
+        message.textContent =
+            "نام کالا را وارد کنید.";
+
+        return;
+    }
+
+
+    if (!price || price <= 0) {
+
+        message.textContent =
+            "قیمت کالا را صحیح وارد کنید.";
+
+        return;
+    }
+
+
+    if (!sellerName) {
+
+        message.textContent =
+            "نام فروشنده را وارد کنید.";
+
+        return;
+    }
+
+
+    if (!sellerPhone) {
+
+        message.textContent =
+            "شماره فروشنده را وارد کنید.";
+
+        return;
+    }
+
+
+    const payload = {
+
+        name: name,
+
+        price: price,
+
+        seller_name: sellerName,
+
+        seller_phone: sellerPhone,
+
+        description: description,
+
+        is_gift: isGift
+
+    };
+
+
+    message.textContent =
+        "در حال ثبت کالا...";
 
 
     try {
@@ -690,1351 +865,201 @@ async function registerProduct(event) {
                     method: "POST",
 
                     headers: {
-                        "Content-Type":
-                            "application/json"
+                        "Content-Type": "application/json",
+                        "apikey": SUPABASE_KEY
                     },
 
                     body:
-                        JSON.stringify(
-                            payload
-                        )
+                        JSON.stringify(payload)
                 }
             );
 
 
-        const text =
-            await response.text();
+        const data =
+            await response.json().catch(
+                () => ({})
+            );
 
 
         if (!response.ok) {
 
             throw new Error(
-                text ||
-                "ثبت کالا انجام نشد."
+                data.error ||
+                data.message ||
+                "ثبت کالا ناموفق بود."
             );
+
         }
 
 
-        setMessage(
-            message,
-            "✅ کالا با موفقیت ثبت شد.",
-            "success"
-        );
+        message.textContent =
+            "✅ کالا با موفقیت ثبت شد.";
 
+        document.getElementById(
+            "productName"
+        ).value = "";
 
-        document
-            .getElementById(
-                "productForm"
-            )
-            .reset();
+        document.getElementById(
+            "productPrice"
+        ).value = "";
+
+        document.getElementById(
+            "sellerName"
+        ).value = "";
+
+        document.getElementById(
+            "sellerPhone"
+        ).value = "";
+
+        document.getElementById(
+            "productDescription"
+        ).value = "";
+
+        document.getElementById(
+            "isGift"
+        ).checked = false;
 
 
         await loadProducts();
-
-
-        showToast(
-            "کالا ثبت شد 🍑"
-        );
 
 
     } catch (error) {
 
         console.error(error);
 
+        message.textContent =
+            "❌ " + error.message;
 
-        setMessage(
-            message,
-            "❌ ثبت کالا انجام نشد. تابع products در Supabase را بررسی کن.",
-            "error"
-        );
     }
+
 }
 
 
-/* =========================================================
-   CART
-   ========================================================= */
-
-function addToCart(product) {
-
-    const id =
-        String(
-            product.id ??
-            product.product_id ??
-            getProductName(product)
-        );
-
-
-    const existing =
-        cart.find(
-            function (item) {
-
-                return (
-                    String(item.id) === id
-                );
-            }
-        );
-
-
-    if (existing) {
-
-        existing.quantity += 1;
-
-    } else {
-
-        cart.push({
-
-            id: id,
-
-            name:
-                getProductName(product),
-
-            price:
-                getProductPrice(product),
-
-            seller:
-                getSellerName(product),
-
-            phone:
-                getSellerPhone(product),
-
-            quantity: 1
-        });
-    }
-
-
-    saveCart();
-
-    updateCart();
-
-
-    showToast(
-        "به سبد خرید اضافه شد 🛒"
-    );
-}
-
-
-function increaseCart(id) {
-
-    const item =
-        cart.find(
-            function (x) {
-
-                return (
-                    String(x.id) ===
-                    String(id)
-                );
-            }
-        );
-
-
-    if (item) {
-
-        item.quantity++;
-    }
-
-
-    saveCart();
-
-    renderCart();
-
-    updateCart();
-}
-
-
-function decreaseCart(id) {
-
-    const item =
-        cart.find(
-            function (x) {
-
-                return (
-                    String(x.id) ===
-                    String(id)
-                );
-            }
-        );
-
-
-    if (!item) return;
-
-
-    item.quantity--;
-
-
-    if (item.quantity <= 0) {
-
-        cart =
-            cart.filter(
-                function (x) {
-
-                    return (
-                        String(x.id) !==
-                        String(id)
-                    );
-                }
-            );
-    }
-
-
-    saveCart();
-
-    renderCart();
-
-    updateCart();
-}
-
-
-function clearCart() {
-
-    cart = [];
-
-    saveCart();
-
-    updateCart();
-
-    renderCart();
-
-
-    showToast(
-        "سبد خرید خالی شد."
-    );
-}
-
-
-function renderCart() {
-
-    const container =
-        document.getElementById(
-            "cartContainer"
-        );
-
-
-    if (!container) return;
-
-
-    if (cart.length === 0) {
-
-        container.innerHTML = `
-            <div class="empty">
-                سبد خرید خالی است.
-            </div>
-        `;
-
-        return;
-    }
-
-
-    let subtotal = 0;
-
-
-    const html =
-        cart
-            .map(
-                function (item) {
-
-                    const total =
-                        item.price *
-                        item.quantity;
-
-
-                    subtotal += total;
-
-
-                    return `
-                        <div class="cart-item">
-
-                            <div>
-
-                                <strong>
-                                    ${escapeHTML(item.name)}
-                                </strong>
-
-                                <br>
-
-                                <small>
-                                    قیمت واحد:
-                                    ${formatPrice(item.price)}
-                                </small>
-
-                                <br>
-
-                                <small>
-                                    فروشنده:
-                                    ${escapeHTML(item.seller)}
-                                </small>
-
-                            </div>
-
-
-                            <div class="cart-controls">
-
-                                <button
-                                    onclick="increaseCart('${escapeAttribute(item.id)}')"
-                                >
-                                    +
-                                </button>
-
-                                <strong>
-                                    ${item.quantity}
-                                </strong>
-
-                                <button
-                                    onclick="decreaseCart('${escapeAttribute(item.id)}')"
-                                >
-                                    −
-                                </button>
-
-                            </div>
-
-
-                            <strong>
-                                ${formatPrice(total)}
-                            </strong>
-
-                        </div>
-                    `;
-                }
-            )
-            .join("");
-
-
-    const discountPercent =
-        activeDiscount?.percent || 0;
-
-
-    const discountAmount =
-        Math.round(
-            subtotal *
-            discountPercent /
-            100
-        );
-
-
-    const finalPrice =
-        subtotal -
-        discountAmount;
-
-
-    container.innerHTML = `
-
-        ${html}
-
-        <div class="cart-summary">
-
-            <div>
-                مبلغ اولیه:
-                <strong>
-                    ${formatPrice(subtotal)}
-                </strong>
-            </div>
-
-            <div>
-                تخفیف:
-                <strong>
-                    ${discountPercent}٪
-                </strong>
-            </div>
-
-            <div>
-                مبلغ تخفیف:
-                <strong>
-                    ${formatPrice(discountAmount)}
-                </strong>
-            </div>
-
-            <hr>
-
-            <div>
-                مبلغ نهایی:
-                <strong>
-                    ${formatPrice(finalPrice)}
-                </strong>
-            </div>
-
-        </div>
-    `;
-}
-
-
-function updateCart() {
-
-    const count =
-        cart.reduce(
-            function (sum, item) {
-
-                return (
-                    sum + item.quantity
-                );
-            },
-            0
-        );
-
-
-    document
-        .querySelectorAll(
-            "[data-cart-count]"
-        )
-        .forEach(
-            function (el) {
-
-                el.textContent =
-                    count;
-            }
-        );
-
-
-    updateAdminStats();
-}
-
-
-/* =========================================================
-   DISCOUNT
-   ========================================================= */
-
-function applyDiscount() {
-
-    const input =
-        document.getElementById(
-            "discountInput"
-        );
-
-
-    const message =
-        document.getElementById(
-            "discountMessage"
-        );
-
-
-    const code =
-        input.value
-            .trim()
-            .toUpperCase();
-
-
-    const percent =
-        DEFAULT_DISCOUNTS[code];
-
-
-    if (!percent) {
-
-        activeDiscount = null;
-
-
-        localStorage.removeItem(
-            "zardaloo_discount"
-        );
-
-
-        setMessage(
-            message,
-            "❌ این کد تخفیف معتبر نیست.",
-            "error"
-        );
-
-
-        renderCart();
-
-        return;
-    }
-
-
-    activeDiscount = {
-
-        code: code,
-
-        percent: percent
-    };
-
-
-    localStorage.setItem(
-        "zardaloo_discount",
-        JSON.stringify(
-            activeDiscount
-        )
-    );
-
-
-    setMessage(
-        message,
-        `✅ کد ${code} اعمال شد؛ ${percent}٪ تخفیف.`,
-        "success"
-    );
-
-
-    renderCart();
-}
-
-
-/* =========================================================
-   ADMIN - PASSKEY
-   ========================================================= */
-
-
-/*
-   روند ورود:
-
-   بار اول:
-
-   ایمیل + رمز
-        ↓
-   Supabase Auth
-        ↓
-   Session
-        ↓
-   registerPasskey()
-        ↓
-   اثر انگشت / PIN / Windows Hello
-        ↓
-   Passkey ثبت می‌شود
-
-   دفعات بعد:
-
-   signInWithPasskey()
-        ↓
-   اثر انگشت / PIN
-        ↓
-   ورود
-*/
-
-
-/* =========================================================
-   PASSKEY LOGIN
-   ========================================================= */
-
-async function loginWithPasskey() {
-
-    const message =
-        document.getElementById(
-            "adminLoginMessage"
-        );
-
-
-    try {
-
-        if (
-            !window.PublicKeyCredential
-        ) {
-
-            throw new Error(
-                "مرورگر شما Passkey/WebAuthn را پشتیبانی نمی‌کند."
-            );
-        }
-
-
-        if (
-            typeof supabaseClient
-                .auth
-                .signInWithPasskey !==
-            "function"
-        ) {
-
-            throw new Error(
-                "Passkey در نسخه فعلی Supabase JS در دسترس نیست."
-            );
-        }
-
-
-        setMessage(
-            message,
-            "👆 پنجره Passkey را تأیید کن...",
-            ""
-        );
-
-
-        const {
-            data,
-            error
-        } =
-            await supabaseClient
-                .auth
-                .signInWithPasskey();
-
-
-        if (error) {
-
-            throw error;
-        }
-
-
-        await verifyAdminUser(
-            data?.user
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "PASSKEY LOGIN ERROR:",
-            error
-        );
-
-
-        setMessage(
-            message,
-            "❌ ورود با Passkey انجام نشد: " +
-            (
-                error.message ||
-                "خطای نامشخص"
-            ),
-            "error"
-        );
-    }
-}
-
-
-/* =========================================================
-   SHOW SETUP
-   ========================================================= */
-
-function showAdminSetup() {
-
-    document
-        .getElementById(
-            "adminLoginBox"
-        )
-        .classList.add("hidden");
-
-
-    document
-        .getElementById(
-            "adminSetupBox"
-        )
-        .classList.remove("hidden");
-
-
-    const emailInput =
-        document.getElementById(
-            "adminEmail"
-        );
-
-
-    if (emailInput) {
-
-        emailInput.value =
-            ADMIN_EMAIL ===
-            "YOUR_ADMIN_EMAIL@example.com"
-                ? ""
-                : ADMIN_EMAIL;
-    }
-}
-
-
-function hideAdminSetup() {
-
-    document
-        .getElementById(
-            "adminSetupBox"
-        )
-        .classList.add("hidden");
-
-
-    document
-        .getElementById(
-            "adminLoginBox"
-        )
-        .classList.remove("hidden");
-}
-
-
-/* =========================================================
-   FIRST LOGIN
-   ========================================================= */
-
-async function loginAdminForSetup() {
-
-    const emailInput =
-        document.getElementById(
-            "adminEmail"
-        );
-
-
-    const passwordInput =
-        document.getElementById(
-            "adminPassword"
-        );
-
-
-    const message =
-        document.getElementById(
-            "setupMessage"
-        );
-
-
-    const email =
-        emailInput
-            .value
-            .trim()
-            .toLowerCase();
-
-
-    const password =
-        passwordInput
-            .value;
-
-
-    if (!email || !password) {
-
-        setMessage(
-            message,
-            "ایمیل و رمز را وارد کن.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    if (
-        ADMIN_EMAIL ===
-        "YOUR_ADMIN_EMAIL@example.com"
-    ) {
-
-        setMessage(
-            message,
-            "❌ ابتدا ADMIN_EMAIL را در script.js تنظیم کن.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    if (
-        email !==
-        ADMIN_EMAIL
-            .trim()
-            .toLowerCase()
-    ) {
-
-        setMessage(
-            message,
-            "❌ این ایمیل، ایمیل مدیر نیست.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    try {
-
-        setMessage(
-            message,
-            "🔐 در حال ورود به حساب مدیر...",
-            ""
-        );
-
-
-        const {
-            data,
-            error
-        } =
-            await supabaseClient
-                .auth
-                .signInWithPassword({
-
-                    email: email,
-
-                    password: password
-                });
-
-
-        if (error) {
-
-            throw error;
-        }
-
-
-        if (!data?.user) {
-
-            throw new Error(
-                "حساب مدیر پیدا نشد."
-            );
-        }
-
-
-        if (
-            !isAdminEmail(
-                data.user
-            )
-        ) {
-
-            await supabaseClient
-                .auth
-                .signOut();
-
-
-            throw new Error(
-                "این حساب اجازه مدیریت ندارد."
-            );
-        }
-
-
-        setMessage(
-            message,
-            "✅ ورود موفق بود. حالا Passkey را ثبت می‌کنیم...",
-            "success"
-        );
-
-
-        await registerPasskey();
-
-
-    } catch (error) {
-
-        console.error(
-            "ADMIN SETUP LOGIN ERROR:",
-            error
-        );
-
-
-        setMessage(
-            message,
-            "❌ ورود انجام نشد: " +
-            (
-                error.message ||
-                "خطای نامشخص"
-            ),
-            "error"
-        );
-    }
-}
-
-
-/* =========================================================
-   REGISTER PASSKEY
-   ========================================================= */
-
-async function registerPasskey() {
-
-    const message =
-        document.getElementById(
-            "setupMessage"
-        );
-
-
-    try {
-
-        const {
-            data,
-            error
-        } =
-            await supabaseClient
-                .auth
-                .getUser();
-
-
-        if (error) {
-
-            throw error;
-        }
-
-
-        const user =
-            data?.user;
-
-
-        if (!user) {
-
-            throw new Error(
-                "Session مدیر پیدا نشد. ابتدا وارد حساب مدیر شو."
-            );
-        }
-
-
-        if (
-            !isAdminEmail(user)
-        ) {
-
-            throw new Error(
-                "این حساب، حساب مدیر نیست."
-            );
-        }
-
-
-        if (
-            typeof supabaseClient
-                .auth
-                .registerPasskey !==
-            "function"
-        ) {
-
-            throw new Error(
-                "registerPasskey در نسخه فعلی Supabase JS موجود نیست."
-            );
-        }
-
-
-        setMessage(
-            message,
-            "👆 حالا پنجره ثبت Passkey را تأیید کن...",
-            ""
-        );
-
-
-        const {
-            data: passkey,
-            error: passkeyError
-        } =
-            await supabaseClient
-                .auth
-                .registerPasskey();
-
-
-        if (passkeyError) {
-
-            throw passkeyError;
-        }
-
-
-        console.log(
-            "REGISTERED PASSKEY:",
-            passkey
-        );
-
-
-        setMessage(
-            message,
-            "✅ Passkey با موفقیت ثبت شد!",
-            "success"
-        );
-
-
-        showToast(
-            "✅ Passkey ثبت شد!"
-        );
-
-
-        hideAdminSetup();
-
-
-        await showAdminPanel(
-            user
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "PASSKEY REGISTRATION ERROR:",
-            error
-        );
-
-
-        setMessage(
-            message,
-            "❌ ثبت Passkey انجام نشد: " +
-            (
-                error.message ||
-                "خطای نامشخص"
-            ),
-            "error"
-        );
-    }
-}
-
-
-/* =========================================================
-   CHECK SESSION
-   ========================================================= */
-
-async function checkAdminSession() {
-
-    try {
-
-        const {
-            data
-        } =
-            await supabaseClient
-                .auth
-                .getSession();
-
-
-        const session =
-            data?.session;
-
-
-        if (!session) {
-
-            showAdminLogin();
-
-            return;
-        }
-
-
-        const {
-            data: userData
-        } =
-            await supabaseClient
-                .auth
-                .getUser();
-
-
-        const user =
-            userData?.user;
-
-
-        if (
-            !isAdminEmail(user)
-        ) {
-
-            await supabaseClient
-                .auth
-                .signOut();
-
-
-            showAdminLogin();
-
-            return;
-        }
-
-
-        await showAdminPanel(
-            user
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "SESSION CHECK ERROR:",
-            error
-        );
-
-
-        showAdminLogin();
-    }
-}
-
-
-/* =========================================================
-   VERIFY ADMIN
-   ========================================================= */
-
-async function verifyAdminUser(user) {
-
-    if (!user) {
-
-        throw new Error(
-            "کاربر احراز هویت نشد."
-        );
-    }
-
-
-    if (
-        !isAdminEmail(user)
-    ) {
-
-        await supabaseClient
-            .auth
-            .signOut();
-
-
-        throw new Error(
-            "این حساب اجازه ورود به مدیریت را ندارد."
-        );
-    }
-
-
-    await showAdminPanel(
-        user
-    );
-}
-
-
-/* =========================================================
-   ADMIN EMAIL
-   ========================================================= */
-
-function isAdminEmail(user) {
-
-    if (!user) {
-
-        return false;
-    }
-
-
-    const configuredEmail =
-        ADMIN_EMAIL
-            .trim()
-            .toLowerCase();
-
-
-    if (
-        !configuredEmail ||
-        configuredEmail ===
-        "your_admin_email@example.com"
-    ) {
-
-        return false;
-    }
-
-
-    return (
-        String(
-            user.email || ""
-        )
-        .toLowerCase() ===
-        configuredEmail
-    );
-}
-
-
-/* =========================================================
-   ADMIN PANEL
-   ========================================================= */
-
-async function showAdminPanel(user) {
-
-    document
-        .getElementById(
-            "adminLoginBox"
-        )
-        .classList.add("hidden");
-
-
-    document
-        .getElementById(
-            "adminSetupBox"
-        )
-        .classList.add("hidden");
-
-
-    document
-        .getElementById(
-            "adminPanel"
-        )
-        .classList.remove("hidden");
-
-
-    document
-        .getElementById(
-            "adminUserText"
-        )
-        .textContent =
-            "وارد شده با: " +
-            (
-                user.email ||
-                "مدیر"
-            );
-
-
-    updateAdminStats();
-
-    renderAdminProducts();
-
-    await loadPasskeys();
-}
-
-
-/* =========================================================
-   SHOW LOGIN
-   ========================================================= */
+/* ==============================
+   ADMIN LOGIN
+================================ */
 
 function showAdminLogin() {
 
-    document
-        .getElementById(
-            "adminLoginBox"
-        )
-        .classList.remove("hidden");
+    const login =
+        document.getElementById("adminLoginBox");
 
+    const panel =
+        document.getElementById("adminPanel");
 
-    document
-        .getElementById(
-            "adminSetupBox"
-        )
-        .classList.add("hidden");
+    login.classList.remove("hidden");
 
+    panel.classList.add("hidden");
 
-    document
-        .getElementById(
-            "adminPanel"
-        )
-        .classList.add("hidden");
 }
 
 
-/* =========================================================
-   LOGOUT
-   ========================================================= */
+function adminLogin() {
 
-async function logoutAdmin() {
+    const number =
+        document.getElementById("adminNumber").value.trim();
 
-    await supabaseClient
-        .auth
-        .signOut();
+    const password =
+        document.getElementById("adminPassword").value;
 
-
-    showAdminLogin();
+    const message =
+        document.getElementById("adminMessage");
 
 
-    showToast(
-        "از مدیریت خارج شدی."
-    );
-}
+    if (!number || !password) {
 
-
-/* =========================================================
-   PASSKEY LIST
-   ========================================================= */
-
-async function loadPasskeys() {
-
-    const container =
-        document.getElementById(
-            "passkeysList"
-        );
-
-
-    if (!container) return;
-
-
-    if (
-        !supabaseClient.auth.passkey ||
-        typeof supabaseClient
-            .auth
-            .passkey
-            .list !==
-        "function"
-    ) {
-
-        container.innerHTML = `
-            <p class="muted">
-                مدیریت Passkey در این نسخه در دسترس نیست.
-            </p>
-        `;
+        message.textContent =
+            "هر دو رمز را وارد کنید.";
 
         return;
     }
 
 
-    try {
+    if (
+        number !== ADMIN_NUMBER ||
+        password !== ADMIN_PASSWORD
+    ) {
 
-        const {
-            data,
-            error
-        } =
-            await supabaseClient
-                .auth
-                .passkey
-                .list();
+        message.textContent =
+            "❌ رمز مدیریت یا پسورد اشتباه است.";
 
-
-        if (error) {
-
-            throw error;
-        }
-
-
-        const passkeys =
-            data || [];
-
-
-        if (
-            passkeys.length === 0
-        ) {
-
-            container.innerHTML = `
-                <p class="muted">
-                    هنوز Passkey ثبت نشده است.
-                </p>
-            `;
-
-            return;
-        }
-
-
-        container.innerHTML =
-            passkeys
-                .map(
-                    function (passkey) {
-
-                        return `
-                            <div class="passkey-item">
-
-                                <strong>
-                                    👆 ${
-                                        escapeHTML(
-                                            passkey.friendly_name ||
-                                            "Passkey دستگاه"
-                                        )
-                                    }
-                                </strong>
-
-                                <br>
-
-                                <small>
-                                    ثبت:
-                                    ${
-                                        formatDate(
-                                            passkey.created_at
-                                        )
-                                    }
-                                </small>
-
-                            </div>
-                        `;
-                    }
-                )
-                .join("");
-
-
-    } catch (error) {
-
-        console.error(
-            "PASSKEY LIST ERROR:",
-            error
-        );
-
-
-        container.innerHTML = `
-            <p class="muted">
-                دریافت Passkeyها ممکن نشد.
-            </p>
-        `;
+        return;
     }
+
+
+    sessionStorage.setItem(
+        "zardaloo_admin",
+        "1"
+    );
+
+
+    message.textContent =
+        "✅ ورود موفق بود.";
+
+    showAdminPanel();
+
 }
 
 
-/* =========================================================
+function showAdminPanel() {
+
+    const login =
+        document.getElementById("adminLoginBox");
+
+    const panel =
+        document.getElementById("adminPanel");
+
+
+    login.classList.add("hidden");
+
+    panel.classList.remove("hidden");
+
+
+    updateAdminStats();
+
+}
+
+
+/* ==============================
+   ADMIN LOGOUT
+================================ */
+
+function adminLogout() {
+
+    sessionStorage.removeItem(
+        "zardaloo_admin"
+    );
+
+    showAdminLogin();
+
+}
+
+
+/* ==============================
    ADMIN STATS
-   ========================================================= */
+================================ */
 
 function updateAdminStats() {
 
     const productCount =
         document.getElementById(
-            "productCount"
+            "adminProductCount"
         );
-
-
-    const giftCount =
-        document.getElementById(
-            "giftCount"
-        );
-
 
     const cartCount =
         document.getElementById(
-            "cartCount"
+            "adminCartCount"
+        );
+
+    const cartTotal =
+        document.getElementById(
+            "adminCartTotal"
         );
 
 
     if (productCount) {
-
         productCount.textContent =
             products.length;
-    }
-
-
-    if (giftCount) {
-
-        giftCount.textContent =
-            products.filter(
-                isGiftProduct
-            ).length;
     }
 
 
@@ -2042,311 +1067,336 @@ function updateAdminStats() {
 
         cartCount.textContent =
             cart.reduce(
-                function (sum, item) {
-
-                    return (
-                        sum + item.quantity
-                    );
-                },
+                (sum, item) =>
+                    sum + item.quantity,
                 0
             );
+
     }
 
 
-    renderAdminProducts();
+    if (cartTotal) {
+
+        const total =
+            cart.reduce(
+                (sum, item) =>
+                    sum +
+                    item.price *
+                    item.quantity,
+                0
+            );
+
+        cartTotal.textContent =
+            formatPrice(total);
+
+    }
+
 }
 
 
-/* =========================================================
-   ADMIN PRODUCTS
-   ========================================================= */
+/* ==============================
+   ADMIN REQUEST
+================================ */
 
-function renderAdminProducts() {
-
-    const container =
-        document.getElementById(
-            "adminProducts"
-        );
-
-
-    if (!container) return;
-
+async function adminRequest(
+    path,
+    options = {}
+) {
 
     if (
-        products.length === 0
+        sessionStorage.getItem(
+            "zardaloo_admin"
+        ) !== "1"
     ) {
 
-        container.innerHTML = `
-            <p class="muted">
-                کالایی وجود ندارد.
-            </p>
-        `;
+        throw new Error(
+            "ابتدا وارد مدیریت شوید."
+        );
 
-        return;
     }
 
 
-    container.innerHTML =
-        products
-            .map(
-                function (product) {
+    const response =
+        await fetch(
+            ADMIN_FUNCTION_URL + path,
+            {
+                ...options,
 
-                    const name =
-                        escapeHTML(
-                            getProductName(product)
-                        );
+                headers: {
+                    "Content-Type":
+                        "application/json",
 
+                    "apikey":
+                        SUPABASE_KEY,
 
-                    const seller =
-                        escapeHTML(
-                            getSellerName(product)
-                        );
+                    "Authorization":
+                        "Bearer " + SUPABASE_KEY,
 
-
-                    const price =
-                        formatPrice(
-                            getProductPrice(product)
-                        );
-
-
-                    return `
-                        <div class="admin-product">
-
-                            <div>
-
-                                <strong>
-                                    ${name}
-                                </strong>
-
-                                <br>
-
-                                <small>
-                                    ${seller}
-                                    — ${price}
-                                </small>
-
-                            </div>
-
-                            ${
-                                isGiftProduct(product)
-                                    ? "<span>🎁</span>"
-                                    : ""
-                            }
-
-                        </div>
-                    `;
+                    ...(options.headers || {})
                 }
-            )
-            .join("");
-}
+            }
+        );
 
 
-/* =========================================================
-   STORAGE
-   ========================================================= */
-
-function saveCart() {
-
-    localStorage.setItem(
-        "zardaloo_cart",
-        JSON.stringify(cart)
-    );
-}
+    const data =
+        await response.json().catch(
+            () => ({})
+        );
 
 
-function loadJSON(
-    key,
-    fallback
-) {
+    if (!response.ok) {
 
-    try {
+        throw new Error(
+            data.error ||
+            data.message ||
+            "درخواست مدیریت ناموفق بود."
+        );
 
-        const raw =
-            localStorage.getItem(
-                key
-            );
-
-
-        if (!raw) {
-
-            return fallback;
-        }
-
-
-        return JSON.parse(raw);
-
-    } catch {
-
-        return fallback;
     }
+
+
+    return data;
+
 }
 
 
-/* =========================================================
-   HELPERS
-   ========================================================= */
+/* ==============================
+   ADMIN PRODUCTS
+================================ */
 
-function setMessage(
-    element,
-    text,
-    type
-) {
+async function loadAdminProducts() {
 
-    if (!element) return;
-
-
-    element.textContent =
-        text;
-
-
-    element.className =
-        "message " +
-        (type || "");
-}
-
-
-function showToast(text) {
-
-    const toast =
+    const content =
         document.getElementById(
-            "toast"
+            "adminContent"
         );
 
-
-    if (!toast) return;
-
-
-    toast.textContent =
-        text;
-
-
-    toast.classList.add(
-        "show"
-    );
-
-
-    setTimeout(
-        function () {
-
-            toast.classList.remove(
-                "show"
-            );
-
-        },
-        2500
-    );
-}
-
-
-function escapeHTML(value) {
-
-    return String(
-        value ?? ""
-    )
-        .replaceAll(
-            "&",
-            "&amp;"
-        )
-        .replaceAll(
-            "<",
-            "&lt;"
-        )
-        .replaceAll(
-            ">",
-            "&gt;"
-        )
-        .replaceAll(
-            '"',
-            "&quot;"
-        )
-        .replaceAll(
-            "'",
-            "&#039;"
-        );
-}
-
-
-function escapeAttribute(value) {
-
-    return String(
-        value ?? ""
-    )
-        .replaceAll(
-            "\\",
-            "\\\\"
-        )
-        .replaceAll(
-            "'",
-            "\\'"
-        );
-}
-
-
-function formatDate(date) {
-
-    if (!date) {
-
-        return "نامشخص";
-    }
+    content.innerHTML =
+        `<div class="loading">
+            در حال دریافت کالاها...
+        </div>`;
 
 
     try {
 
-        return new Date(date)
-            .toLocaleString(
-                "fa-IR"
+        const data =
+            await adminRequest(
+                "/products"
             );
 
-    } catch {
 
-        return "نامشخص";
-    }
-}
+        const list =
+            Array.isArray(data)
+                ? data
+                : data.products || [];
 
 
-/* =========================================================
-   AUTH STATE
-   ========================================================= */
+        if (!list.length) {
 
-supabaseClient.auth.onAuthStateChange(
-    async function (
-        event,
-        session
-    ) {
-
-        if (
-            event ===
-            "SIGNED_OUT"
-        ) {
-
-            showAdminLogin();
+            content.innerHTML =
+                `<div class="empty">
+                    کالایی وجود ندارد.
+                </div>`;
 
             return;
         }
 
 
-        if (
-            event ===
-                "SIGNED_IN" &&
-            session?.user
-        ) {
+        content.innerHTML = `
 
-            if (
-                isAdminEmail(
-                    session.user
-                )
-            ) {
+            <div class="admin-products">
 
-                await showAdminPanel(
-                    session.user
-                );
+                ${list.map(product => `
 
-            } else {
+                    <div class="admin-product">
 
-                await supabaseClient
-                    .auth
-                    .signOut();
-            }
-        }
+                        <strong>
+                            ${escapeHTML(
+                                String(
+                                    product.name ??
+                                    product.product_name ??
+                                    "کالا"
+                                )
+                            )}
+                        </strong>
+
+                        <span>
+                            ${formatPrice(
+                                Number(
+                                    product.price ?? 0
+                                )
+                            )}
+                            تومان
+                        </span>
+
+                        <button
+                            class="danger"
+                            onclick="deleteAdminProduct('${escapeAttribute(String(product.id ?? product.product_id ?? ""))}')"
+                        >
+                            حذف
+                        </button>
+
+                    </div>
+
+                `).join("")}
+
+            </div>
+
+        `;
+
+
+    } catch (error) {
+
+        content.innerHTML =
+            `<div class="error">
+                ${escapeHTML(error.message)}
+            </div>`;
+
     }
-);
+
+}
+
+
+/* ==============================
+   DELETE PRODUCT
+================================ */
+
+async function deleteAdminProduct(id) {
+
+    if (!id) return;
+
+
+    const confirmed =
+        confirm(
+            "آیا از حذف این کالا مطمئن هستید؟"
+        );
+
+
+    if (!confirmed) return;
+
+
+    try {
+
+        await adminRequest(
+            "/products?id=" +
+            encodeURIComponent(id),
+            {
+                method: "DELETE"
+            }
+        );
+
+
+        alert(
+            "کالا حذف شد."
+        );
+
+
+        await loadProducts();
+
+        await loadAdminProducts();
+
+
+    } catch (error) {
+
+        alert(
+            error.message
+        );
+
+    }
+
+}
+
+
+/* ==============================
+   ADMIN REPORTS
+================================ */
+
+async function loadAdminReports() {
+
+    const content =
+        document.getElementById(
+            "adminContent"
+        );
+
+
+    content.innerHTML =
+        `<div class="loading">
+            در حال دریافت گزارش...
+        </div>`;
+
+
+    try {
+
+        const data =
+            await adminRequest(
+                "/reports"
+            );
+
+
+        content.innerHTML = `
+
+            <div class="report-card">
+
+                <h3>📊 گزارش مدیریت</h3>
+
+                <pre>
+${escapeHTML(
+    JSON.stringify(
+        data,
+        null,
+        2
+    )
+)}
+                </pre>
+
+            </div>
+
+        `;
+
+
+    } catch (error) {
+
+        content.innerHTML =
+            `<div class="error">
+                ${escapeHTML(error.message)}
+            </div>`;
+
+    }
+
+}
+
+
+/* ==============================
+   HELPERS
+================================ */
+
+function formatPrice(number) {
+
+    return Number(
+        number || 0
+    ).toLocaleString(
+        "fa-IR"
+    );
+
+}
+
+
+function escapeHTML(value) {
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+
+
+function escapeAttribute(value) {
+
+    return String(value)
+        .replaceAll("\\", "\\\\")
+        .replaceAll("'", "\\'");
+
+}
