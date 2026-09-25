@@ -1,0 +1,2057 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>زردآلو | با زردآلو خرید راحته!</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Tahoma, Arial, sans-serif;
+            background: #fffaf0;
+            color: #333;
+            line-height: 1.8;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+
+            background: #ff9f1c;
+
+            padding: 14px 5%;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            box-shadow: 0 3px 15px rgba(0,0,0,.12);
+        }
+
+        .brand {
+            color: white;
+            text-decoration: none;
+            font-size: 27px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 7px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 12px;
+            transition: .2s;
+        }
+
+        nav a:hover {
+            background: rgba(255,255,255,.2);
+        }
+
+        #count {
+            background: white;
+            color: #ff8c00;
+            border-radius: 50%;
+            padding: 2px 7px;
+            margin-right: 4px;
+        }
+
+        main {
+            width: 100%;
+        }
+
+        section {
+            width: 100%;
+            max-width: 1400px;
+            margin: auto;
+            padding: 70px 6%;
+        }
+
+        /* HERO */
+
+        .hero {
+            min-height: 600px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 40px;
+        }
+
+        .hero small {
+            color: #e76f00;
+            font-weight: bold;
+        }
+
+        .hero h1 {
+            font-size: clamp(42px, 6vw, 75px);
+            line-height: 1.2;
+            color: #e76f00;
+        }
+
+        .hero h1 strong {
+            color: #ff9f1c;
+        }
+
+        .hero p {
+            max-width: 650px;
+            font-size: 20px;
+            margin: 25px 0;
+        }
+
+        .fruit {
+            font-size: 190px;
+            filter: drop-shadow(
+                0 15px 20px rgba(0,0,0,.15)
+            );
+        }
+
+        /* BUTTON */
+
+        .btn {
+            display: inline-block;
+
+            border: none;
+
+            background: #ff9f1c;
+            color: white;
+
+            padding: 12px 25px;
+
+            border-radius: 14px;
+
+            text-decoration: none;
+
+            cursor: pointer;
+
+            font-size: 17px;
+
+            transition: .2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            background: #f48c00;
+        }
+
+        /* TITLES */
+
+        .title {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+
+            gap: 20px;
+
+            margin-bottom: 30px;
+        }
+
+        .title small {
+            color: #e76f00;
+            font-weight: bold;
+        }
+
+        .title h2 {
+            font-size: 36px;
+        }
+
+        /* SEARCH */
+
+        #search {
+            width: 350px;
+            max-width: 100%;
+
+            padding: 14px 18px;
+
+            border: 2px solid #ffd08a;
+            border-radius: 14px;
+
+            outline: none;
+
+            font-size: 16px;
+
+            background: white;
+        }
+
+        /* PRODUCT GRID */
+
+        .grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    auto-fill,
+                    minmax(240px, 1fr)
+                );
+
+            gap: 22px;
+        }
+
+        /* PRODUCT CARD */
+
+        .product-card {
+            position: relative;
+
+            background: white;
+
+            border-radius: 22px;
+
+            padding: 22px;
+
+            box-shadow:
+                0 7px 25px rgba(0,0,0,.08);
+
+            transition: .2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+
+            box-shadow:
+                0 12px 30px rgba(0,0,0,.12);
+        }
+
+        .product-image {
+            height: 150px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 85px;
+
+            background: #fff7e8;
+
+            border-radius: 18px;
+
+            margin-bottom: 18px;
+        }
+
+        .product-card h3 {
+            font-size: 21px;
+            margin-bottom: 8px;
+        }
+
+        .price {
+            color: #e76f00;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .seller {
+            color: #777;
+            margin: 8px 0 15px;
+        }
+
+        /* GIFT */
+
+        .gift-section {
+            background: #fff3d6;
+
+            border-radius: 30px;
+
+            margin-top: 30px;
+            margin-bottom: 40px;
+        }
+
+        .gift-card {
+            border: 2px solid #ffc04d;
+        }
+
+        .gift-badge {
+            display: inline-block;
+
+            background: #ffb703;
+
+            color: #5b3900;
+
+            font-weight: bold;
+
+            padding: 7px 13px;
+
+            border-radius: 30px;
+
+            margin-bottom: 12px;
+        }
+
+        .gift-card .product-image {
+            background: #fff8df;
+        }
+
+        /* EMPTY */
+
+        .empty-message {
+            text-align: center;
+
+            padding: 30px;
+
+            background: white;
+
+            border-radius: 18px;
+
+            color: #777;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ABOUT */
+
+        .cards {
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(230px, 1fr)
+                );
+
+            gap: 20px;
+        }
+
+        .cards article {
+            background: white;
+
+            border-radius: 20px;
+
+            padding: 30px;
+
+            box-shadow:
+                0 7px 25px rgba(0,0,0,.07);
+        }
+
+        .cards span {
+            font-size: 40px;
+        }
+
+        .cards h3 {
+            margin: 10px 0;
+
+            color: #e76f00;
+        }
+
+        /* REPORT */
+
+        .report {
+            background: white;
+
+            border-radius: 25px;
+
+            margin-top: 30px;
+            margin-bottom: 30px;
+
+            box-shadow:
+                0 7px 25px rgba(0,0,0,.07);
+        }
+
+        .report h2 {
+            margin: 8px 0 20px;
+
+            color: #e76f00;
+        }
+
+        /* CREATORS */
+
+        .creators-section {
+            background: white;
+
+            border-radius: 28px;
+
+            box-shadow:
+                0 7px 25px rgba(0,0,0,.07);
+
+            text-align: center;
+        }
+
+        .creators-section h2 {
+            color: #e76f00;
+
+            font-size: 36px;
+
+            margin-bottom: 30px;
+        }
+
+        .creator-main {
+            background: #fff7e8;
+
+            border-radius: 20px;
+
+            padding: 25px;
+
+            margin-bottom: 25px;
+        }
+
+        .creator-main h3 {
+            color: #e76f00;
+
+            margin-bottom: 10px;
+        }
+
+        .creator-main p {
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .thanks-box {
+            background: #fffaf0;
+
+            border: 2px solid #ffd08a;
+
+            border-radius: 20px;
+
+            padding: 25px;
+        }
+
+        .thanks-box h3 {
+            color: #e76f00;
+
+            margin-bottom: 15px;
+        }
+
+        .thanks-box p {
+            margin: 7px 0;
+            font-size: 18px;
+        }
+
+        .godot-note {
+            margin-top: 25px;
+
+            background: #fff0f0;
+
+            border-radius: 15px;
+
+            padding: 18px;
+
+            color: #a33;
+        }
+
+        /* CONTACT */
+
+        .contact {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 30px;
+        }
+
+        .contact-box {
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 22px;
+
+            box-shadow:
+                0 7px 25px rgba(0,0,0,.07);
+        }
+
+        .contact-box input,
+        .contact-box textarea {
+            width: 100%;
+
+            margin: 8px 0;
+
+            padding: 13px;
+
+            border: 2px solid #ffd08a;
+
+            border-radius: 12px;
+
+            outline: none;
+
+            font-family: inherit;
+        }
+
+        .contact-box textarea {
+            min-height: 150px;
+
+            resize: vertical;
+        }
+
+        /* CART */
+
+        .cart-item {
+            background: white;
+
+            border-radius: 18px;
+
+            padding: 20px;
+
+            margin-bottom: 15px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 20px;
+
+            box-shadow:
+                0 5px 18px rgba(0,0,0,.06);
+        }
+
+        .total {
+            background: #ffefcf;
+
+            border-radius: 18px;
+
+            padding: 22px;
+
+            font-size: 23px;
+
+            font-weight: bold;
+
+            margin-top: 20px;
+        }
+
+        /* FOOTER */
+
+        footer {
+            background: #3b2f2f;
+
+            color: white;
+
+            padding: 35px 6%;
+
+            text-align: center;
+        }
+
+        footer strong {
+            color: #ffb703;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 800px) {
+
+            header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            nav {
+                width: 100%;
+            }
+
+            .hero {
+                flex-direction: column;
+
+                text-align: center;
+
+                justify-content: center;
+            }
+
+            .fruit {
+                font-size: 120px;
+            }
+
+            .title {
+                flex-direction: column;
+
+                align-items: stretch;
+            }
+
+            #search {
+                width: 100%;
+            }
+
+            .contact {
+                grid-template-columns: 1fr;
+            }
+
+            .cart-item {
+                flex-direction: column;
+
+                align-items: stretch;
+            }
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<header>
+
+    <a class="brand" href="#home">
+        🍑 زردآلو
+    </a>
+
+    <nav>
+
+        <a href="#home">
+            خانه
+        </a>
+
+        <a href="#market">
+            بازار
+        </a>
+
+        <a href="#gifts">
+            🎁 اشانتیون‌ها
+        </a>
+
+        <a href="#about">
+            درباره زردآلو
+        </a>
+
+        <a href="#creators">
+            👨‍💻 سازندگان
+        </a>
+
+        <a href="#report">
+            گزارش پروژه
+        </a>
+
+        <a href="#contact">
+            ارتباط با ما
+        </a>
+
+        <a href="#cart">
+            سبد خرید
+            <b id="count">0</b>
+        </a>
+
+    </nav>
+
+</header>
+
+
+<main>
+
+
+<!-- =====================================================
+     HOME
+===================================================== -->
+
+<section id="home" class="hero">
+
+    <div>
+
+        <small>
+            فروشگاه آنلاین زردآلو
+        </small>
+
+        <h1>
+            با زردآلو<br>
+            <strong>
+                خرید راحته!
+            </strong>
+        </h1>
+
+        <p>
+            یک فروشگاه ساده، فارسی و دوست‌داشتنی
+            برای خرید، مشاهده کالاها و ارتباط با فروشنده.
+        </p>
+
+        <a
+            class="btn"
+            href="#market"
+        >
+            ورود به بازار
+        </a>
+
+    </div>
+
+
+    <div class="fruit">
+        🍑
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     MARKET
+===================================================== -->
+
+<section id="market">
+
+    <div class="title">
+
+        <div>
+
+            <small>
+                فروشگاه
+            </small>
+
+            <h2>
+                بازار زردآلو
+            </h2>
+
+        </div>
+
+
+        <input
+            id="search"
+            type="text"
+            placeholder="جستجوی کالا..."
+        >
+
+    </div>
+
+
+    <div
+        id="products"
+        class="grid"
+    ></div>
+
+</section>
+
+
+<!-- =====================================================
+     GIFT PRODUCTS
+===================================================== -->
+
+<section
+    id="gifts"
+    class="gift-section"
+>
+
+    <div class="title">
+
+        <div>
+
+            <small>
+                🎁 پیشنهاد ویژه
+            </small>
+
+            <h2>
+                کالاهای دارای اشانتیون
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="giftProducts"
+        class="grid"
+    ></div>
+
+
+    <p
+        id="noGifts"
+        class="empty-message hidden"
+    >
+        در حال حاضر کالایی با اشانتیون
+        ثبت نشده است.
+    </p>
+
+</section>
+
+
+<!-- =====================================================
+     ABOUT
+===================================================== -->
+
+<section
+    id="about"
+    class="cards"
+>
+
+    <article>
+
+        <span>
+            🛍️
+        </span>
+
+        <h3>
+            بازار کالا
+        </h3>
+
+        <p>
+            کالاهای ثبت‌شده را مشاهده و
+            جزئیات فروشنده را بررسی کنید.
+        </p>
+
+    </article>
+
+
+    <article>
+
+        <span>
+            🛒
+        </span>
+
+        <h3>
+            سبد خرید
+        </h3>
+
+        <p>
+            کالاهای دلخواه را به سبد اضافه
+            و مجموع قیمت را ببینید.
+        </p>
+
+    </article>
+
+
+    <article>
+
+        <span>
+            💬
+        </span>
+
+        <h3>
+            ارتباط با فروشنده
+        </h3>
+
+        <p>
+            اطلاعات فروشنده کالاهای ثبت‌شده
+            در اختیار خریدار قرار می‌گیرد.
+        </p>
+
+    </article>
+
+
+    <article>
+
+        <span>
+            🎁
+        </span>
+
+        <h3>
+            اشانتیون
+        </h3>
+
+        <p>
+            کالاهایی که فروشنده برای آن‌ها
+            اشانتیون فعال کرده باشد در بخش
+            ویژه نمایش داده می‌شوند.
+        </p>
+
+    </article>
+
+</section>
+
+
+<!-- =====================================================
+     CREATORS
+===================================================== -->
+
+<section id="creators">
+
+    <div class="creators-section">
+
+        <h2>
+            👨‍💻 سازندگان زردآلو
+        </h2>
+
+
+        <div class="creator-main">
+
+            <h3>
+                سازنده:
+            </h3>
+
+            <p>
+                عرفان ریاحی
+            </p>
+
+        </div>
+
+
+        <div class="thanks-box">
+
+            <h3>
+                💐 با تشکر از:
+            </h3>
+
+            <p>
+                برنامه گودوت
+            </p>
+
+            <p>
+                امیر عباس حیدری
+            </p>
+
+            <p>
+                ملیحه همت گیر
+            </p>
+
+            <p>
+                شهاب الدین ریاحی
+            </p>
+
+        </div>
+
+
+        <div class="godot-note">
+
+            <strong>
+                ⚠️ لطفا برای اجرای برنامه
+                گودوت را نصب داشته باشید!
+            </strong>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     REPORT
+===================================================== -->
+
+<section
+    id="report"
+    class="report"
+>
+
+    <small>
+        معرفی رسمی
+    </small>
+
+    <h2>
+        گزارش رسمی پروژه «زردآلو»
+    </h2>
+
+
+    <p>
+
+        تاریخ گزارش:
+        ۲۵ سپتامبر ۲۰۲۶
+
+        <br>
+
+        نام پروژه:
+        زردآلو
+
+        <br>
+
+        نوع پروژه:
+        فروشگاه / بازار آنلاین
+
+        <br>
+
+        بستر توسعه:
+        Godot 4.x
+
+        <br>
+
+        پایگاه داده و خدمات ابری:
+        Supabase
+
+    </p>
+
+
+    <br>
+
+
+    <p>
+
+        «زردآلو» یک پروژهٔ فروشگاهی است
+        که با هدف فراهم‌کردن محیطی ساده
+        برای ثبت کالا، مشاهدهٔ کالاها،
+        خرید و ارتباط میان خریدار و
+        فروشنده توسعه داده شده است.
+
+    </p>
+
+
+    <br>
+
+
+    <p>
+
+        رابط کاربری پروژه به زبان فارسی
+        طراحی شده و تمرکز آن بر ساده‌بودن
+        استفاده و دسترسی سریع به بخش‌های
+        مختلف است.
+
+    </p>
+
+
+    <br>
+
+
+    <p>
+
+        در بخش بازار، کاربر می‌تواند
+        کالاهای ثبت‌شده را مشاهده کند.
+
+    </p>
+
+
+    <br>
+
+
+    <p>
+
+        یکی از قابلیت‌های پروژه،
+        نمایش کالاهای دارای اشانتیون است.
+
+        اگر مقدار
+        <b>is_gift</b>
+        یک کالا فعال باشد،
+        آن کالا در بخش
+        «کالاهای دارای اشانتیون»
+        نیز نمایش داده می‌شود.
+
+    </p>
+
+</section>
+
+
+<!-- =====================================================
+     CONTACT
+===================================================== -->
+
+<section
+    id="contact"
+    class="contact"
+>
+
+    <div>
+
+        <small>
+            پشتیبانی
+        </small>
+
+        <h2>
+            ارتباط با ما
+        </h2>
+
+        <p>
+            پیام خود را برای تیم زردآلو بنویسید.
+        </p>
+
+    </div>
+
+
+    <div class="contact-box">
+
+        <input
+            id="contactName"
+            type="text"
+            placeholder="نام"
+        >
+
+
+        <input
+            id="contactEmail"
+            type="email"
+            placeholder="ایمیل"
+        >
+
+
+        <textarea
+            id="contactMessage"
+            placeholder="پیام شما..."
+        ></textarea>
+
+
+        <button
+            class="btn"
+            type="button"
+            onclick="sendContact()"
+        >
+            ارسال پیام
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     CART
+===================================================== -->
+
+<section id="cart">
+
+    <div class="title">
+
+        <div>
+
+            <small>
+                خرید
+            </small>
+
+            <h2>
+                سبد خرید
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="cartItems"
+    ></div>
+
+
+    <div
+        id="total"
+        class="total"
+    >
+        مجموع: ۰ تومان
+    </div>
+
+</section>
+
+
+</main>
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<footer>
+
+    <p>
+        <strong>
+            زردآلو
+        </strong>
+
+        |
+
+        با زردآلو خرید راحته!
+    </p>
+
+
+    <p>
+        © ۲۰۲۶ پروژه زردآلو
+    </p>
+
+</footer>
+
+
+<script>
+
+/* =====================================================
+   SUPABASE
+===================================================== */
+
+const SUPABASE_URL =
+    "https://ovqldknqpaiczrddcrxp.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_VDZ_tgoMgYRI7K419ieDKw_y29xeXA2";
+
+const PRODUCTS_FUNCTION_URL =
+    SUPABASE_URL +
+    "/functions/v1/products";
+
+
+/* =====================================================
+   GLOBAL
+===================================================== */
+
+let products = [];
+
+let cart = JSON.parse(
+    localStorage.getItem(
+        "zardaloo_cart"
+    ) || "[]"
+);
+
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHtml(value) {
+
+    return String(value)
+
+        .replace(/&/g, "&amp;")
+
+        .replace(/</g, "&lt;")
+
+        .replace(/>/g, "&gt;")
+
+        .replace(/"/g, "&quot;")
+
+        .replace(/'/g, "&#039;");
+}
+
+
+/* =====================================================
+   FORMAT PRICE
+===================================================== */
+
+function formatPrice(value) {
+
+    const number =
+        Number(value);
+
+    if (Number.isNaN(number)) {
+        return "۰";
+    }
+
+    return number.toLocaleString(
+        "fa-IR"
+    );
+}
+
+
+/* =====================================================
+   IS GIFT
+===================================================== */
+
+function isGift(product) {
+
+    return (
+        product.is_gift === true ||
+        product.is_gift === "true" ||
+        product.is_gift === 1 ||
+        product.is_gift === "1"
+    );
+}
+
+
+/* =====================================================
+   LOAD PRODUCTS
+===================================================== */
+
+async function loadProducts() {
+
+    const container =
+        document.getElementById(
+            "products"
+        );
+
+
+    container.innerHTML = `
+        <p class="empty-message">
+            در حال دریافت کالاها...
+        </p>
+    `;
+
+
+    try {
+
+        const response =
+            await fetch(
+                PRODUCTS_FUNCTION_URL,
+                {
+                    method: "GET",
+
+                    headers: {
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY
+                    }
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "HTTP " +
+                response.status
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        if (Array.isArray(data)) {
+
+            products = data;
+
+        }
+
+        else if (
+            data &&
+            Array.isArray(data.products)
+        ) {
+
+            products =
+                data.products;
+
+        }
+
+        else {
+
+            products = [];
+
+        }
+
+
+        renderProducts(
+            products
+        );
+
+
+        renderGiftProducts(
+            products
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "خطا در دریافت کالاها:",
+            error
+        );
+
+
+        container.innerHTML = `
+            <p class="empty-message">
+                دریافت کالاها با خطا مواجه شد.
+            </p>
+        `;
+
+
+        renderGiftProducts([]);
+
+    }
+
+}
+
+
+/* =====================================================
+   NORMAL PRODUCTS
+===================================================== */
+
+function renderProducts(list) {
+
+    const container =
+        document.getElementById(
+            "products"
+        );
+
+
+    container.innerHTML = "";
+
+
+    if (
+        !list ||
+        list.length === 0
+    ) {
+
+        container.innerHTML = `
+            <p class="empty-message">
+                کالایی برای نمایش وجود ندارد.
+            </p>
+        `;
+
+        return;
+    }
+
+
+    list.forEach(
+        product => {
+
+            const card =
+                createProductCard(
+                    product,
+                    false
+                );
+
+            container.appendChild(
+                card
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   GIFT PRODUCTS
+===================================================== */
+
+function renderGiftProducts(list) {
+
+    const container =
+        document.getElementById(
+            "giftProducts"
+        );
+
+
+    const empty =
+        document.getElementById(
+            "noGifts"
+        );
+
+
+    if (
+        !container ||
+        !empty
+    ) {
+        return;
+    }
+
+
+    container.innerHTML = "";
+
+
+    const giftProducts =
+        (list || []).filter(
+            product =>
+                isGift(product)
+        );
+
+
+    if (
+        giftProducts.length === 0
+    ) {
+
+        empty.classList.remove(
+            "hidden"
+        );
+
+        return;
+    }
+
+
+    empty.classList.add(
+        "hidden"
+    );
+
+
+    giftProducts.forEach(
+        product => {
+
+            const card =
+                createProductCard(
+                    product,
+                    true
+                );
+
+            container.appendChild(
+                card
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   CREATE PRODUCT CARD
+===================================================== */
+
+function createProductCard(
+    product,
+    gift
+) {
+
+    const card =
+        document.createElement(
+            "article"
+        );
+
+
+    card.className =
+        "product-card" +
+        (
+            gift
+                ? " gift-card"
+                : ""
+        );
+
+
+    const name =
+        product.name ||
+        product.title ||
+        product.product_name ||
+        "کالا";
+
+
+    const price =
+        product.price !== undefined &&
+        product.price !== null
+            ? formatPrice(
+                product.price
+            )
+            : "بدون قیمت";
+
+
+    const seller =
+        product.seller ||
+        product.seller_name ||
+        "فروشنده نامشخص";
+
+
+    const zardalooNumber =
+        product.zardaloo_number ||
+        product.seller_number ||
+        "-";
+
+
+    const phone =
+        product.phone ||
+        product.seller_phone ||
+        "-";
+
+
+    card.innerHTML = `
+
+        ${
+            gift
+            ?
+            `
+            <div class="gift-badge">
+                🎁 اشانتیون فعال
+            </div>
+            `
+            :
+            ""
+        }
+
+
+        <div class="product-image">
+            🍑
+        </div>
+
+
+        <h3>
+            ${escapeHtml(name)}
+        </h3>
+
+
+        <p class="price">
+            ${price} تومان
+        </p>
+
+
+        <p class="seller">
+            فروشنده:
+            ${escapeHtml(seller)}
+        </p>
+
+
+        <p>
+            شماره زردآلو:
+            ${escapeHtml(
+                zardalooNumber
+            )}
+        </p>
+
+
+        <p>
+            تماس:
+            ${escapeHtml(phone)}
+        </p>
+
+
+        <br>
+
+
+        <button
+            class="btn"
+            type="button"
+        >
+            مشاهده کالا
+        </button>
+
+    `;
+
+
+    const button =
+        card.querySelector(
+            "button"
+        );
+
+
+    button.addEventListener(
+        "click",
+        function() {
+
+            showProductDetails(
+                product
+            );
+
+        }
+    );
+
+
+    return card;
+}
+
+
+/* =====================================================
+   PRODUCT DETAILS
+===================================================== */
+
+function showProductDetails(
+    product
+) {
+
+    const name =
+        product.name ||
+        product.title ||
+        product.product_name ||
+        "کالا";
+
+
+    const price =
+        product.price !== undefined &&
+        product.price !== null
+            ? formatPrice(
+                product.price
+            )
+            : "بدون قیمت";
+
+
+    const seller =
+        product.seller ||
+        product.seller_name ||
+        "فروشنده نامشخص";
+
+
+    const number =
+        product.zardaloo_number ||
+        product.seller_number ||
+        "-";
+
+
+    const phone =
+        product.phone ||
+        product.seller_phone ||
+        "-";
+
+
+    let message =
+
+        "نام کالا: " +
+        name +
+
+        "\n\n" +
+
+        "قیمت: " +
+        price +
+        " تومان" +
+
+        "\n\n" +
+
+        "فروشنده: " +
+        seller +
+
+        "\n\n" +
+
+        "شماره زردآلو: " +
+        number +
+
+        "\n\n" +
+
+        "شماره تماس: " +
+        phone;
+
+
+    if (isGift(product)) {
+
+        message +=
+            "\n\n🎁 اشانتیون فعال است.";
+
+    }
+
+
+    alert(message);
+
+
+    addToCart(
+        product
+    );
+
+}
+
+
+/* =====================================================
+   ADD TO CART
+===================================================== */
+
+function addToCart(
+    product
+) {
+
+    cart.push(
+        product
+    );
+
+
+    localStorage.setItem(
+        "zardaloo_cart",
+        JSON.stringify(cart)
+    );
+
+
+    updateCartCount();
+
+    renderCart();
+
+
+    alert(
+        "کالا به سبد خرید اضافه شد."
+    );
+
+}
+
+
+/* =====================================================
+   REMOVE CART
+===================================================== */
+
+function removeFromCart(
+    index
+) {
+
+    cart.splice(
+        index,
+        1
+    );
+
+
+    localStorage.setItem(
+        "zardaloo_cart",
+        JSON.stringify(cart)
+    );
+
+
+    updateCartCount();
+
+    renderCart();
+
+}
+
+
+/* =====================================================
+   CART COUNT
+===================================================== */
+
+function updateCartCount() {
+
+    const count =
+        document.getElementById(
+            "count"
+        );
+
+
+    count.textContent =
+        cart.length.toLocaleString(
+            "fa-IR"
+        );
+
+}
+
+
+/* =====================================================
+   RENDER CART
+===================================================== */
+
+function renderCart() {
+
+    const container =
+        document.getElementById(
+            "cartItems"
+        );
+
+
+    const total =
+        document.getElementById(
+            "total"
+        );
+
+
+    container.innerHTML = "";
+
+
+    if (
+        cart.length === 0
+    ) {
+
+        container.innerHTML = `
+            <p class="empty-message">
+                سبد خرید خالی است.
+            </p>
+        `;
+
+
+        total.textContent =
+            "مجموع: ۰ تومان";
+
+
+        return;
+    }
+
+
+    let sum = 0;
+
+
+    cart.forEach(
+        (product, index) => {
+
+            const price =
+                Number(
+                    product.price
+                ) || 0;
+
+
+            sum += price;
+
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+
+            item.className =
+                "cart-item";
+
+
+            item.innerHTML = `
+
+                <div>
+
+                    <h3>
+                        ${escapeHtml(
+                            product.name ||
+                            product.title ||
+                            product.product_name ||
+                            "کالا"
+                        )}
+                    </h3>
+
+
+                    <p>
+                        ${formatPrice(
+                            price
+                        )}
+                        تومان
+                    </p>
+
+                </div>
+
+
+                <button
+                    class="btn"
+                    type="button"
+                >
+                    حذف
+                </button>
+
+            `;
+
+
+            item
+                .querySelector(
+                    "button"
+                )
+                .addEventListener(
+                    "click",
+                    function() {
+
+                        removeFromCart(
+                            index
+                        );
+
+                    }
+                );
+
+
+            container.appendChild(
+                item
+            );
+
+        }
+    );
+
+
+    total.textContent =
+        "مجموع: " +
+        formatPrice(sum) +
+        " تومان";
+
+}
+
+
+/* =====================================================
+   SEARCH
+===================================================== */
+
+document
+    .getElementById(
+        "search"
+    )
+    .addEventListener(
+        "input",
+        function(event) {
+
+            const query =
+                event.target.value
+                    .trim()
+                    .toLowerCase();
+
+
+            if (!query) {
+
+                renderProducts(
+                    products
+                );
+
+                return;
+            }
+
+
+            const filtered =
+                products.filter(
+                    product => {
+
+                        const name =
+                            String(
+                                product.name ||
+                                product.title ||
+                                product.product_name ||
+                                ""
+                            ).toLowerCase();
+
+
+                        const seller =
+                            String(
+                                product.seller ||
+                                product.seller_name ||
+                                ""
+                            ).toLowerCase();
+
+
+                        return (
+                            name.includes(
+                                query
+                            ) ||
+                            seller.includes(
+                                query
+                            )
+                        );
+
+                    }
+                );
+
+
+            renderProducts(
+                filtered
+            );
+
+        }
+    );
+
+
+/* =====================================================
+   CONTACT
+===================================================== */
+
+function sendContact() {
+
+    const name =
+        document.getElementById(
+            "contactName"
+        ).value.trim();
+
+
+    const email =
+        document.getElementById(
+            "contactEmail"
+        ).value.trim();
+
+
+    const message =
+        document.getElementById(
+            "contactMessage"
+        ).value.trim();
+
+
+    if (
+        !name ||
+        !message
+    ) {
+
+        alert(
+            "لطفاً نام و پیام را وارد کنید."
+        );
+
+        return;
+    }
+
+
+    console.log({
+        name: name,
+        email: email,
+        message: message
+    });
+
+
+    alert(
+        "پیام شما ثبت شد."
+    );
+
+
+    document.getElementById(
+        "contactName"
+    ).value = "";
+
+
+    document.getElementById(
+        "contactEmail"
+    ).value = "";
+
+
+    document.getElementById(
+        "contactMessage"
+    ).value = "";
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+updateCartCount();
+
+renderCart();
+
+loadProducts();
+
+</script>
+
+</body>
+</html>
