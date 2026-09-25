@@ -37,8 +37,8 @@ const supabaseClient = window.supabase.createClient(
    ========================================================= */
 
 const ADMIN_EMAIL =
-    "YOUR_ADMIN_EMAIL@example.com";
-
+    erfancity2014@gmail.com
+   
 
 /* ---------------- DATA ---------------- */
 
