@@ -10,8 +10,26 @@ const PRODUCTS_FUNCTION_URL =
 const CART_KEY =
     "zardaloo_cart";
 
+const THEME_KEY =
+    "zardaloo_theme";
+
+const DISCOUNT_KEY =
+    "zardaloo_discounts";
+
+const ADMIN_PASSWORD =
+    "ZardalooAdmin2026";
+
+
 let products = [];
-let cart = loadCart();
+
+let cart =
+    loadCart();
+
+let discounts =
+    loadDiscounts();
+
+let activeDiscount =
+    null;
 
 
 /* =========================
@@ -20,30 +38,48 @@ let cart = loadCart();
 
 function showPage(pageId) {
 
-    document.querySelectorAll(".page").forEach(page => {
-        page.classList.add("hidden");
-    });
+    document.querySelectorAll(".page")
+        .forEach(page => {
+
+            page.classList.add("hidden");
+
+        });
+
 
     const page =
         document.getElementById(pageId);
 
+
     if (page) {
+
         page.classList.remove("hidden");
+
     }
+
 
     window.scrollTo({
         top: 0,
         behavior: "smooth"
     });
 
+
     if (pageId === "cart") {
+
         renderCart();
+
+    }
+
+
+    if (pageId === "management") {
+
+        refreshAdmin();
+
     }
 }
 
 
 /* =========================
-   SAFE HTML
+   HTML SECURITY
 ========================= */
 
 function escapeHtml(value) {
@@ -54,6 +90,7 @@ function escapeHtml(value) {
     ) {
         return "";
     }
+
 
     return String(value)
         .replace(/&/g, "&amp;")
@@ -107,14 +144,14 @@ function productPrice(product) {
         product?.unit_price ??
         0;
 
+
     const number =
         Number(value);
 
-    if (!Number.isFinite(number)) {
-        return 0;
-    }
 
-    return number;
+    return Number.isFinite(number)
+        ? number
+        : 0;
 }
 
 
@@ -185,6 +222,7 @@ function productCard(product) {
 
 
     return `
+
         <article class="product">
 
             ${
@@ -197,9 +235,11 @@ function productCard(product) {
                     : ""
             }
 
+
             <h3>
                 ${escapeHtml(name)}
             </h3>
+
 
             <p>
                 ${escapeHtml(
@@ -209,9 +249,11 @@ function productCard(product) {
                 )}
             </p>
 
+
             <p class="product-price">
                 💰 ${formatPrice(price)}
             </p>
+
 
             <div class="seller-info">
 
@@ -225,6 +267,7 @@ function productCard(product) {
 
                 </div>
 
+
                 <div class="seller-phone">
 
                     📞 شماره تماس:
@@ -237,6 +280,7 @@ function productCard(product) {
 
             </div>
 
+
             <button
                 onclick='addToCart(${JSON.stringify(id)})'
             >
@@ -244,12 +288,13 @@ function productCard(product) {
             </button>
 
         </article>
+
     `;
 }
 
 
 /* =========================
-   RENDER PRODUCTS
+   PRODUCTS
 ========================= */
 
 function renderProducts(list) {
@@ -257,9 +302,11 @@ function renderProducts(list) {
     const container =
         document.getElementById("products");
 
+
     if (!container) {
         return;
     }
+
 
     if (!list.length) {
 
@@ -272,26 +319,26 @@ function renderProducts(list) {
         return;
     }
 
+
     container.innerHTML =
         list.map(productCard).join("");
 }
 
-
-/* =========================
-   RENDER GIFTS
-========================= */
 
 function renderGifts(list) {
 
     const container =
         document.getElementById("giftProducts");
 
+
     if (!container) {
         return;
     }
 
+
     const gifts =
         list.filter(isGift);
+
 
     if (!gifts.length) {
 
@@ -304,6 +351,7 @@ function renderGifts(list) {
 
         return;
     }
+
 
     container.innerHTML =
         gifts.map(productCard).join("");
@@ -319,10 +367,11 @@ function filterProducts() {
     const input =
         document.getElementById("searchInput");
 
+
     const query =
         input?.value
             ?.trim()
-            .toLowerCase() || "";
+            ?.toLowerCase() || "";
 
 
     if (!query) {
@@ -340,12 +389,14 @@ function filterProducts() {
                 productName(product)
                     .toLowerCase();
 
+
             const description =
                 String(
                     product?.description ||
                     product?.details ||
                     ""
                 ).toLowerCase();
+
 
             const seller =
                 String(
@@ -358,6 +409,7 @@ function filterProducts() {
                 description.includes(query) ||
                 seller.includes(query)
             );
+
         });
 
 
@@ -373,6 +425,7 @@ async function loadProducts() {
 
     const productsContainer =
         document.getElementById("products");
+
 
     const giftsContainer =
         document.getElementById("giftProducts");
@@ -438,6 +491,7 @@ async function loadProducts() {
         else {
 
             products = [];
+
         }
 
 
@@ -458,14 +512,9 @@ async function loadProducts() {
 
         const message = `
             <div class="empty">
-
-                دریافت کالاها با مشکل
-                مواجه شد.
-
+                دریافت کالاها با مشکل مواجه شد.
                 <br>
-
                 لطفاً دوباره تلاش کنید.
-
             </div>
         `;
 
@@ -474,6 +523,7 @@ async function loadProducts() {
 
             productsContainer.innerHTML =
                 message;
+
         }
 
 
@@ -481,7 +531,148 @@ async function loadProducts() {
 
             giftsContainer.innerHTML =
                 message;
+
         }
+
+    }
+}
+
+
+/* =========================
+   PRODUCT REGISTRATION
+========================= */
+
+async function registerProduct(event) {
+
+    event.preventDefault();
+
+
+    const message =
+        document.getElementById(
+            "productFormMessage"
+        );
+
+
+    const product = {
+
+        name:
+            document.getElementById(
+                "productName"
+            ).value.trim(),
+
+        description:
+            document.getElementById(
+                "productDescription"
+            ).value.trim(),
+
+        price:
+            Number(
+                document.getElementById(
+                    "productPrice"
+                ).value
+            ),
+
+        seller_name:
+            document.getElementById(
+                "sellerName"
+            ).value.trim(),
+
+        seller_phone:
+            document.getElementById(
+                "sellerPhone"
+            ).value.trim(),
+
+        is_gift:
+            document.getElementById(
+                "isGift"
+            ).checked
+    };
+
+
+    if (
+        !product.name ||
+        !product.description ||
+        !product.seller_name ||
+        !product.seller_phone ||
+        !Number.isFinite(product.price)
+    ) {
+
+        message.textContent =
+            "لطفاً همه اطلاعات را کامل وارد کنید.";
+
+        return;
+    }
+
+
+    message.textContent =
+        "در حال ثبت کالا...";
+
+
+    try {
+
+        const response =
+            await fetch(
+                PRODUCTS_FUNCTION_URL,
+                {
+                    method: "POST",
+
+                    headers: {
+
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY,
+
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(product)
+                }
+            );
+
+
+        const data =
+            await response.json()
+                .catch(() => null);
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data?.error ||
+                data?.message ||
+                "خطا در ثبت کالا"
+            );
+
+        }
+
+
+        message.textContent =
+            "✅ کالا با موفقیت ارسال شد.";
+
+
+        document
+            .getElementById("productForm")
+            .reset();
+
+
+        await loadProducts();
+
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+
+        message.textContent =
+            "❌ ثبت کالا انجام نشد: " +
+            error.message;
     }
 }
 
@@ -495,7 +686,9 @@ function loadCart() {
     try {
 
         const saved =
-            localStorage.getItem(CART_KEY);
+            localStorage.getItem(
+                CART_KEY
+            );
 
 
         if (!saved) {
@@ -510,7 +703,6 @@ function loadCart() {
         return Array.isArray(parsed)
             ? parsed
             : [];
-
 
     }
 
@@ -546,6 +738,11 @@ function addToCart(id) {
 
 
     if (!product) {
+
+        alert(
+            "کالا پیدا نشد."
+        );
+
         return;
     }
 
@@ -568,7 +765,8 @@ function addToCart(id) {
 
         cart.push({
 
-            id: stringId,
+            id:
+                stringId,
 
             name:
                 productName(product),
@@ -576,8 +774,11 @@ function addToCart(id) {
             price:
                 productPrice(product),
 
-            quantity: 1
+            quantity:
+                1
+
         });
+
     }
 
 
@@ -587,6 +788,9 @@ function addToCart(id) {
     alert(
         "کالا به سبد خرید اضافه شد! 🛒"
     );
+
+
+    renderCart();
 }
 
 
@@ -610,12 +814,186 @@ function removeFromCart(id) {
 }
 
 
+/* =========================
+   DISCOUNTS
+========================= */
+
+function loadDiscounts() {
+
+    try {
+
+        const saved =
+            localStorage.getItem(
+                DISCOUNT_KEY
+            );
+
+
+        if (!saved) {
+
+            return [
+                {
+                    code: "ZARDALOO10",
+                    percent: 10,
+                    active: true
+                },
+
+                {
+                    code: "ZARDALOO20",
+                    percent: 20,
+                    active: true
+                }
+            ];
+
+        }
+
+
+        const parsed =
+            JSON.parse(saved);
+
+
+        return Array.isArray(parsed)
+            ? parsed
+            : [];
+
+    }
+
+    catch {
+
+        return [];
+    }
+}
+
+
+function saveDiscounts() {
+
+    localStorage.setItem(
+        DISCOUNT_KEY,
+        JSON.stringify(discounts)
+    );
+}
+
+
+function findDiscount(code) {
+
+    const normalized =
+        String(code || "")
+            .trim()
+            .toUpperCase();
+
+
+    return discounts.find(
+        discount =>
+            String(
+                discount.code
+            ).toUpperCase() ===
+            normalized &&
+            discount.active !== false
+    );
+}
+
+
+function applyDiscount() {
+
+    const input =
+        document.getElementById(
+            "discountInput"
+        );
+
+
+    const message =
+        document.getElementById(
+            "discountMessage"
+        );
+
+
+    const discount =
+        findDiscount(
+            input.value
+        );
+
+
+    if (!discount) {
+
+        message.textContent =
+            "❌ کد تخفیف معتبر نیست.";
+
+        return;
+    }
+
+
+    activeDiscount =
+        discount;
+
+
+    message.textContent =
+        "✅ کد تخفیف " +
+        discount.percent +
+        "٪ اعمال شد.";
+
+}
+
+
+function applyCartDiscount() {
+
+    const input =
+        document.getElementById(
+            "cartDiscountInput"
+        );
+
+
+    const result =
+        document.getElementById(
+            "discountResult"
+        );
+
+
+    const discount =
+        findDiscount(
+            input.value
+        );
+
+
+    if (!discount) {
+
+        activeDiscount =
+            null;
+
+
+        result.textContent =
+            "❌ کد تخفیف معتبر نیست.";
+
+
+        renderCart();
+
+        return;
+    }
+
+
+    activeDiscount =
+        discount;
+
+
+    result.textContent =
+        "✅ " +
+        discount.percent +
+        "٪ تخفیف اعمال شد.";
+
+
+    renderCart();
+}
+
+
+/* =========================
+   CART RENDER
+========================= */
+
 function renderCart() {
 
     const container =
         document.getElementById(
             "cartItems"
         );
+
 
     const totalElement =
         document.getElementById(
@@ -627,6 +1005,7 @@ function renderCart() {
         !container ||
         !totalElement
     ) {
+
         return;
     }
 
@@ -648,7 +1027,8 @@ function renderCart() {
     }
 
 
-    let total = 0;
+    let subtotal =
+        0;
 
 
     container.innerHTML =
@@ -659,10 +1039,12 @@ function renderCart() {
                 Number(item.quantity || 0);
 
 
-            total += itemTotal;
+            subtotal +=
+                itemTotal;
 
 
             return `
+
                 <div class="cart-item">
 
                     <div>
@@ -685,13 +1067,14 @@ function renderCart() {
                         </div>
 
                         <div>
+                            قیمت واحد:
                             ${formatPrice(
                                 item.price
                             )}
                         </div>
 
                         <div>
-                            جمع این کالا:
+                            جمع کالا:
                             ${formatPrice(
                                 itemTotal
                             )}
@@ -707,14 +1090,426 @@ function renderCart() {
                     </button>
 
                 </div>
+
             `;
 
         }).join("");
 
 
-    totalElement.textContent =
-        "مجموع: " +
-        formatPrice(total);
+    let discountAmount =
+        0;
+
+
+    if (activeDiscount) {
+
+        discountAmount =
+            Math.round(
+                subtotal *
+                Number(
+                    activeDiscount.percent
+                ) /
+                100
+            );
+
+    }
+
+
+    const finalTotal =
+        Math.max(
+            0,
+            subtotal -
+            discountAmount
+        );
+
+
+    totalElement.innerHTML = `
+
+        <div>
+            مبلغ کالاها:
+            ${formatPrice(subtotal)}
+        </div>
+
+        ${
+            discountAmount > 0
+                ? `
+                    <div>
+                        تخفیف:
+                        ${formatPrice(
+                            discountAmount
+                        )}
+                    </div>
+                `
+                : ""
+        }
+
+        <div>
+            مبلغ نهایی:
+            ${formatPrice(finalTotal)}
+        </div>
+
+    `;
+}
+
+
+/* =========================
+   THEME
+========================= */
+
+function loadTheme() {
+
+    const saved =
+        localStorage.getItem(
+            THEME_KEY
+        );
+
+
+    if (saved === "dark") {
+
+        document.body.classList.add(
+            "dark"
+        );
+
+    }
+
+
+    updateThemeButton();
+}
+
+
+function toggleTheme() {
+
+    document.body.classList.toggle(
+        "dark"
+    );
+
+
+    const isDark =
+        document.body.classList.contains(
+            "dark"
+        );
+
+
+    localStorage.setItem(
+        THEME_KEY,
+        isDark
+            ? "dark"
+            : "light"
+    );
+
+
+    updateThemeButton();
+}
+
+
+function updateThemeButton() {
+
+    const button =
+        document.getElementById(
+            "themeButton"
+        );
+
+
+    if (!button) {
+        return;
+    }
+
+
+    const isDark =
+        document.body.classList.contains(
+            "dark"
+        );
+
+
+    button.textContent =
+        isDark
+            ? "☀️"
+            : "🌙";
+
+
+    button.title =
+        isDark
+            ? "حالت روشن"
+            : "حالت تاریک";
+}
+
+
+/* =========================
+   ADMIN
+========================= */
+
+function loginAdmin() {
+
+    const input =
+        document.getElementById(
+            "adminPassword"
+        );
+
+
+    const message =
+        document.getElementById(
+            "adminMessage"
+        );
+
+
+    if (
+        input.value ===
+        ADMIN_PASSWORD
+    ) {
+
+        sessionStorage.setItem(
+            "zardaloo_admin",
+            "true"
+        );
+
+
+        document
+            .getElementById(
+                "adminLogin"
+            )
+            .classList.add(
+                "hidden"
+            );
+
+
+        document
+            .getElementById(
+                "adminPanel"
+            )
+            .classList.remove(
+                "hidden"
+            );
+
+
+        refreshAdmin();
+
+
+    }
+
+    else {
+
+        message.textContent =
+            "❌ رمز مدیریت اشتباه است.";
+
+    }
+}
+
+
+function logoutAdmin() {
+
+    sessionStorage.removeItem(
+        "zardaloo_admin"
+    );
+
+
+    document
+        .getElementById(
+            "adminLogin"
+        )
+        .classList.remove(
+            "hidden"
+        );
+
+
+    document
+        .getElementById(
+            "adminPanel"
+        )
+        .classList.add(
+            "hidden"
+        );
+
+
+    document
+        .getElementById(
+            "adminPassword"
+        ).value = "";
+}
+
+
+function isAdmin() {
+
+    return (
+        sessionStorage.getItem(
+            "zardaloo_admin"
+        ) === "true"
+    );
+}
+
+
+function refreshAdmin() {
+
+    if (!isAdmin()) {
+
+        return;
+    }
+
+
+    document
+        .getElementById(
+            "adminLogin"
+        )
+        .classList.add(
+            "hidden"
+        );
+
+
+    document
+        .getElementById(
+            "adminPanel"
+        )
+        .classList.remove(
+            "hidden"
+        );
+
+
+    const productCount =
+        products.length;
+
+
+    const giftCount =
+        products.filter(
+            isGift
+        ).length;
+
+
+    const cartCount =
+        cart.reduce(
+            (sum, item) =>
+                sum +
+                Number(
+                    item.quantity || 0
+                ),
+            0
+        );
+
+
+    document
+        .getElementById(
+            "adminProductCount"
+        )
+        .textContent =
+        productCount.toLocaleString(
+            "fa-IR"
+        );
+
+
+    document
+        .getElementById(
+            "adminGiftCount"
+        )
+        .textContent =
+        giftCount.toLocaleString(
+            "fa-IR"
+        );
+
+
+    document
+        .getElementById(
+            "adminCartCount"
+        )
+        .textContent =
+        cartCount.toLocaleString(
+            "fa-IR"
+        );
+
+
+    document
+        .getElementById(
+            "adminDiscountCount"
+        )
+        .textContent =
+        discounts.length
+            .toLocaleString(
+                "fa-IR"
+            );
+
+
+    renderAdminProducts();
+}
+
+
+function renderAdminProducts() {
+
+    const container =
+        document.getElementById(
+            "adminProductsList"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    if (!products.length) {
+
+        container.innerHTML =
+            "<p>کالایی وجود ندارد.</p>";
+
+        return;
+    }
+
+
+    container.innerHTML =
+        products.map(product => {
+
+            return `
+
+                <div class="admin-product">
+
+                    <div>
+
+                        <strong>
+                            ${escapeHtml(
+                                productName(product)
+                            )}
+                        </strong>
+
+                        <br>
+
+                        فروشنده:
+                        ${escapeHtml(
+                            sellerName(product)
+                        )}
+
+                    </div>
+
+
+                    <div>
+
+                        ${formatPrice(
+                            productPrice(product)
+                        )}
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }).join("");
+}
+
+
+/* =========================
+   ADMIN CART CLEAR
+========================= */
+
+function clearCartFromAdmin() {
+
+    cart = [];
+
+    saveCart();
+
+    activeDiscount = null;
+
+    renderCart();
+
+    refreshAdmin();
+
+    alert(
+        "سبد خرید محلی پاک شد."
+    );
 }
 
 
@@ -726,11 +1521,36 @@ document.addEventListener(
     "DOMContentLoaded",
     () => {
 
+        loadTheme();
+
         showPage("home");
 
         loadProducts();
 
         renderCart();
+
+
+        const productForm =
+            document.getElementById(
+                "productForm"
+            );
+
+
+        if (productForm) {
+
+            productForm.addEventListener(
+                "submit",
+                registerProduct
+            );
+
+        }
+
+
+        if (isAdmin()) {
+
+            refreshAdmin();
+
+        }
 
     }
 );
