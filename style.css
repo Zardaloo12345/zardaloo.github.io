@@ -7,6 +7,7 @@
 :root {
     --orange: #f59e0b;
     --orange-dark: #d97706;
+    --yellow: #facc15;
     --cream: #fffaf0;
     --white: #ffffff;
     --text: #292524;
@@ -23,6 +24,7 @@ body {
 
     background: var(--cream);
     color: var(--text);
+
     line-height: 1.8;
 }
 
@@ -32,7 +34,9 @@ input {
 }
 
 
-/* HEADER */
+/* =========================
+   HEADER
+========================= */
 
 .header {
     position: sticky;
@@ -40,6 +44,7 @@ input {
     z-index: 1000;
 
     background: rgba(255, 255, 255, 0.96);
+
     backdrop-filter: blur(10px);
 
     border-bottom: 1px solid var(--border);
@@ -53,31 +58,66 @@ input {
     gap: 20px;
 }
 
+
+/* =========================
+   LOGO
+========================= */
+
 .logo {
     display: flex;
     align-items: center;
-    gap: 8px;
+
+    gap: 10px;
 
     font-size: 25px;
+
     color: var(--orange-dark);
+
     white-space: nowrap;
 }
 
-.logo span {
-    font-size: 30px;
-}
+.logo-circle {
+    width: 48px;
+    height: 48px;
 
-nav {
     display: flex;
     align-items: center;
     justify-content: center;
 
+    background: var(--yellow);
+
+    border: 3px solid #000000;
+
+    border-radius: 50%;
+
+    color: #000000;
+
+    font-size: 26px;
+
+    font-weight: bold;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================
+   NAV
+========================= */
+
+nav {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
     gap: 7px;
+
     flex-wrap: wrap;
 }
 
 nav button {
     border: none;
+
     background: transparent;
 
     padding: 8px 12px;
@@ -85,6 +125,7 @@ nav button {
     cursor: pointer;
 
     color: var(--text);
+
     border-radius: 10px;
 
     transition: 0.2s;
@@ -92,11 +133,14 @@ nav button {
 
 nav button:hover {
     background: #fff7ed;
+
     color: var(--orange-dark);
 }
 
 
-/* PAGE */
+/* =========================
+   PAGE
+========================= */
 
 .page {
     min-height: 70vh;
@@ -107,12 +151,15 @@ nav button:hover {
 }
 
 
-/* HERO */
+/* =========================
+   HERO
+========================= */
 
 .hero {
     min-height: 520px;
 
     display: flex;
+
     align-items: center;
     justify-content: center;
 
@@ -135,15 +182,19 @@ nav button:hover {
 
 .hero h1 {
     font-size: clamp(38px, 6vw, 72px);
+
     color: var(--orange-dark);
+
     margin-bottom: 20px;
 }
 
 .hero p {
     max-width: 650px;
+
     margin: auto;
 
     color: var(--muted);
+
     font-size: 18px;
 }
 
@@ -151,14 +202,17 @@ nav button:hover {
     margin-top: 30px;
 
     border: none;
+
     border-radius: 14px;
 
     padding: 14px 28px;
 
     background: var(--orange);
+
     color: white;
 
     font-size: 17px;
+
     cursor: pointer;
 
     transition: 0.2s;
@@ -166,14 +220,18 @@ nav button:hover {
 
 .main-button:hover {
     background: var(--orange-dark);
+
     transform: translateY(-2px);
 }
 
 
-/* SECTION */
+/* =========================
+   SECTION
+========================= */
 
 .section {
     width: min(1150px, 92%);
+
     margin: auto;
 
     padding: 70px 0;
@@ -191,12 +249,16 @@ nav button:hover {
 
 .section-description {
     text-align: center;
+
     color: var(--muted);
+
     margin-bottom: 25px;
 }
 
 
-/* FEATURES */
+/* =========================
+   FEATURES
+========================= */
 
 .features {
     display: grid;
@@ -219,7 +281,8 @@ nav button:hover {
     text-align: center;
 
     box-shadow:
-        0 8px 25px rgba(120, 53, 15, 0.06);
+        0 8px 25px
+        rgba(120, 53, 15, 0.06);
 }
 
 .feature span {
@@ -231,7 +294,9 @@ nav button:hover {
 }
 
 
-/* SEARCH */
+/* =========================
+   SEARCH
+========================= */
 
 .search {
     display: block;
@@ -245,6 +310,7 @@ nav button:hover {
     padding: 15px 18px;
 
     border: 1px solid var(--border);
+
     border-radius: 14px;
 
     outline: none;
@@ -256,11 +322,15 @@ nav button:hover {
 
 .search:focus {
     border-color: var(--orange);
-    box-shadow: 0 0 0 3px #fed7aa;
+
+    box-shadow:
+        0 0 0 3px #fed7aa;
 }
 
 
-/* PRODUCTS */
+/* =========================
+   PRODUCTS
+========================= */
 
 .products {
     display: grid;
@@ -283,7 +353,8 @@ nav button:hover {
     padding: 20px;
 
     box-shadow:
-        0 8px 25px rgba(120, 53, 15, 0.06);
+        0 8px 25px
+        rgba(120, 53, 15, 0.06);
 
     transition: 0.2s;
 }
@@ -292,11 +363,13 @@ nav button:hover {
     transform: translateY(-4px);
 
     box-shadow:
-        0 12px 30px rgba(120, 53, 15, 0.1);
+        0 12px 30px
+        rgba(120, 53, 15, 0.1);
 }
 
 .product h3 {
     color: var(--orange-dark);
+
     margin-bottom: 8px;
 }
 
@@ -333,7 +406,9 @@ nav button:hover {
 }
 
 
-/* GIFT */
+/* =========================
+   GIFT
+========================= */
 
 .gift-badge {
     position: absolute;
@@ -342,6 +417,7 @@ nav button:hover {
     left: 12px;
 
     background: #dcfce7;
+
     color: #166534;
 
     padding: 4px 9px;
@@ -354,7 +430,9 @@ nav button:hover {
 }
 
 
-/* SELLER INFO */
+/* =========================
+   SELLER
+========================= */
 
 .seller-info {
     margin: 15px 0;
@@ -392,6 +470,10 @@ nav button:hover {
 }
 
 
+/* =========================
+   LOADING / EMPTY
+========================= */
+
 .loading,
 .empty {
     grid-column: 1 / -1;
@@ -404,7 +486,9 @@ nav button:hover {
 }
 
 
-/* ABOUT */
+/* =========================
+   ABOUT
+========================= */
 
 .about-section {
     max-width: 850px;
@@ -435,7 +519,9 @@ nav button:hover {
 }
 
 
-/* CREATORS */
+/* =========================
+   CREATORS
+========================= */
 
 .creators-section {
     max-width: 850px;
@@ -457,7 +543,8 @@ nav button:hover {
     margin-bottom: 20px;
 
     box-shadow:
-        0 8px 25px rgba(120, 53, 15, 0.05);
+        0 8px 25px
+        rgba(120, 53, 15, 0.05);
 }
 
 .creator-main h3 {
@@ -466,6 +553,7 @@ nav button:hover {
 
 .creator-main p {
     font-size: 25px;
+
     font-weight: bold;
 }
 
@@ -484,7 +572,9 @@ nav button:hover {
 }
 
 
-/* CONTACT */
+/* =========================
+   CONTACT
+========================= */
 
 .contact-section {
     max-width: 800px;
@@ -504,6 +594,7 @@ nav button:hover {
 
 .contact-card h3 {
     font-size: 25px;
+
     color: var(--orange-dark);
 }
 
@@ -516,7 +607,9 @@ nav button:hover {
 }
 
 
-/* CART */
+/* =========================
+   CART
+========================= */
 
 #cartItems {
     display: flex;
@@ -579,7 +672,9 @@ nav button:hover {
 }
 
 
-/* FOOTER */
+/* =========================
+   FOOTER
+========================= */
 
 footer {
     background: #292524;
@@ -598,7 +693,9 @@ footer p {
 }
 
 
-/* MOBILE */
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 800px) {
 
@@ -628,6 +725,14 @@ footer p {
 
     .cart-item {
         flex-direction: column;
+
         text-align: center;
+    }
+
+    .logo-circle {
+        width: 44px;
+        height: 44px;
+
+        font-size: 24px;
     }
 }
