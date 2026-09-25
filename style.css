@@ -332,6 +332,9 @@ nav button:hover {
     background: var(--orange-dark);
 }
 
+
+/* GIFT */
+
 .gift-badge {
     position: absolute;
 
@@ -349,6 +352,45 @@ nav button:hover {
 
     font-weight: bold;
 }
+
+
+/* SELLER INFO */
+
+.seller-info {
+    margin: 15px 0;
+
+    padding: 13px;
+
+    background: #fff7ed;
+
+    border: 1px solid var(--border);
+
+    border-radius: 12px;
+
+    font-size: 14px;
+
+    color: var(--text);
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+.seller-name,
+.seller-phone {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 5px;
+}
+
+.seller-info strong {
+    color: var(--orange-dark);
+}
+
 
 .loading,
 .empty {
