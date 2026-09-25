@@ -2,10 +2,216 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>زردآلو</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>زردآلو | با زردآلو خرید راحته!</title>
+    <meta name="description" content="زردآلو؛ با زردآلو خرید راحته!">
+
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <h1>🍑 زردآلو</h1>
-    <p>با زردآلو خرید راحته!</p>
+
+<header class="header">
+    <div class="logo">
+        <span>🍑</span>
+        <strong>زردآلو</strong>
+    </div>
+
+    <nav>
+        <button onclick="showPage('home')">خانه</button>
+        <button onclick="showPage('market')">بازار</button>
+        <button onclick="showPage('gifts')">🎁 اشانتیون‌ها</button>
+        <button onclick="showPage('about')">درباره زردآلو</button>
+        <button onclick="showPage('creators')">👨‍💻 سازندگان</button>
+        <button onclick="showPage('contact')">ارتباط با ما</button>
+        <button onclick="showPage('cart')">🛒 سبد خرید</button>
+    </nav>
+</header>
+
+
+<main>
+
+    <!-- HOME -->
+    <section id="home" class="page">
+        <div class="hero">
+            <div>
+                <h1>با زردآلو خرید راحته! 🍑</h1>
+
+                <p>
+                    به زردآلو خوش اومدی؛
+                    جایی برای پیدا کردن کالاهای مختلف و خرید راحت.
+                </p>
+
+                <button class="main-button" onclick="showPage('market')">
+                    ورود به بازار
+                </button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>چرا زردآلو؟</h2>
+
+            <div class="features">
+                <div class="feature">
+                    <span>🛍️</span>
+                    <h3>خرید راحت</h3>
+                    <p>کالاها را راحت پیدا کن و به سبد خرید اضافه کن.</p>
+                </div>
+
+                <div class="feature">
+                    <span>🎁</span>
+                    <h3>اشانتیون</h3>
+                    <p>کالاهایی که فروشنده برایشان اشانتیون گذاشته ببین.</p>
+                </div>
+
+                <div class="feature">
+                    <span>⚡</span>
+                    <h3>ساده و سریع</h3>
+                    <p>محیط ساده و فارسی برای خرید راحت‌تر.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- MARKET -->
+    <section id="market" class="page hidden">
+        <div class="section">
+            <h2>🛍️ بازار زردآلو</h2>
+
+            <input
+                id="searchInput"
+                class="search"
+                type="text"
+                placeholder="جستجوی کالا..."
+                oninput="filterProducts()"
+            >
+
+            <div id="products" class="products">
+                <div class="loading">در حال دریافت کالاها...</div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- GIFTS -->
+    <section id="gifts" class="page hidden">
+        <div class="section">
+            <h2>🎁 کالاهای دارای اشانتیون</h2>
+
+            <p class="section-description">
+                کالاهایی که فروشنده برای آن‌ها اشانتیون در نظر گرفته است.
+            </p>
+
+            <div id="giftProducts" class="products">
+                <div class="loading">در حال دریافت کالاها...</div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ABOUT -->
+    <section id="about" class="page hidden">
+        <div class="section about-section">
+
+            <h2>🍑 درباره زردآلو</h2>
+
+            <p>
+                زردآلو یک پروژه فروشگاهی است که با هدف ساده‌تر کردن
+                خرید و ارتباط بین خریدار و فروشنده ساخته شده است.
+            </p>
+
+            <p>
+                شعار ما:
+            </p>
+
+            <div class="quote">
+                «با زردآلو خرید راحته!»
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- CREATORS -->
+    <section id="creators" class="page hidden">
+        <div class="section creators-section">
+
+            <h2>👨‍💻 سازندگان زردآلو</h2>
+
+            <div class="creator-main">
+                <h3>سازنده:</h3>
+                <p>عرفان ریاحی</p>
+            </div>
+
+            <div class="thanks-box">
+                <h3>💐 با تشکر از:</h3>
+
+                <p>برنامه گودوت</p>
+                <p>امیر عباس حیدری</p>
+                <p>ملیحه همت گیر</p>
+                <p>شهاب الدین ریاحی</p>
+            </div>
+
+            <div class="godot-note">
+                <strong>
+                    ⚠️ لطفا برای اجرای برنامه گودوت را نصب داشته باشید!
+                </strong>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- CONTACT -->
+    <section id="contact" class="page hidden">
+        <div class="section contact-section">
+
+            <h2>📞 ارتباط با ما</h2>
+
+            <div class="contact-card">
+                <h3>زردآلو</h3>
+
+                <p>
+                    برای ارتباط با ما می‌توانید از راه‌های ارتباطی
+                    قرار داده‌شده در برنامه استفاده کنید.
+                </p>
+
+                <p class="contact-number">
+                    📱 شماره ارتباطی فروشنده
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- CART -->
+    <section id="cart" class="page hidden">
+        <div class="section">
+
+            <h2>🛒 سبد خرید</h2>
+
+            <div id="cartItems"></div>
+
+            <div id="cartTotal" class="cart-total">
+                مجموع: ۰ تومان
+            </div>
+
+        </div>
+    </section>
+
+</main>
+
+
+<footer>
+    <p>🍑 زردآلو | با زردآلو خرید راحته!</p>
+    <p>© 2026 Zardaloo</p>
+</footer>
+
+
+<script src="script.js"></script>
+
 </body>
 </html>
