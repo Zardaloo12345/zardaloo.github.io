@@ -2,11 +2,13 @@
 
 /* =========================================================
    ZARDALOO
-   Supabase + Products + Cart + Discount + Passkey Admin
+   Supabase + Products + Cart + Discount + Admin + Passkey
    ========================================================= */
 
 
-/* ---------------- SUPABASE ---------------- */
+/* =========================================================
+   SUPABASE
+   ========================================================= */
 
 const SUPABASE_URL =
     "https://ovqldknqpaiczrddcrxp.supabase.co";
@@ -18,44 +20,59 @@ const PRODUCTS_FUNCTION_URL =
     SUPABASE_URL + "/functions/v1/products";
 
 
-const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY,
-    {
-        auth: {
-            experimental: {
-                passkey: true
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY,
+        {
+            auth: {
+                experimental: {
+                    passkey: true
+                }
             }
         }
-    }
-);
+    );
 
 
 /* =========================================================
-   IMPORTANT:
-   این ایمیل باید ایمیل حساب مدیر Supabase باشد.
+   ADMIN
    ========================================================= */
 
-const ADMIN_EMAIL =
-    erfancity2014@gmail.com
-   
+/*
+   ایمیل حساب مدیر Supabase Auth را اینجا بگذار.
 
-/* ---------------- DATA ---------------- */
+   مثال:
+   const ADMIN_EMAIL = "admin@example.com";
+
+   رمز را هرگز اینجا ننویس.
+*/
+
+const ADMIN_EMAIL =
+    "erfan_city_2014@gmail.com";
+
+
+/* =========================================================
+   DATA
+   ========================================================= */
 
 let products = [];
 
-let cart = loadJSON(
-    "zardaloo_cart",
-    []
-);
+let cart =
+    loadJSON(
+        "zardaloo_cart",
+        []
+    );
 
-let activeDiscount = loadJSON(
-    "zardaloo_discount",
-    null
-);
+let activeDiscount =
+    loadJSON(
+        "zardaloo_discount",
+        null
+    );
 
 
-/* ---------------- DISCOUNTS ---------------- */
+/* =========================================================
+   DISCOUNTS
+   ========================================================= */
 
 const DEFAULT_DISCOUNTS = {
     ZARDALOO10: 10,
@@ -64,12 +81,12 @@ const DEFAULT_DISCOUNTS = {
 
 
 /* =========================================================
-   INITIALIZE
+   START
    ========================================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
-    async () => {
+    async function () {
 
         loadTheme();
 
@@ -90,32 +107,45 @@ function showPage(pageId) {
 
     document
         .querySelectorAll(".page")
-        .forEach(page => {
+        .forEach(function (page) {
+
             page.classList.remove("active");
         });
+
 
     const page =
         document.getElementById(pageId);
 
+
     if (page) {
+
         page.classList.add("active");
     }
 
+
     if (pageId === "cart") {
+
         renderCart();
     }
 
+
     if (pageId === "market") {
+
         renderProducts();
     }
 
+
     if (pageId === "gifts") {
+
         renderGifts();
     }
 
+
     if (pageId === "management") {
+
         checkAdminSession();
     }
+
 
     window.scrollTo({
         top: 0,
@@ -132,13 +162,16 @@ function toggleTheme() {
 
     document.body.classList.toggle("dark");
 
+
     const dark =
         document.body.classList.contains("dark");
+
 
     localStorage.setItem(
         "zardaloo_theme",
         dark ? "dark" : "light"
     );
+
 
     updateThemeButton();
 }
@@ -147,11 +180,16 @@ function toggleTheme() {
 function loadTheme() {
 
     const theme =
-        localStorage.getItem("zardaloo_theme");
+        localStorage.getItem(
+            "zardaloo_theme"
+        );
+
 
     if (theme === "dark") {
+
         document.body.classList.add("dark");
     }
+
 
     updateThemeButton();
 }
@@ -160,9 +198,13 @@ function loadTheme() {
 function updateThemeButton() {
 
     const button =
-        document.getElementById("themeButton");
+        document.getElementById(
+            "themeButton"
+        );
+
 
     if (!button) return;
+
 
     button.textContent =
         document.body.classList.contains("dark")
@@ -182,10 +224,16 @@ async function loadProducts() {
             "productsContainer"
         );
 
+
     if (container) {
-        container.innerHTML =
-            `<div class="loading">در حال دریافت کالاها...</div>`;
+
+        container.innerHTML = `
+            <div class="loading">
+                در حال دریافت کالاها...
+            </div>
+        `;
     }
+
 
     try {
 
@@ -194,24 +242,35 @@ async function loadProducts() {
                 PRODUCTS_FUNCTION_URL
             );
 
+
         if (!response.ok) {
+
             throw new Error(
                 "خطا در دریافت کالاها"
             );
         }
 
+
         const data =
             await response.json();
 
+
         if (Array.isArray(data)) {
+
             products = data;
-        }
-        else if (Array.isArray(data.products)) {
-            products = data.products;
-        }
-        else {
+
+        } else if (
+            Array.isArray(data.products)
+        ) {
+
+            products =
+                data.products;
+
+        } else {
+
             products = [];
         }
+
 
     } catch (error) {
 
@@ -219,7 +278,9 @@ async function loadProducts() {
 
         products = [];
 
+
         if (container) {
+
             container.innerHTML = `
                 <div class="empty">
                     دریافت کالاها با خطا مواجه شد.
@@ -229,17 +290,21 @@ async function loadProducts() {
             `;
         }
 
+
         return;
     }
 
+
     renderProducts();
+
     renderGifts();
+
     updateAdminStats();
 }
 
 
 /* =========================================================
-   PRODUCT NORMALIZATION
+   PRODUCT HELPERS
    ========================================================= */
 
 function getProductName(product) {
@@ -305,13 +370,16 @@ function isGiftProduct(product) {
 
 
 /* =========================================================
-   FORMAT PRICE
+   PRICE
    ========================================================= */
 
 function formatPrice(value) {
 
-    return Number(value || 0)
-        .toLocaleString("fa-IR") + " تومان";
+    return (
+        Number(value || 0)
+            .toLocaleString("fa-IR")
+        + " تومان"
+    );
 }
 
 
@@ -326,7 +394,9 @@ function renderProducts() {
             "productsContainer"
         );
 
+
     if (!container) return;
+
 
     const search =
         (
@@ -339,18 +409,21 @@ function renderProducts() {
 
 
     const filtered =
-        products.filter(product => {
+        products.filter(
+            function (product) {
 
-            const text = (
-                getProductName(product) +
-                " " +
-                getSellerName(product) +
-                " " +
-                getDescription(product)
-            ).toLowerCase();
+                const text = (
+                    getProductName(product) +
+                    " " +
+                    getSellerName(product) +
+                    " " +
+                    getDescription(product)
+                ).toLowerCase();
 
-            return text.includes(search);
-        });
+
+                return text.includes(search);
+            }
+        );
 
 
     if (filtered.length === 0) {
@@ -366,9 +439,9 @@ function renderProducts() {
 
 
     container.innerHTML =
-        filtered.map(
-            createProductCard
-        ).join("");
+        filtered
+            .map(createProductCard)
+            .join("");
 }
 
 
@@ -383,36 +456,33 @@ function createProductCard(product) {
             getProductName(product)
         );
 
+
     const price =
         formatPrice(
             getProductPrice(product)
         );
+
 
     const seller =
         escapeHTML(
             getSellerName(product)
         );
 
+
     const phone =
         escapeHTML(
             getSellerPhone(product)
         );
+
 
     const description =
         escapeHTML(
             getDescription(product)
         );
 
+
     const gift =
         isGiftProduct(product);
-
-
-    const productId =
-        String(
-            product.id ??
-            product.product_id ??
-            crypto.randomUUID()
-        );
 
 
     return `
@@ -420,15 +490,25 @@ function createProductCard(product) {
 
             ${
                 gift
-                    ? `<span class="gift-badge">🎁 اشانتیون</span>`
+                    ? `
+                        <span class="gift-badge">
+                            🎁 اشانتیون
+                        </span>
+                    `
                     : ""
             }
 
-            <h3>${name}</h3>
+            <h3>
+                ${name}
+            </h3>
 
             ${
                 description
-                    ? `<div class="product-description">${description}</div>`
+                    ? `
+                        <div class="product-description">
+                            ${description}
+                        </div>
+                    `
                     : ""
             }
 
@@ -445,9 +525,7 @@ function createProductCard(product) {
             <div class="card-actions">
 
                 <button
-                    onclick='addToCart(${JSON.stringify(
-                        product
-                    )})'
+                    onclick='addToCart(${JSON.stringify(product)})'
                 >
                     🛒 افزودن
                 </button>
@@ -469,6 +547,7 @@ function renderGifts() {
         document.getElementById(
             "giftsContainer"
         );
+
 
     if (!container) return;
 
@@ -492,9 +571,9 @@ function renderGifts() {
 
 
     container.innerHTML =
-        gifts.map(
-            createProductCard
-        ).join("");
+        gifts
+            .map(createProductCard)
+            .join("");
 }
 
 
@@ -524,37 +603,57 @@ async function registerProduct(event) {
     const payload = {
 
         name:
-            document.getElementById(
-                "productName"
-            ).value.trim(),
+            document
+                .getElementById(
+                    "productName"
+                )
+                .value
+                .trim(),
+
 
         price:
             Number(
-                document.getElementById(
-                    "productPrice"
-                ).value
+                document
+                    .getElementById(
+                        "productPrice"
+                    )
+                    .value
             ),
 
+
         seller_name:
-            document.getElementById(
-                "sellerName"
-            ).value.trim(),
+            document
+                .getElementById(
+                    "sellerName"
+                )
+                .value
+                .trim(),
+
 
         seller_phone:
-            document.getElementById(
-                "sellerPhone"
-            ).value.trim(),
+            document
+                .getElementById(
+                    "sellerPhone"
+                )
+                .value
+                .trim(),
+
 
         description:
-            document.getElementById(
-                "productDescription"
-            ).value.trim(),
+            document
+                .getElementById(
+                    "productDescription"
+                )
+                .value
+                .trim(),
+
 
         is_gift:
-            document.getElementById(
-                "isGift"
-            ).checked
-
+            document
+                .getElementById(
+                    "isGift"
+                )
+                .checked
     };
 
 
@@ -642,6 +741,7 @@ async function registerProduct(event) {
 
         console.error(error);
 
+
         setMessage(
             message,
             "❌ ثبت کالا انجام نشد. تابع products در Supabase را بررسی کن.",
@@ -667,8 +767,12 @@ function addToCart(product) {
 
     const existing =
         cart.find(
-            item =>
-                String(item.id) === id
+            function (item) {
+
+                return (
+                    String(item.id) === id
+                );
+            }
         );
 
 
@@ -695,7 +799,6 @@ function addToCart(product) {
                 getSellerPhone(product),
 
             quantity: 1
-
         });
     }
 
@@ -703,6 +806,7 @@ function addToCart(product) {
     saveCart();
 
     updateCart();
+
 
     showToast(
         "به سبد خرید اضافه شد 🛒"
@@ -714,17 +818,26 @@ function increaseCart(id) {
 
     const item =
         cart.find(
-            x =>
-                String(x.id) ===
-                String(id)
+            function (x) {
+
+                return (
+                    String(x.id) ===
+                    String(id)
+                );
+            }
         );
 
+
     if (item) {
+
         item.quantity++;
     }
 
+
     saveCart();
+
     renderCart();
+
     updateCart();
 }
 
@@ -733,10 +846,15 @@ function decreaseCart(id) {
 
     const item =
         cart.find(
-            x =>
-                String(x.id) ===
-                String(id)
+            function (x) {
+
+                return (
+                    String(x.id) ===
+                    String(id)
+                );
+            }
         );
+
 
     if (!item) return;
 
@@ -748,15 +866,21 @@ function decreaseCart(id) {
 
         cart =
             cart.filter(
-                x =>
-                    String(x.id) !==
-                    String(id)
+                function (x) {
+
+                    return (
+                        String(x.id) !==
+                        String(id)
+                    );
+                }
             );
     }
 
 
     saveCart();
+
     renderCart();
+
     updateCart();
 }
 
@@ -771,6 +895,7 @@ function clearCart() {
 
     renderCart();
 
+
     showToast(
         "سبد خرید خالی شد."
     );
@@ -783,6 +908,7 @@ function renderCart() {
         document.getElementById(
             "cartContainer"
         );
+
 
     if (!container) return;
 
@@ -803,66 +929,74 @@ function renderCart() {
 
 
     const html =
-        cart.map(item => {
+        cart
+            .map(
+                function (item) {
 
-            const total =
-                item.price *
-                item.quantity;
-
-            subtotal += total;
+                    const total =
+                        item.price *
+                        item.quantity;
 
 
-            return `
-                <div class="cart-item">
+                    subtotal += total;
 
-                    <div>
-                        <strong>
-                            ${escapeHTML(item.name)}
-                        </strong>
 
-                        <br>
+                    return `
+                        <div class="cart-item">
 
-                        <small>
-                            قیمت واحد:
-                            ${formatPrice(item.price)}
-                        </small>
+                            <div>
 
-                        <br>
+                                <strong>
+                                    ${escapeHTML(item.name)}
+                                </strong>
 
-                        <small>
-                            فروشنده:
-                            ${escapeHTML(item.seller)}
-                        </small>
-                    </div>
+                                <br>
 
-                    <div class="cart-controls">
+                                <small>
+                                    قیمت واحد:
+                                    ${formatPrice(item.price)}
+                                </small>
 
-                        <button
-                            onclick="increaseCart('${escapeAttribute(item.id)}')"
-                        >
-                            +
-                        </button>
+                                <br>
 
-                        <strong>
-                            ${item.quantity}
-                        </strong>
+                                <small>
+                                    فروشنده:
+                                    ${escapeHTML(item.seller)}
+                                </small>
 
-                        <button
-                            onclick="decreaseCart('${escapeAttribute(item.id)}')"
-                        >
-                            −
-                        </button>
+                            </div>
 
-                    </div>
 
-                    <strong>
-                        ${formatPrice(total)}
-                    </strong>
+                            <div class="cart-controls">
 
-                </div>
-            `;
+                                <button
+                                    onclick="increaseCart('${escapeAttribute(item.id)}')"
+                                >
+                                    +
+                                </button>
 
-        }).join("");
+                                <strong>
+                                    ${item.quantity}
+                                </strong>
+
+                                <button
+                                    onclick="decreaseCart('${escapeAttribute(item.id)}')"
+                                >
+                                    −
+                                </button>
+
+                            </div>
+
+
+                            <strong>
+                                ${formatPrice(total)}
+                            </strong>
+
+                        </div>
+                    `;
+                }
+            )
+            .join("");
 
 
     const discountPercent =
@@ -927,8 +1061,12 @@ function updateCart() {
 
     const count =
         cart.reduce(
-            (sum, item) =>
-                sum + item.quantity,
+            function (sum, item) {
+
+                return (
+                    sum + item.quantity
+                );
+            },
             0
         );
 
@@ -937,9 +1075,13 @@ function updateCart() {
         .querySelectorAll(
             "[data-cart-count]"
         )
-        .forEach(el => {
-            el.textContent = count;
-        });
+        .forEach(
+            function (el) {
+
+                el.textContent =
+                    count;
+            }
+        );
 
 
     updateAdminStats();
@@ -956,6 +1098,7 @@ function applyDiscount() {
         document.getElementById(
             "discountInput"
         );
+
 
     const message =
         document.getElementById(
@@ -977,6 +1120,7 @@ function applyDiscount() {
 
         activeDiscount = null;
 
+
         localStorage.removeItem(
             "zardaloo_discount"
         );
@@ -987,6 +1131,7 @@ function applyDiscount() {
             "❌ این کد تخفیف معتبر نیست.",
             "error"
         );
+
 
         renderCart();
 
@@ -1022,19 +1167,40 @@ function applyDiscount() {
 
 
 /* =========================================================
-   ADMIN / PASSKEY
+   ADMIN - PASSKEY
    ========================================================= */
 
-/*
-    Passkey در Supabase:
 
-    1. حساب مدیر باید قبلاً در Supabase Auth وجود داشته باشد.
-    2. یک بار با ایمیل/رمز وارد می‌شوی.
-    3. Passkey ثبت می‌شود.
-    4. دفعات بعد ورود می‌تواند بدون رمز و با
-       اثر انگشت / Face ID / Windows Hello انجام شود.
+/*
+   روند ورود:
+
+   بار اول:
+
+   ایمیل + رمز
+        ↓
+   Supabase Auth
+        ↓
+   Session
+        ↓
+   registerPasskey()
+        ↓
+   اثر انگشت / PIN / Windows Hello
+        ↓
+   Passkey ثبت می‌شود
+
+   دفعات بعد:
+
+   signInWithPasskey()
+        ↓
+   اثر انگشت / PIN
+        ↓
+   ورود
 */
 
+
+/* =========================================================
+   PASSKEY LOGIN
+   ========================================================= */
 
 async function loginWithPasskey() {
 
@@ -1051,26 +1217,27 @@ async function loginWithPasskey() {
         ) {
 
             throw new Error(
-                "مرورگر شما WebAuthn/Passkey را پشتیبانی نمی‌کند."
+                "مرورگر شما Passkey/WebAuthn را پشتیبانی نمی‌کند."
             );
         }
 
 
         if (
-            typeof supabaseClient.auth
+            typeof supabaseClient
+                .auth
                 .signInWithPasskey !==
             "function"
         ) {
 
             throw new Error(
-                "نسخه Supabase JS یا قابلیت Passkey فعال نیست."
+                "Passkey در نسخه فعلی Supabase JS در دسترس نیست."
             );
         }
 
 
         setMessage(
             message,
-            "👆 منتظر تأیید Passkey دستگاه باش...",
+            "👆 پنجره Passkey را تأیید کن...",
             ""
         );
 
@@ -1085,6 +1252,7 @@ async function loginWithPasskey() {
 
 
         if (error) {
+
             throw error;
         }
 
@@ -1096,12 +1264,19 @@ async function loginWithPasskey() {
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "PASSKEY LOGIN ERROR:",
+            error
+        );
+
 
         setMessage(
             message,
             "❌ ورود با Passkey انجام نشد: " +
-            error.message,
+            (
+                error.message ||
+                "خطای نامشخص"
+            ),
             "error"
         );
     }
@@ -1109,7 +1284,7 @@ async function loginWithPasskey() {
 
 
 /* =========================================================
-   ADMIN SETUP
+   SHOW SETUP
    ========================================================= */
 
 function showAdminSetup() {
@@ -1120,11 +1295,28 @@ function showAdminSetup() {
         )
         .classList.add("hidden");
 
+
     document
         .getElementById(
             "adminSetupBox"
         )
         .classList.remove("hidden");
+
+
+    const emailInput =
+        document.getElementById(
+            "adminEmail"
+        );
+
+
+    if (emailInput) {
+
+        emailInput.value =
+            ADMIN_EMAIL ===
+            "YOUR_ADMIN_EMAIL@example.com"
+                ? ""
+                : ADMIN_EMAIL;
+    }
 }
 
 
@@ -1136,6 +1328,7 @@ function hideAdminSetup() {
         )
         .classList.add("hidden");
 
+
     document
         .getElementById(
             "adminLoginBox"
@@ -1144,28 +1337,40 @@ function hideAdminSetup() {
 }
 
 
+/* =========================================================
+   FIRST LOGIN
+   ========================================================= */
+
 async function loginAdminForSetup() {
 
-    const email =
-        document
-            .getElementById(
-                "adminEmail"
-            )
-            .value
-            .trim();
+    const emailInput =
+        document.getElementById(
+            "adminEmail"
+        );
 
-    const password =
-        document
-            .getElementById(
-                "adminPassword"
-            )
-            .value;
+
+    const passwordInput =
+        document.getElementById(
+            "adminPassword"
+        );
 
 
     const message =
         document.getElementById(
             "setupMessage"
         );
+
+
+    const email =
+        emailInput
+            .value
+            .trim()
+            .toLowerCase();
+
+
+    const password =
+        passwordInput
+            .value;
 
 
     if (!email || !password) {
@@ -1180,11 +1385,43 @@ async function loginAdminForSetup() {
     }
 
 
+    if (
+        ADMIN_EMAIL ===
+        "YOUR_ADMIN_EMAIL@example.com"
+    ) {
+
+        setMessage(
+            message,
+            "❌ ابتدا ADMIN_EMAIL را در script.js تنظیم کن.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    if (
+        email !==
+        ADMIN_EMAIL
+            .trim()
+            .toLowerCase()
+    ) {
+
+        setMessage(
+            message,
+            "❌ این ایمیل، ایمیل مدیر نیست.",
+            "error"
+        );
+
+        return;
+    }
+
+
     try {
 
         setMessage(
             message,
-            "در حال ورود...",
+            "🔐 در حال ورود به حساب مدیر...",
             ""
         );
 
@@ -1197,14 +1434,23 @@ async function loginAdminForSetup() {
                 .auth
                 .signInWithPassword({
 
-                    email,
-                    password
+                    email: email,
 
+                    password: password
                 });
 
 
         if (error) {
+
             throw error;
+        }
+
+
+        if (!data?.user) {
+
+            throw new Error(
+                "حساب مدیر پیدا نشد."
+            );
         }
 
 
@@ -1218,10 +1464,18 @@ async function loginAdminForSetup() {
                 .auth
                 .signOut();
 
+
             throw new Error(
                 "این حساب اجازه مدیریت ندارد."
             );
         }
+
+
+        setMessage(
+            message,
+            "✅ ورود موفق بود. حالا Passkey را ثبت می‌کنیم...",
+            "success"
+        );
 
 
         await registerPasskey();
@@ -1229,11 +1483,19 @@ async function loginAdminForSetup() {
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "ADMIN SETUP LOGIN ERROR:",
+            error
+        );
+
 
         setMessage(
             message,
-            "❌ " + error.message,
+            "❌ ورود انجام نشد: " +
+            (
+                error.message ||
+                "خطای نامشخص"
+            ),
             "error"
         );
     }
@@ -1246,22 +1508,37 @@ async function loginAdminForSetup() {
 
 async function registerPasskey() {
 
+    const message =
+        document.getElementById(
+            "setupMessage"
+        );
+
+
     try {
 
         const {
-            data: {
-                user
-            }
+            data,
+            error
         } =
             await supabaseClient
                 .auth
                 .getUser();
 
 
+        if (error) {
+
+            throw error;
+        }
+
+
+        const user =
+            data?.user;
+
+
         if (!user) {
 
             throw new Error(
-                "ابتدا وارد حساب مدیر شو."
+                "Session مدیر پیدا نشد. ابتدا وارد حساب مدیر شو."
             );
         }
 
@@ -1271,7 +1548,7 @@ async function registerPasskey() {
         ) {
 
             throw new Error(
-                "این حساب مدیر نیست."
+                "این حساب، حساب مدیر نیست."
             );
         }
 
@@ -1289,26 +1566,48 @@ async function registerPasskey() {
         }
 
 
+        setMessage(
+            message,
+            "👆 حالا پنجره ثبت Passkey را تأیید کن...",
+            ""
+        );
+
+
         const {
-            data,
-            error
+            data: passkey,
+            error: passkeyError
         } =
             await supabaseClient
                 .auth
                 .registerPasskey();
 
 
-        if (error) {
-            throw error;
+        if (passkeyError) {
+
+            throw passkeyError;
         }
 
 
+        console.log(
+            "REGISTERED PASSKEY:",
+            passkey
+        );
+
+
+        setMessage(
+            message,
+            "✅ Passkey با موفقیت ثبت شد!",
+            "success"
+        );
+
+
         showToast(
-            "✅ Passkey با موفقیت ثبت شد!"
+            "✅ Passkey ثبت شد!"
         );
 
 
         hideAdminSetup();
+
 
         await showAdminPanel(
             user
@@ -1317,18 +1616,19 @@ async function registerPasskey() {
 
     } catch (error) {
 
-        console.error(error);
-
-        const message =
-            document.getElementById(
-                "setupMessage"
-            );
+        console.error(
+            "PASSKEY REGISTRATION ERROR:",
+            error
+        );
 
 
         setMessage(
             message,
             "❌ ثبت Passkey انجام نشد: " +
-            error.message,
+            (
+                error.message ||
+                "خطای نامشخص"
+            ),
             "error"
         );
     }
@@ -1336,7 +1636,7 @@ async function registerPasskey() {
 
 
 /* =========================================================
-   CHECK ADMIN SESSION
+   CHECK SESSION
    ========================================================= */
 
 async function checkAdminSession() {
@@ -1364,13 +1664,15 @@ async function checkAdminSession() {
 
 
         const {
-            data: {
-                user
-            }
+            data: userData
         } =
             await supabaseClient
                 .auth
                 .getUser();
+
+
+        const user =
+            userData?.user;
 
 
         if (
@@ -1380,6 +1682,7 @@ async function checkAdminSession() {
             await supabaseClient
                 .auth
                 .signOut();
+
 
             showAdminLogin();
 
@@ -1394,7 +1697,11 @@ async function checkAdminSession() {
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "SESSION CHECK ERROR:",
+            error
+        );
+
 
         showAdminLogin();
     }
@@ -1423,6 +1730,7 @@ async function verifyAdminUser(user) {
             .auth
             .signOut();
 
+
         throw new Error(
             "این حساب اجازه ورود به مدیریت را ندارد."
         );
@@ -1436,12 +1744,13 @@ async function verifyAdminUser(user) {
 
 
 /* =========================================================
-   ADMIN EMAIL CHECK
+   ADMIN EMAIL
    ========================================================= */
 
 function isAdminEmail(user) {
 
     if (!user) {
+
         return false;
     }
 
@@ -1458,10 +1767,6 @@ function isAdminEmail(user) {
         "your_admin_email@example.com"
     ) {
 
-        console.warn(
-            "ADMIN_EMAIL هنوز تنظیم نشده است."
-        );
-
         return false;
     }
 
@@ -1477,7 +1782,7 @@ function isAdminEmail(user) {
 
 
 /* =========================================================
-   SHOW ADMIN PANEL
+   ADMIN PANEL
    ========================================================= */
 
 async function showAdminPanel(user) {
@@ -1509,7 +1814,10 @@ async function showAdminPanel(user) {
         )
         .textContent =
             "وارد شده با: " +
-            (user.email || "مدیر");
+            (
+                user.email ||
+                "مدیر"
+            );
 
 
     updateAdminStats();
@@ -1561,6 +1869,7 @@ async function logoutAdmin() {
 
     showAdminLogin();
 
+
     showToast(
         "از مدیریت خارج شدی."
     );
@@ -1578,6 +1887,7 @@ async function loadPasskeys() {
             "passkeysList"
         );
 
+
     if (!container) return;
 
 
@@ -1586,7 +1896,8 @@ async function loadPasskeys() {
         typeof supabaseClient
             .auth
             .passkey
-            .list !== "function"
+            .list !==
+        "function"
     ) {
 
         container.innerHTML = `
@@ -1612,6 +1923,7 @@ async function loadPasskeys() {
 
 
         if (error) {
+
             throw error;
         }
 
@@ -1620,7 +1932,9 @@ async function loadPasskeys() {
             data || [];
 
 
-        if (passkeys.length === 0) {
+        if (
+            passkeys.length === 0
+        ) {
 
             container.innerHTML = `
                 <p class="muted">
@@ -1633,40 +1947,47 @@ async function loadPasskeys() {
 
 
         container.innerHTML =
-            passkeys.map(
-                passkey => `
+            passkeys
+                .map(
+                    function (passkey) {
 
-                    <div class="passkey-item">
+                        return `
+                            <div class="passkey-item">
 
-                        <strong>
-                            👆 ${
-                                escapeHTML(
-                                    passkey.friendly_name ||
-                                    "Passkey دستگاه"
-                                )
-                            }
-                        </strong>
+                                <strong>
+                                    👆 ${
+                                        escapeHTML(
+                                            passkey.friendly_name ||
+                                            "Passkey دستگاه"
+                                        )
+                                    }
+                                </strong>
 
-                        <br>
+                                <br>
 
-                        <small>
-                            ثبت:
-                            ${
-                                formatDate(
-                                    passkey.created_at
-                                )
-                            }
-                        </small>
+                                <small>
+                                    ثبت:
+                                    ${
+                                        formatDate(
+                                            passkey.created_at
+                                        )
+                                    }
+                                </small>
 
-                    </div>
-
-                `
-            ).join("");
+                            </div>
+                        `;
+                    }
+                )
+                .join("");
 
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "PASSKEY LIST ERROR:",
+            error
+        );
+
 
         container.innerHTML = `
             <p class="muted">
@@ -1688,10 +2009,12 @@ function updateAdminStats() {
             "productCount"
         );
 
+
     const giftCount =
         document.getElementById(
             "giftCount"
         );
+
 
     const cartCount =
         document.getElementById(
@@ -1719,8 +2042,12 @@ function updateAdminStats() {
 
         cartCount.textContent =
             cart.reduce(
-                (sum, item) =>
-                    sum + item.quantity,
+                function (sum, item) {
+
+                    return (
+                        sum + item.quantity
+                    );
+                },
                 0
             );
     }
@@ -1741,10 +2068,13 @@ function renderAdminProducts() {
             "adminProducts"
         );
 
+
     if (!container) return;
 
 
-    if (products.length === 0) {
+    if (
+        products.length === 0
+    ) {
 
         container.innerHTML = `
             <p class="muted">
@@ -1757,56 +2087,57 @@ function renderAdminProducts() {
 
 
     container.innerHTML =
-        products.map(
-            product => {
+        products
+            .map(
+                function (product) {
 
-                const name =
-                    escapeHTML(
-                        getProductName(product)
-                    );
-
-                const seller =
-                    escapeHTML(
-                        getSellerName(product)
-                    );
-
-                const price =
-                    formatPrice(
-                        getProductPrice(product)
-                    );
+                    const name =
+                        escapeHTML(
+                            getProductName(product)
+                        );
 
 
-                return `
+                    const seller =
+                        escapeHTML(
+                            getSellerName(product)
+                        );
 
-                    <div class="admin-product">
 
-                        <div>
+                    const price =
+                        formatPrice(
+                            getProductPrice(product)
+                        );
 
-                            <strong>
-                                ${name}
-                            </strong>
 
-                            <br>
+                    return `
+                        <div class="admin-product">
 
-                            <small>
-                                ${seller}
-                                — ${price}
-                            </small>
+                            <div>
+
+                                <strong>
+                                    ${name}
+                                </strong>
+
+                                <br>
+
+                                <small>
+                                    ${seller}
+                                    — ${price}
+                                </small>
+
+                            </div>
+
+                            ${
+                                isGiftProduct(product)
+                                    ? "<span>🎁</span>"
+                                    : ""
+                            }
 
                         </div>
-
-                        ${
-                            isGiftProduct(product)
-                                ? "<span>🎁</span>"
-                                : ""
-                        }
-
-                    </div>
-
-                `;
-
-            }
-        ).join("");
+                    `;
+                }
+            )
+            .join("");
 }
 
 
@@ -1823,16 +2154,24 @@ function saveCart() {
 }
 
 
-function loadJSON(key, fallback) {
+function loadJSON(
+    key,
+    fallback
+) {
 
     try {
 
         const raw =
-            localStorage.getItem(key);
+            localStorage.getItem(
+                key
+            );
+
 
         if (!raw) {
+
             return fallback;
         }
+
 
         return JSON.parse(raw);
 
@@ -1855,7 +2194,10 @@ function setMessage(
 
     if (!element) return;
 
-    element.textContent = text;
+
+    element.textContent =
+        text;
+
 
     element.className =
         "message " +
@@ -1870,19 +2212,26 @@ function showToast(text) {
             "toast"
         );
 
+
     if (!toast) return;
 
 
-    toast.textContent = text;
+    toast.textContent =
+        text;
 
-    toast.classList.add("show");
+
+    toast.classList.add(
+        "show"
+    );
 
 
     setTimeout(
-        () => {
+        function () {
+
             toast.classList.remove(
                 "show"
             );
+
         },
         2500
     );
@@ -1891,26 +2240,52 @@ function showToast(text) {
 
 function escapeHTML(value) {
 
-    return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+    return String(
+        value ?? ""
+    )
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
 }
 
 
 function escapeAttribute(value) {
 
-    return String(value ?? "")
-        .replaceAll("\\", "\\\\")
-        .replaceAll("'", "\\'");
+    return String(
+        value ?? ""
+    )
+        .replaceAll(
+            "\\",
+            "\\\\"
+        )
+        .replaceAll(
+            "'",
+            "\\'"
+        );
 }
 
 
 function formatDate(date) {
 
     if (!date) {
+
         return "نامشخص";
     }
 
@@ -1934,10 +2309,14 @@ function formatDate(date) {
    ========================================================= */
 
 supabaseClient.auth.onAuthStateChange(
-    async (event, session) => {
+    async function (
+        event,
+        session
+    ) {
 
         if (
-            event === "SIGNED_OUT"
+            event ===
+            "SIGNED_OUT"
         ) {
 
             showAdminLogin();
@@ -1947,7 +2326,8 @@ supabaseClient.auth.onAuthStateChange(
 
 
         if (
-            event === "SIGNED_IN" &&
+            event ===
+                "SIGNED_IN" &&
             session?.user
         ) {
 
