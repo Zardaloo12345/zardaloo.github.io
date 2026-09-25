@@ -112,6 +112,40 @@ function productPrice(product) {
 }
 
 
+/* =========================
+   SELLER HELPERS
+========================= */
+
+function sellerName(product) {
+
+    return (
+        product?.seller_name ??
+        product?.sellerName ??
+        product?.seller ??
+        product?.vendor_name ??
+        product?.vendor ??
+        "ثبت نشده"
+    );
+}
+
+
+function sellerPhone(product) {
+
+    return (
+        product?.seller_phone ??
+        product?.sellerPhone ??
+        product?.phone ??
+        product?.seller_phone_number ??
+        product?.contact_phone ??
+        "ثبت نشده"
+    );
+}
+
+
+/* =========================
+   PRICE
+========================= */
+
 function formatPrice(value) {
 
     return Number(value || 0).toLocaleString("fa-IR") + " تومان";
@@ -128,6 +162,9 @@ function productCard(product) {
     const name = productName(product);
     const price = productPrice(product);
 
+    const seller = sellerName(product);
+    const phone = sellerPhone(product);
+
     return `
         <article class="product">
 
@@ -137,7 +174,9 @@ function productCard(product) {
                     : ""
             }
 
-            <h3>${escapeHtml(name)}</h3>
+            <h3>
+                ${escapeHtml(name)}
+            </h3>
 
             <p>
                 ${escapeHtml(
@@ -148,8 +187,26 @@ function productCard(product) {
             </p>
 
             <p class="product-price">
-                ${formatPrice(price)}
+                💰 ${formatPrice(price)}
             </p>
+
+            <div class="seller-info">
+
+                <div class="seller-name">
+                    👤 فروشنده:
+                    <strong>
+                        ${escapeHtml(seller)}
+                    </strong>
+                </div>
+
+                <div class="seller-phone">
+                    📞 شماره تماس:
+                    <strong>
+                        ${escapeHtml(sellerPhone(product))}
+                    </strong>
+                </div>
+
+            </div>
 
             <button onclick='addToCart(${JSON.stringify(id)})'>
                 🛒 افزودن به سبد
@@ -254,9 +311,15 @@ function filterProducts() {
                     ""
                 ).toLowerCase();
 
+            const seller =
+                String(
+                    sellerName(product)
+                ).toLowerCase();
+
             return (
                 name.includes(query) ||
-                description.includes(query)
+                description.includes(query) ||
+                seller.includes(query)
             );
         });
 
@@ -482,18 +545,21 @@ function renderCart() {
                 <div class="cart-item">
 
                     <div>
+
                         <strong>
                             ${escapeHtml(item.name)}
                         </strong>
 
                         <div>
                             تعداد:
-                            ${Number(item.quantity).toLocaleString("fa-IR")}
+                            ${Number(item.quantity)
+                                .toLocaleString("fa-IR")}
                         </div>
 
                         <div>
                             ${formatPrice(itemTotal)}
                         </div>
+
                     </div>
 
                     <button
