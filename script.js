@@ -10,7 +10,6 @@ const PRODUCTS_FUNCTION_URL =
 const CART_KEY =
     "zardaloo_cart";
 
-
 let products = [];
 let cart = loadCart();
 
@@ -198,11 +197,9 @@ function productCard(product) {
                     : ""
             }
 
-
             <h3>
                 ${escapeHtml(name)}
             </h3>
-
 
             <p>
                 ${escapeHtml(
@@ -212,11 +209,9 @@ function productCard(product) {
                 )}
             </p>
 
-
             <p class="product-price">
                 💰 ${formatPrice(price)}
             </p>
-
 
             <div class="seller-info">
 
@@ -230,7 +225,6 @@ function productCard(product) {
 
                 </div>
 
-
                 <div class="seller-phone">
 
                     📞 شماره تماس:
@@ -242,7 +236,6 @@ function productCard(product) {
                 </div>
 
             </div>
-
 
             <button
                 onclick='addToCart(${JSON.stringify(id)})'
@@ -692,6 +685,13 @@ function renderCart() {
                         </div>
 
                         <div>
+                            ${formatPrice(
+                                item.price
+                            )}
+                        </div>
+
+                        <div>
+                            جمع این کالا:
                             ${formatPrice(
                                 itemTotal
                             )}
