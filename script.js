@@ -7,7 +7,9 @@ const SUPABASE_KEY =
 const PRODUCTS_FUNCTION_URL =
     SUPABASE_URL + "/functions/v1/products";
 
-const CART_KEY = "zardaloo_cart";
+const CART_KEY =
+    "zardaloo_cart";
+
 
 let products = [];
 let cart = loadCart();
@@ -23,7 +25,8 @@ function showPage(pageId) {
         page.classList.add("hidden");
     });
 
-    const page = document.getElementById(pageId);
+    const page =
+        document.getElementById(pageId);
 
     if (page) {
         page.classList.remove("hidden");
@@ -46,7 +49,10 @@ function showPage(pageId) {
 
 function escapeHtml(value) {
 
-    if (value === null || value === undefined) {
+    if (
+        value === null ||
+        value === undefined
+    ) {
         return "";
     }
 
@@ -102,7 +108,8 @@ function productPrice(product) {
         product?.unit_price ??
         0;
 
-    const number = Number(value);
+    const number =
+        Number(value);
 
     if (!Number.isFinite(number)) {
         return 0;
@@ -113,7 +120,7 @@ function productPrice(product) {
 
 
 /* =========================
-   SELLER HELPERS
+   SELLER
 ========================= */
 
 function sellerName(product) {
@@ -148,7 +155,11 @@ function sellerPhone(product) {
 
 function formatPrice(value) {
 
-    return Number(value || 0).toLocaleString("fa-IR") + " تومان";
+    return (
+        Number(value || 0)
+            .toLocaleString("fa-IR")
+        + " تومان"
+    );
 }
 
 
@@ -158,25 +169,40 @@ function formatPrice(value) {
 
 function productCard(product) {
 
-    const id = String(productId(product));
-    const name = productName(product);
-    const price = productPrice(product);
+    const id =
+        String(productId(product));
 
-    const seller = sellerName(product);
-    const phone = sellerPhone(product);
+    const name =
+        productName(product);
+
+    const price =
+        productPrice(product);
+
+    const seller =
+        sellerName(product);
+
+    const phone =
+        sellerPhone(product);
+
 
     return `
         <article class="product">
 
             ${
                 isGift(product)
-                    ? `<span class="gift-badge">🎁 اشانتیون</span>`
+                    ? `
+                        <span class="gift-badge">
+                            🎁 اشانتیون
+                        </span>
+                    `
                     : ""
             }
+
 
             <h3>
                 ${escapeHtml(name)}
             </h3>
+
 
             <p>
                 ${escapeHtml(
@@ -186,29 +212,41 @@ function productCard(product) {
                 )}
             </p>
 
+
             <p class="product-price">
                 💰 ${formatPrice(price)}
             </p>
 
+
             <div class="seller-info">
 
                 <div class="seller-name">
+
                     👤 فروشنده:
+
                     <strong>
                         ${escapeHtml(seller)}
                     </strong>
+
                 </div>
 
+
                 <div class="seller-phone">
+
                     📞 شماره تماس:
+
                     <strong>
-                        ${escapeHtml(sellerPhone(product))}
+                        ${escapeHtml(phone)}
                     </strong>
+
                 </div>
 
             </div>
 
-            <button onclick='addToCart(${JSON.stringify(id)})'>
+
+            <button
+                onclick='addToCart(${JSON.stringify(id)})'
+            >
                 🛒 افزودن به سبد
             </button>
 
@@ -232,10 +270,11 @@ function renderProducts(list) {
 
     if (!list.length) {
 
-        container.innerHTML =
-            `<div class="empty">
+        container.innerHTML = `
+            <div class="empty">
                 کالایی پیدا نشد.
-            </div>`;
+            </div>
+        `;
 
         return;
     }
@@ -263,10 +302,12 @@ function renderGifts(list) {
 
     if (!gifts.length) {
 
-        container.innerHTML =
-            `<div class="empty">
-                فعلاً کالای دارای اشانتیون وجود ندارد.
-            </div>`;
+        container.innerHTML = `
+            <div class="empty">
+                فعلاً کالای دارای اشانتیون
+                وجود ندارد.
+            </div>
+        `;
 
         return;
     }
@@ -290,12 +331,14 @@ function filterProducts() {
             ?.trim()
             .toLowerCase() || "";
 
+
     if (!query) {
 
         renderProducts(products);
 
         return;
     }
+
 
     const filtered =
         products.filter(product => {
@@ -316,12 +359,14 @@ function filterProducts() {
                     sellerName(product)
                 ).toLowerCase();
 
+
             return (
                 name.includes(query) ||
                 description.includes(query) ||
                 seller.includes(query)
             );
         });
+
 
     renderProducts(filtered);
 }
@@ -339,6 +384,7 @@ async function loadProducts() {
     const giftsContainer =
         document.getElementById("giftProducts");
 
+
     try {
 
         const response =
@@ -348,64 +394,100 @@ async function loadProducts() {
                     method: "GET",
 
                     headers: {
-                        "apikey": SUPABASE_KEY,
+                        "apikey":
+                            SUPABASE_KEY,
+
                         "Authorization":
-                            "Bearer " + SUPABASE_KEY
+                            "Bearer " +
+                            SUPABASE_KEY
                     }
                 }
             );
 
+
         if (!response.ok) {
 
             throw new Error(
-                "HTTP " + response.status
+                "HTTP " +
+                response.status
             );
         }
 
+
         const data =
             await response.json();
+
 
         if (Array.isArray(data)) {
 
             products = data;
 
-        } else if (Array.isArray(data?.products)) {
+        }
 
-            products = data.products;
+        else if (
+            Array.isArray(data?.products)
+        ) {
 
-        } else if (Array.isArray(data?.data)) {
+            products =
+                data.products;
 
-            products = data.data;
+        }
 
-        } else {
+        else if (
+            Array.isArray(data?.data)
+        ) {
+
+            products =
+                data.data;
+
+        }
+
+        else {
 
             products = [];
         }
 
+
         renderProducts(products);
+
         renderGifts(products);
 
-    } catch (error) {
+
+    }
+
+    catch (error) {
 
         console.error(
             "خطا در دریافت کالاها:",
             error
         );
 
+
         const message = `
             <div class="empty">
-                دریافت کالاها با مشکل مواجه شد.
+
+                دریافت کالاها با مشکل
+                مواجه شد.
+
                 <br>
+
                 لطفاً دوباره تلاش کنید.
+
             </div>
         `;
 
+
         if (productsContainer) {
-            productsContainer.innerHTML = message;
+
+            productsContainer.innerHTML =
+                message;
         }
 
+
         if (giftsContainer) {
-            giftsContainer.innerHTML = message;
+
+            giftsContainer.innerHTML =
+                message;
         }
     }
 }
@@ -422,18 +504,24 @@ function loadCart() {
         const saved =
             localStorage.getItem(CART_KEY);
 
+
         if (!saved) {
             return [];
         }
 
+
         const parsed =
             JSON.parse(saved);
+
 
         return Array.isArray(parsed)
             ? parsed
             : [];
 
-    } catch {
+
+    }
+
+    catch {
 
         return [];
     }
@@ -451,53 +539,77 @@ function saveCart() {
 
 function addToCart(id) {
 
-    const stringId = String(id);
+    const stringId =
+        String(id);
+
 
     const product =
         products.find(
             item =>
-                String(productId(item)) === stringId
+                String(
+                    productId(item)
+                ) === stringId
         );
+
 
     if (!product) {
         return;
     }
 
+
     const existing =
         cart.find(
             item =>
-                String(item.id) === stringId
+                String(item.id) ===
+                stringId
         );
+
 
     if (existing) {
 
         existing.quantity += 1;
 
-    } else {
+    }
+
+    else {
 
         cart.push({
+
             id: stringId,
-            name: productName(product),
-            price: productPrice(product),
+
+            name:
+                productName(product),
+
+            price:
+                productPrice(product),
+
             quantity: 1
         });
     }
 
+
     saveCart();
 
-    alert("کالا به سبد خرید اضافه شد! 🛒");
+
+    alert(
+        "کالا به سبد خرید اضافه شد! 🛒"
+    );
 }
 
 
 function removeFromCart(id) {
 
-    const stringId = String(id);
+    const stringId =
+        String(id);
+
 
     cart =
         cart.filter(
             item =>
-                String(item.id) !== stringId
+                String(item.id) !==
+                stringId
         );
+
 
     saveCart();
 
@@ -508,29 +620,43 @@ function removeFromCart(id) {
 function renderCart() {
 
     const container =
-        document.getElementById("cartItems");
+        document.getElementById(
+            "cartItems"
+        );
 
     const totalElement =
-        document.getElementById("cartTotal");
+        document.getElementById(
+            "cartTotal"
+        );
 
-    if (!container || !totalElement) {
+
+    if (
+        !container ||
+        !totalElement
+    ) {
         return;
     }
 
+
     if (!cart.length) {
 
-        container.innerHTML =
-            `<div class="empty">
+        container.innerHTML = `
+            <div class="empty">
                 سبد خرید خالی است.
-            </div>`;
+            </div>
+        `;
+
 
         totalElement.textContent =
             "مجموع: ۰ تومان";
 
+
         return;
     }
 
+
     let total = 0;
+
 
     container.innerHTML =
         cart.map(item => {
@@ -539,7 +665,9 @@ function renderCart() {
                 Number(item.price || 0) *
                 Number(item.quantity || 0);
 
+
             total += itemTotal;
+
 
             return `
                 <div class="cart-item">
@@ -547,23 +675,34 @@ function renderCart() {
                     <div>
 
                         <strong>
-                            ${escapeHtml(item.name)}
+                            ${escapeHtml(
+                                item.name
+                            )}
                         </strong>
 
                         <div>
                             تعداد:
-                            ${Number(item.quantity)
-                                .toLocaleString("fa-IR")}
+                            ${
+                                Number(
+                                    item.quantity
+                                ).toLocaleString(
+                                    "fa-IR"
+                                )
+                            }
                         </div>
 
                         <div>
-                            ${formatPrice(itemTotal)}
+                            ${formatPrice(
+                                itemTotal
+                            )}
                         </div>
 
                     </div>
 
+
                     <button
-                        onclick='removeFromCart(${JSON.stringify(item.id)})'>
+                        onclick='removeFromCart(${JSON.stringify(item.id)})'
+                    >
                         حذف
                     </button>
 
@@ -572,8 +711,10 @@ function renderCart() {
 
         }).join("");
 
+
     totalElement.textContent =
-        "مجموع: " + formatPrice(total);
+        "مجموع: " +
+        formatPrice(total);
 }
 
 
