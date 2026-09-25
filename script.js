@@ -1,8 +1,8 @@
 "use strict";
 
-/* ==============================
+/* ==================================================
    ZARDALOO CONFIG
-================================ */
+================================================== */
 
 const SUPABASE_URL =
     "https://ovqldknqpaiczrddcrxp.supabase.co";
@@ -17,31 +17,37 @@ const ADMIN_FUNCTION_URL =
     SUPABASE_URL + "/functions/v1/admin-reports";
 
 
-/* ==============================
-   ADMIN PASSWORDS
-================================ */
+/* ==================================================
+   ADMIN LOGIN
+================================================== */
 
 const ADMIN_NUMBER = "0994051777";
 const ADMIN_PASSWORD = "ERFAN";
 
 
-/* ==============================
+/* ==================================================
    STORAGE
-================================ */
+================================================== */
 
 const CART_KEY = "zardaloo_cart";
 const THEME_KEY = "zardaloo_theme";
 const DISCOUNT_KEY = "zardaloo_discount";
+const ADMIN_SESSION_KEY = "zardaloo_admin";
+const ADMIN_TOKEN_KEY = "zardaloo_admin_token";
 
+
+/* ==================================================
+   GLOBAL DATA
+================================================== */
 
 let products = [];
 let cart = loadCart();
 let activeDiscount = loadDiscount();
 
 
-/* ==============================
+/* ==================================================
    START
-================================ */
+================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -51,16 +57,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     loadProducts();
 
-    if (sessionStorage.getItem("zardaloo_admin") === "1") {
+    const loggedIn =
+        sessionStorage.getItem(ADMIN_SESSION_KEY) === "1";
+
+    const token =
+        sessionStorage.getItem(ADMIN_TOKEN_KEY);
+
+    if (loggedIn && token) {
         showAdminPanel();
     }
 
 });
 
 
-/* ==============================
+/* ==================================================
    PAGE SYSTEM
-================================ */
+================================================== */
 
 function showPage(pageName) {
 
@@ -68,7 +80,8 @@ function showPage(pageName) {
         page.classList.remove("active");
     });
 
-    const page = document.getElementById(pageName);
+    const page =
+        document.getElementById(pageName);
 
     if (page) {
         page.classList.add("active");
@@ -79,21 +92,35 @@ function showPage(pageName) {
         behavior: "smooth"
     });
 
+
     if (pageName === "market") {
         loadProducts();
     }
+
 
     if (pageName === "gifts") {
         renderGifts();
     }
 
+
     if (pageName === "cart") {
         renderCart();
     }
 
+
     if (pageName === "admin") {
 
-        if (sessionStorage.getItem("zardaloo_admin") === "1") {
+        const loggedIn =
+            sessionStorage.getItem(
+                ADMIN_SESSION_KEY
+            ) === "1";
+
+        const token =
+            sessionStorage.getItem(
+                ADMIN_TOKEN_KEY
+            );
+
+        if (loggedIn && token) {
             showAdminPanel();
         } else {
             showAdminLogin();
@@ -104,9 +131,9 @@ function showPage(pageName) {
 }
 
 
-/* ==============================
+/* ==================================================
    THEME
-================================ */
+================================================== */
 
 function toggleTheme() {
 
@@ -117,13 +144,18 @@ function toggleTheme() {
             ? "dark"
             : "light";
 
-    localStorage.setItem(THEME_KEY, theme);
+    localStorage.setItem(
+        THEME_KEY,
+        theme
+    );
+
 }
 
 
 function loadTheme() {
 
-    const theme = localStorage.getItem(THEME_KEY);
+    const theme =
+        localStorage.getItem(THEME_KEY);
 
     if (theme === "dark") {
         document.body.classList.add("dark");
@@ -132,57 +164,88 @@ function loadTheme() {
 }
 
 
-/* ==============================
+/* ==================================================
    PRODUCTS
-================================ */
+================================================== */
 
 async function loadProducts() {
 
     const container =
         document.getElementById("products");
 
-    if (!container) return;
+    if (!container) {
+        return;
+    }
 
     container.innerHTML =
-        `<div class="loading">در حال دریافت کالاها...</div>`;
+        `<div class="loading">
+            در حال دریافت کالاها...
+        </div>`;
+
 
     try {
 
-        const response = await fetch(
-            PRODUCTS_FUNCTION_URL,
-            {
-                method: "GET",
-                headers: {
-                    "apikey": SUPABASE_KEY
+        const response =
+            await fetch(
+                PRODUCTS_FUNCTION_URL,
+                {
+                    method: "GET",
+
+                    headers: {
+                        "apikey":
+                            SUPABASE_KEY
+                    }
                 }
-            }
-        );
+            );
+
 
         const data =
-            await response.json();
+            await response.json().catch(
+                () => ({})
+            );
+
 
         if (!response.ok) {
+
             throw new Error(
                 data.error ||
                 data.message ||
                 "دریافت کالاها ناموفق بود."
             );
+
         }
+
 
         if (Array.isArray(data)) {
+
             products = data;
-        } else if (Array.isArray(data.products)) {
+
+        } else if (
+            Array.isArray(data.products)
+        ) {
+
             products = data.products;
+
         } else {
+
             products = [];
+
         }
 
+
         renderProducts(products);
+
         renderGifts();
+
+        updateAdminStats();
+
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "LOAD PRODUCTS ERROR:",
+            error
+        );
 
         container.innerHTML = `
             <div class="error">
@@ -197,24 +260,30 @@ async function loadProducts() {
 }
 
 
-/* ==============================
+/* ==================================================
    PRODUCT RENDER
-================================ */
+================================================== */
 
 function renderProducts(list) {
 
     const container =
         document.getElementById("products");
 
-    if (!container) return;
+    if (!container) {
+        return;
+    }
 
-    if (!list.length) {
+
+    if (!Array.isArray(list) || !list.length) {
 
         container.innerHTML =
-            `<div class="empty">کالایی پیدا نشد.</div>`;
+            `<div class="empty">
+                کالایی پیدا نشد.
+            </div>`;
 
         return;
     }
+
 
     container.innerHTML =
         list.map(productCard).join("");
@@ -222,20 +291,32 @@ function renderProducts(list) {
 }
 
 
+/* ==================================================
+   GIFTS
+================================================== */
+
 function renderGifts() {
 
     const container =
-        document.getElementById("giftProducts");
+        document.getElementById(
+            "giftProducts"
+        );
 
-    if (!container) return;
+    if (!container) {
+        return;
+    }
+
 
     const gifts =
-        products.filter(product =>
-            Boolean(
+        products.filter(product => {
+
+            return Boolean(
                 product.is_gift ??
                 product.isGift
-            )
-        );
+            );
+
+        });
+
 
     if (!gifts.length) {
 
@@ -247,11 +328,16 @@ function renderGifts() {
         return;
     }
 
+
     container.innerHTML =
         gifts.map(productCard).join("");
 
 }
 
+
+/* ==================================================
+   PRODUCT CARD
+================================================== */
 
 function productCard(product) {
 
@@ -260,10 +346,12 @@ function productCard(product) {
         product.product_id ??
         Math.random().toString(36);
 
+
     const name =
         product.name ??
         product.product_name ??
         "کالای بدون نام";
+
 
     const price =
         Number(
@@ -272,11 +360,13 @@ function productCard(product) {
             0
         );
 
+
     const seller =
         product.seller_name ??
         product.sellerName ??
         product.seller ??
         "فروشنده";
+
 
     const phone =
         product.seller_phone ??
@@ -284,15 +374,18 @@ function productCard(product) {
         product.phone ??
         "ثبت نشده";
 
+
     const description =
         product.description ??
         "";
+
 
     const gift =
         Boolean(
             product.is_gift ??
             product.isGift
         );
+
 
     return `
         <article class="product-card">
@@ -306,11 +399,14 @@ function productCard(product) {
             </h3>
 
             <p class="description">
-                ${escapeHTML(String(description))}
+                ${escapeHTML(
+                    String(description)
+                )}
             </p>
 
             <div class="price">
-                ${formatPrice(price)} تومان
+                ${formatPrice(price)}
+                تومان
             </div>
 
             <div class="seller">
@@ -325,40 +421,58 @@ function productCard(product) {
 
             ${
                 gift
-                    ? `<div class="gift-badge">🎁 اشانتیون</div>`
+                    ? `
+                        <div class="gift-badge">
+                            🎁 اشانتیون
+                        </div>
+                    `
                     : ""
             }
 
             <button
                 class="primary"
-                onclick="addToCart('${escapeAttribute(String(id))}')"
+                onclick="addToCart(
+                    '${escapeAttribute(String(id))}'
+                )"
             >
                 افزودن به سبد
             </button>
 
         </article>
     `;
+
 }
 
 
-/* ==============================
+/* ==================================================
    SEARCH
-================================ */
+================================================== */
 
 function searchProducts() {
 
     const input =
-        document.getElementById("searchInput");
+        document.getElementById(
+            "searchInput"
+        );
 
-    if (!input) return;
-
-    const query =
-        input.value.trim().toLowerCase();
-
-    if (!query) {
-        renderProducts(products);
+    if (!input) {
         return;
     }
+
+
+    const query =
+        input.value
+            .trim()
+            .toLowerCase();
+
+
+    if (!query) {
+
+        renderProducts(products);
+
+        return;
+    }
+
 
     const result =
         products.filter(product => {
@@ -370,11 +484,13 @@ function searchProducts() {
                     ""
                 ).toLowerCase();
 
+
             const description =
                 String(
                     product.description ??
                     ""
                 ).toLowerCase();
+
 
             const seller =
                 String(
@@ -382,6 +498,7 @@ function searchProducts() {
                     product.sellerName ??
                     ""
                 ).toLowerCase();
+
 
             return (
                 name.includes(query) ||
@@ -391,22 +508,35 @@ function searchProducts() {
 
         });
 
+
     renderProducts(result);
 
 }
 
 
-/* ==============================
+/* ==================================================
    CART
-================================ */
+================================================== */
 
 function loadCart() {
 
     try {
 
-        return JSON.parse(
-            localStorage.getItem(CART_KEY)
-        ) || [];
+        const saved =
+            localStorage.getItem(
+                CART_KEY
+            );
+
+        if (!saved) {
+            return [];
+        }
+
+        const parsed =
+            JSON.parse(saved);
+
+        return Array.isArray(parsed)
+            ? parsed
+            : [];
 
     } catch {
 
@@ -427,25 +557,43 @@ function saveCart() {
 }
 
 
+/* ==================================================
+   ADD TO CART
+================================================== */
+
 function addToCart(id) {
 
     const product =
-        products.find(product =>
-            String(
+        products.find(product => {
+
+            const productId =
                 product.id ??
-                product.product_id
-            ) === String(id)
-        );
+                product.product_id;
+
+            return String(productId) ===
+                String(id);
+
+        });
+
 
     if (!product) {
-        alert("کالا پیدا نشد.");
+
+        alert(
+            "کالا پیدا نشد."
+        );
+
         return;
     }
 
+
     const existing =
-        cart.find(item =>
-            String(item.id) === String(id)
-        );
+        cart.find(item => {
+
+            return String(item.id) ===
+                String(id);
+
+        });
+
 
     if (existing) {
 
@@ -454,33 +602,52 @@ function addToCart(id) {
     } else {
 
         cart.push({
+
             id: String(id),
+
             name:
                 product.name ??
                 product.product_name ??
                 "کالا",
+
             price:
-                Number(product.price ?? 0),
+                Number(
+                    product.price ??
+                    0
+                ),
+
             quantity: 1
+
         });
 
     }
 
+
     saveCart();
 
     renderCart();
 
-    alert("کالا به سبد خرید اضافه شد.");
+    alert(
+        "کالا به سبد خرید اضافه شد."
+    );
 
 }
 
+
+/* ==================================================
+   REMOVE FROM CART
+================================================== */
 
 function removeFromCart(id) {
 
     cart =
-        cart.filter(item =>
-            String(item.id) !== String(id)
-        );
+        cart.filter(item => {
+
+            return String(item.id) !==
+                String(id);
+
+        });
+
 
     saveCart();
 
@@ -489,25 +656,45 @@ function removeFromCart(id) {
 }
 
 
-function changeQuantity(id, amount) {
+/* ==================================================
+   QUANTITY
+================================================== */
+
+function changeQuantity(
+    id,
+    amount
+) {
 
     const item =
-        cart.find(item =>
-            String(item.id) === String(id)
-        );
+        cart.find(item => {
 
-    if (!item) return;
+            return String(item.id) ===
+                String(id);
+
+        });
+
+
+    if (!item) {
+        return;
+    }
+
 
     item.quantity += amount;
+
 
     if (item.quantity <= 0) {
 
         cart =
-            cart.filter(cartItem =>
-                String(cartItem.id) !== String(id)
-            );
+            cart.filter(cartItem => {
+
+                return String(
+                    cartItem.id
+                ) !== String(id);
+
+            });
 
     }
+
 
     saveCart();
 
@@ -515,6 +702,10 @@ function changeQuantity(id, amount) {
 
 }
 
+
+/* ==================================================
+   CLEAR CART
+================================================== */
 
 function clearCart() {
 
@@ -527,19 +718,27 @@ function clearCart() {
 }
 
 
-/* ==============================
+/* ==================================================
    CART RENDER
-================================ */
+================================================== */
 
 function renderCart() {
 
     const container =
-        document.getElementById("cartItems");
+        document.getElementById(
+            "cartItems"
+        );
 
     const summary =
-        document.getElementById("cartSummary");
+        document.getElementById(
+            "cartSummary"
+        );
 
-    if (!container || !summary) return;
+
+    if (!container || !summary) {
+        return;
+    }
+
 
     if (!cart.length) {
 
@@ -560,34 +759,47 @@ function renderCart() {
         cart.map(item => {
 
             const total =
-                item.price *
-                item.quantity;
+                Number(item.price || 0) *
+                Number(item.quantity || 0);
+
 
             return `
                 <div class="cart-item">
 
                     <div>
+
                         <strong>
-                            ${escapeHTML(item.name)}
+                            ${escapeHTML(
+                                item.name
+                            )}
                         </strong>
 
                         <div>
                             قیمت واحد:
-                            ${formatPrice(item.price)}
+                            ${formatPrice(
+                                item.price
+                            )}
                             تومان
                         </div>
 
                         <div>
                             مجموع:
-                            ${formatPrice(total)}
+                            ${formatPrice(
+                                total
+                            )}
                             تومان
                         </div>
+
                     </div>
+
 
                     <div class="quantity">
 
                         <button
-                            onclick="changeQuantity('${escapeAttribute(item.id)}', 1)"
+                            onclick="changeQuantity(
+                                '${escapeAttribute(item.id)}',
+                                1
+                            )"
                         >
                             +
                         </button>
@@ -597,16 +809,22 @@ function renderCart() {
                         </span>
 
                         <button
-                            onclick="changeQuantity('${escapeAttribute(item.id)}', -1)"
+                            onclick="changeQuantity(
+                                '${escapeAttribute(item.id)}',
+                                -1
+                            )"
                         >
                             -
                         </button>
 
                     </div>
 
+
                     <button
                         class="danger"
-                        onclick="removeFromCart('${escapeAttribute(item.id)}')"
+                        onclick="removeFromCart(
+                            '${escapeAttribute(item.id)}'
+                        )"
                     >
                         حذف
                     </button>
@@ -619,26 +837,33 @@ function renderCart() {
 
     const subtotal =
         cart.reduce(
-            (sum, item) =>
-                sum + item.price * item.quantity,
+            (sum, item) => {
+
+                return sum +
+                    Number(item.price || 0) *
+                    Number(item.quantity || 0);
+
+            },
             0
         );
 
 
     let discountAmount = 0;
 
+
     if (activeDiscount) {
 
         discountAmount =
             subtotal *
-            activeDiscount.percent /
+            Number(activeDiscount.percent) /
             100;
 
     }
 
 
     const finalPrice =
-        subtotal - discountAmount;
+        subtotal -
+        discountAmount;
 
 
     summary.innerHTML = `
@@ -671,23 +896,29 @@ function renderCart() {
             activeDiscount
                 ? `
                     <div class="discount-success">
-                        کد ${escapeHTML(activeDiscount.code)}
-                        با ${activeDiscount.percent}% تخفیف فعال است.
+                        کد
+                        ${escapeHTML(
+                            activeDiscount.code
+                        )}
+                        با
+                        ${activeDiscount.percent}%
+                        تخفیف فعال است.
                     </div>
-                  `
+                `
                 : ""
         }
 
     `;
+
 
     updateAdminStats();
 
 }
 
 
-/* ==============================
+/* ==================================================
    DISCOUNTS
-================================ */
+================================================== */
 
 const discountCodes = {
 
@@ -702,9 +933,16 @@ function loadDiscount() {
 
     try {
 
-        return JSON.parse(
-            localStorage.getItem(DISCOUNT_KEY)
-        );
+        const saved =
+            localStorage.getItem(
+                DISCOUNT_KEY
+            );
+
+        if (!saved) {
+            return null;
+        }
+
+        return JSON.parse(saved);
 
     } catch {
 
@@ -718,15 +956,26 @@ function loadDiscount() {
 function applyDiscountCode() {
 
     const input =
-        document.getElementById("discountInput");
+        document.getElementById(
+            "discountInput"
+        );
 
     const message =
-        document.getElementById("discountMessage");
+        document.getElementById(
+            "discountMessage"
+        );
 
-    if (!input || !message) return;
+
+    if (!input || !message) {
+        return;
+    }
+
 
     const code =
-        input.value.trim().toUpperCase();
+        input.value
+            .trim()
+            .toUpperCase();
+
 
     if (!code) {
 
@@ -751,13 +1000,19 @@ function applyDiscountCode() {
 
 
     activeDiscount = {
+
         code: code,
+
         percent: percent
+
     };
+
 
     localStorage.setItem(
         DISCOUNT_KEY,
-        JSON.stringify(activeDiscount)
+        JSON.stringify(
+            activeDiscount
+        )
     );
 
 
@@ -769,34 +1024,86 @@ function applyDiscountCode() {
 }
 
 
-/* ==============================
+/* ==================================================
    REGISTER PRODUCT
-================================ */
+================================================== */
 
 async function registerProduct() {
 
+    const nameInput =
+        document.getElementById(
+            "productName"
+        );
+
+    const priceInput =
+        document.getElementById(
+            "productPrice"
+        );
+
+    const sellerNameInput =
+        document.getElementById(
+            "sellerName"
+        );
+
+    const sellerPhoneInput =
+        document.getElementById(
+            "sellerPhone"
+        );
+
+    const descriptionInput =
+        document.getElementById(
+            "productDescription"
+        );
+
+    const giftInput =
+        document.getElementById(
+            "isGift"
+        );
+
+    const message =
+        document.getElementById(
+            "registerMessage"
+        );
+
+
+    if (
+        !nameInput ||
+        !priceInput ||
+        !sellerNameInput ||
+        !sellerPhoneInput ||
+        !descriptionInput ||
+        !giftInput ||
+        !message
+    ) {
+
+        return;
+    }
+
+
     const name =
-        document.getElementById("productName").value.trim();
+        nameInput.value.trim();
+
 
     const price =
         Number(
-            document.getElementById("productPrice").value
+            priceInput.value
         );
 
+
     const sellerName =
-        document.getElementById("sellerName").value.trim();
+        sellerNameInput.value.trim();
+
 
     const sellerPhone =
-        document.getElementById("sellerPhone").value.trim();
+        sellerPhoneInput.value.trim();
+
 
     const description =
-        document.getElementById("productDescription").value.trim();
+        descriptionInput.value.trim();
+
 
     const isGift =
-        document.getElementById("isGift").checked;
-
-    const message =
-        document.getElementById("registerMessage");
+        giftInput.checked;
 
 
     if (!name) {
@@ -865,12 +1172,19 @@ async function registerProduct() {
                     method: "POST",
 
                     headers: {
-                        "Content-Type": "application/json",
-                        "apikey": SUPABASE_KEY
+
+                        "Content-Type":
+                            "application/json",
+
+                        "apikey":
+                            SUPABASE_KEY
+
                     },
 
                     body:
-                        JSON.stringify(payload)
+                        JSON.stringify(
+                            payload
+                        )
                 }
             );
 
@@ -895,29 +1209,18 @@ async function registerProduct() {
         message.textContent =
             "✅ کالا با موفقیت ثبت شد.";
 
-        document.getElementById(
-            "productName"
-        ).value = "";
 
-        document.getElementById(
-            "productPrice"
-        ).value = "";
+        nameInput.value = "";
 
-        document.getElementById(
-            "sellerName"
-        ).value = "";
+        priceInput.value = "";
 
-        document.getElementById(
-            "sellerPhone"
-        ).value = "";
+        sellerNameInput.value = "";
 
-        document.getElementById(
-            "productDescription"
-        ).value = "";
+        sellerPhoneInput.value = "";
 
-        document.getElementById(
-            "isGift"
-        ).checked = false;
+        descriptionInput.value = "";
+
+        giftInput.checked = false;
 
 
         await loadProducts();
@@ -925,7 +1228,10 @@ async function registerProduct() {
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "REGISTER PRODUCT ERROR:",
+            error
+        );
 
         message.textContent =
             "❌ " + error.message;
@@ -935,45 +1241,93 @@ async function registerProduct() {
 }
 
 
-/* ==============================
-   ADMIN LOGIN
-================================ */
+/* ==================================================
+   ADMIN LOGIN PAGE
+================================================== */
 
 function showAdminLogin() {
 
     const login =
-        document.getElementById("adminLoginBox");
+        document.getElementById(
+            "adminLoginBox"
+        );
 
     const panel =
-        document.getElementById("adminPanel");
+        document.getElementById(
+            "adminPanel"
+        );
 
-    login.classList.remove("hidden");
 
-    panel.classList.add("hidden");
+    if (login) {
+        login.classList.remove(
+            "hidden"
+        );
+    }
+
+
+    if (panel) {
+        panel.classList.add(
+            "hidden"
+        );
+    }
 
 }
 
 
-function adminLogin() {
+/* ==================================================
+   ADMIN LOGIN
+================================================== */
 
-    const number =
-        document.getElementById("adminNumber").value.trim();
+async function adminLogin() {
 
-    const password =
-        document.getElementById("adminPassword").value;
+    const numberInput =
+        document.getElementById(
+            "adminNumber"
+        );
+
+    const passwordInput =
+        document.getElementById(
+            "adminPassword"
+        );
 
     const message =
-        document.getElementById("adminMessage");
+        document.getElementById(
+            "adminMessage"
+        );
+
+
+    if (
+        !numberInput ||
+        !passwordInput ||
+        !message
+    ) {
+
+        return;
+    }
+
+
+    const number =
+        numberInput.value.trim();
+
+
+    const password =
+        passwordInput.value;
 
 
     if (!number || !password) {
 
         message.textContent =
-            "هر دو رمز را وارد کنید.";
+            "شماره مدیریت و رمز عبور را وارد کنید.";
 
         return;
     }
 
+
+    /*
+       اول بررسی محلی
+       تا اطلاعات اشتباه
+       بیهوده به سرور ارسال نشود.
+    */
 
     if (
         number !== ADMIN_NUMBER ||
@@ -981,38 +1335,155 @@ function adminLogin() {
     ) {
 
         message.textContent =
-            "❌ رمز مدیریت یا پسورد اشتباه است.";
+            "❌ شماره مدیریت یا رمز عبور اشتباه است.";
 
         return;
     }
 
 
-    sessionStorage.setItem(
-        "zardaloo_admin",
-        "1"
-    );
-
-
     message.textContent =
-        "✅ ورود موفق بود.";
+        "در حال ورود به مدیریت...";
 
-    showAdminPanel();
+
+    try {
+
+        const response =
+            await fetch(
+                ADMIN_FUNCTION_URL +
+                "/login",
+                {
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        "apikey":
+                            SUPABASE_KEY
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            number:
+                                number,
+
+                            password:
+                                password
+
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json().catch(
+                () => ({})
+            );
+
+
+        if (
+            !response.ok ||
+            !data.ok
+        ) {
+
+            throw new Error(
+                data.error ||
+                "ورود به مدیریت ناموفق بود."
+            );
+
+        }
+
+
+        const token =
+            String(
+                data.token ||
+                data.admin_token ||
+                data.adminToken ||
+                ""
+            ).trim();
+
+
+        if (!token) {
+
+            throw new Error(
+                "سرور توکن مدیریت ارسال نکرد."
+            );
+
+        }
+
+
+        sessionStorage.setItem(
+            ADMIN_SESSION_KEY,
+            "1"
+        );
+
+
+        sessionStorage.setItem(
+            ADMIN_TOKEN_KEY,
+            token
+        );
+
+
+        message.textContent =
+            "✅ ورود موفق بود.";
+
+
+        passwordInput.value = "";
+
+
+        showAdminPanel();
+
+
+    } catch (error) {
+
+        console.error(
+            "ADMIN LOGIN ERROR:",
+            error
+        );
+
+
+        message.textContent =
+            "❌ " +
+            error.message;
+
+    }
 
 }
 
 
+/* ==================================================
+   ADMIN PANEL
+================================================== */
+
 function showAdminPanel() {
 
     const login =
-        document.getElementById("adminLoginBox");
+        document.getElementById(
+            "adminLoginBox"
+        );
 
     const panel =
-        document.getElementById("adminPanel");
+        document.getElementById(
+            "adminPanel"
+        );
 
 
-    login.classList.add("hidden");
+    if (login) {
+        login.classList.add(
+            "hidden"
+        );
+    }
 
-    panel.classList.remove("hidden");
+
+    if (panel) {
+        panel.classList.remove(
+            "hidden"
+        );
+    }
 
 
     updateAdminStats();
@@ -1020,24 +1491,40 @@ function showAdminPanel() {
 }
 
 
-/* ==============================
+/* ==================================================
    ADMIN LOGOUT
-================================ */
+================================================== */
 
 function adminLogout() {
 
     sessionStorage.removeItem(
-        "zardaloo_admin"
+        ADMIN_SESSION_KEY
     );
+
+    sessionStorage.removeItem(
+        ADMIN_TOKEN_KEY
+    );
+
+
+    const content =
+        document.getElementById(
+            "adminContent"
+        );
+
+
+    if (content) {
+        content.innerHTML = "";
+    }
+
 
     showAdminLogin();
 
 }
 
 
-/* ==============================
+/* ==================================================
    ADMIN STATS
-================================ */
+================================================== */
 
 function updateAdminStats() {
 
@@ -1058,8 +1545,10 @@ function updateAdminStats() {
 
 
     if (productCount) {
+
         productCount.textContent =
             products.length;
+
     }
 
 
@@ -1067,8 +1556,14 @@ function updateAdminStats() {
 
         cartCount.textContent =
             cart.reduce(
-                (sum, item) =>
-                    sum + item.quantity,
+                (sum, item) => {
+
+                    return sum +
+                        Number(
+                            item.quantity || 0
+                        );
+
+                },
                 0
             );
 
@@ -1079,12 +1574,20 @@ function updateAdminStats() {
 
         const total =
             cart.reduce(
-                (sum, item) =>
-                    sum +
-                    item.price *
-                    item.quantity,
+                (sum, item) => {
+
+                    return sum +
+                        Number(
+                            item.price || 0
+                        ) *
+                        Number(
+                            item.quantity || 0
+                        );
+
+                },
                 0
             );
+
 
         cartTotal.textContent =
             formatPrice(total);
@@ -1094,23 +1597,71 @@ function updateAdminStats() {
 }
 
 
-/* ==============================
+/* ==================================================
    ADMIN REQUEST
-================================ */
+================================================== */
 
 async function adminRequest(
     path,
     options = {}
 ) {
 
-    if (
+    const loggedIn =
         sessionStorage.getItem(
-            "zardaloo_admin"
-        ) !== "1"
-    ) {
+            ADMIN_SESSION_KEY
+        ) === "1";
+
+
+    if (!loggedIn) {
 
         throw new Error(
             "ابتدا وارد مدیریت شوید."
+        );
+
+    }
+
+
+    const adminToken =
+        sessionStorage.getItem(
+            ADMIN_TOKEN_KEY
+        ) || "";
+
+
+    if (!adminToken) {
+
+        sessionStorage.removeItem(
+            ADMIN_SESSION_KEY
+        );
+
+
+        throw new Error(
+            "توکن مدیریت پیدا نشد. دوباره وارد شوید."
+        );
+
+    }
+
+
+    const headers = {
+
+        "Content-Type":
+            "application/json",
+
+        "apikey":
+            SUPABASE_KEY,
+
+        "x-admin-token":
+            adminToken
+
+    };
+
+
+    if (
+        options.headers
+    ) {
+
+        Object.assign(
+            headers,
+            options.headers
         );
 
     }
@@ -1121,19 +1672,7 @@ async function adminRequest(
             ADMIN_FUNCTION_URL + path,
             {
                 ...options,
-
-                headers: {
-                    "Content-Type":
-                        "application/json",
-
-                    "apikey":
-                        SUPABASE_KEY,
-
-                    "Authorization":
-                        "Bearer " + SUPABASE_KEY,
-
-                    ...(options.headers || {})
-                }
+                headers: headers
             }
         );
 
@@ -1145,6 +1684,21 @@ async function adminRequest(
 
 
     if (!response.ok) {
+
+        if (
+            response.status === 401
+        ) {
+
+            sessionStorage.removeItem(
+                ADMIN_SESSION_KEY
+            );
+
+            sessionStorage.removeItem(
+                ADMIN_TOKEN_KEY
+            );
+
+        }
+
 
         throw new Error(
             data.error ||
@@ -1160,9 +1714,92 @@ async function adminRequest(
 }
 
 
-/* ==============================
+/* ==================================================
+   ADMIN DASHBOARD
+================================================== */
+
+async function loadAdminDashboard() {
+
+    const content =
+        document.getElementById(
+            "adminContent"
+        );
+
+
+    if (!content) {
+        return;
+    }
+
+
+    content.innerHTML =
+        `<div class="loading">
+            در حال دریافت اطلاعات مدیریت...
+        </div>`;
+
+
+    try {
+
+        const data =
+            await adminRequest(
+                "/dashboard"
+            );
+
+
+        content.innerHTML = `
+
+            <div class="admin-dashboard">
+
+                <div class="admin-card">
+
+                    <h3>
+                        📦 تعداد کالاها
+                    </h3>
+
+                    <strong>
+                        ${formatPrice(
+                            data.products_count || 0
+                        )}
+                    </strong>
+
+                </div>
+
+
+                <div class="admin-card">
+
+                    <h3>
+                        📊 تعداد گزارش‌ها
+                    </h3>
+
+                    <strong>
+                        ${formatPrice(
+                            data.reports_count || 0
+                        )}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        `;
+
+
+    } catch (error) {
+
+        content.innerHTML =
+            `<div class="error">
+                ${escapeHTML(
+                    error.message
+                )}
+            </div>`;
+
+    }
+
+}
+
+
+/* ==================================================
    ADMIN PRODUCTS
-================================ */
+================================================== */
 
 async function loadAdminProducts() {
 
@@ -1170,6 +1807,12 @@ async function loadAdminProducts() {
         document.getElementById(
             "adminContent"
         );
+
+
+    if (!content) {
+        return;
+    }
+
 
     content.innerHTML =
         `<div class="loading">
@@ -1188,7 +1831,13 @@ async function loadAdminProducts() {
         const list =
             Array.isArray(data)
                 ? data
-                : data.products || [];
+                : (
+                    Array.isArray(
+                        data.products
+                    )
+                        ? data.products
+                        : []
+                );
 
 
         if (!list.length) {
@@ -1206,39 +1855,62 @@ async function loadAdminProducts() {
 
             <div class="admin-products">
 
-                ${list.map(product => `
+                ${list.map(
+                    product => {
 
-                    <div class="admin-product">
+                        const id =
+                            product.id ??
+                            product.product_id ??
+                            "";
 
-                        <strong>
-                            ${escapeHTML(
-                                String(
-                                    product.name ??
-                                    product.product_name ??
-                                    "کالا"
-                                )
-                            )}
-                        </strong>
 
-                        <span>
-                            ${formatPrice(
-                                Number(
-                                    product.price ?? 0
-                                )
-                            )}
-                            تومان
-                        </span>
+                        const name =
+                            product.name ??
+                            product.product_name ??
+                            "کالا";
 
-                        <button
-                            class="danger"
-                            onclick="deleteAdminProduct('${escapeAttribute(String(product.id ?? product.product_id ?? ""))}')"
-                        >
-                            حذف
-                        </button>
 
-                    </div>
+                        const price =
+                            Number(
+                                product.price ??
+                                0
+                            );
 
-                `).join("")}
+
+                        return `
+
+                            <div class="admin-product">
+
+                                <strong>
+                                    ${escapeHTML(
+                                        String(name)
+                                    )}
+                                </strong>
+
+                                <span>
+                                    ${formatPrice(
+                                        price
+                                    )}
+                                    تومان
+                                </span>
+
+                                <button
+                                    class="danger"
+                                    onclick="deleteAdminProduct(
+                                        '${escapeAttribute(
+                                            String(id)
+                                        )}'
+                                    )"
+                                >
+                                    حذف
+                                </button>
+
+                            </div>
+
+                        `;
+
+                    }
+                ).join("")}
 
             </div>
 
@@ -1249,7 +1921,9 @@ async function loadAdminProducts() {
 
         content.innerHTML =
             `<div class="error">
-                ${escapeHTML(error.message)}
+                ${escapeHTML(
+                    error.message
+                )}
             </div>`;
 
     }
@@ -1257,13 +1931,15 @@ async function loadAdminProducts() {
 }
 
 
-/* ==============================
-   DELETE PRODUCT
-================================ */
+/* ==================================================
+   DELETE ADMIN PRODUCT
+================================================== */
 
 async function deleteAdminProduct(id) {
 
-    if (!id) return;
+    if (!id) {
+        return;
+    }
 
 
     const confirmed =
@@ -1272,7 +1948,9 @@ async function deleteAdminProduct(id) {
         );
 
 
-    if (!confirmed) return;
+    if (!confirmed) {
+        return;
+    }
 
 
     try {
@@ -1287,7 +1965,7 @@ async function deleteAdminProduct(id) {
 
 
         alert(
-            "کالا حذف شد."
+            "✅ کالا حذف شد."
         );
 
 
@@ -1307,9 +1985,9 @@ async function deleteAdminProduct(id) {
 }
 
 
-/* ==============================
+/* ==================================================
    ADMIN REPORTS
-================================ */
+================================================== */
 
 async function loadAdminReports() {
 
@@ -1319,9 +1997,14 @@ async function loadAdminReports() {
         );
 
 
+    if (!content) {
+        return;
+    }
+
+
     content.innerHTML =
         `<div class="loading">
-            در حال دریافت گزارش...
+            در حال دریافت گزارش‌ها...
         </div>`;
 
 
@@ -1333,21 +2016,143 @@ async function loadAdminReports() {
             );
 
 
+        const reports =
+            Array.isArray(data)
+                ? data
+                : (
+                    Array.isArray(
+                        data.reports
+                    )
+                        ? data.reports
+                        : []
+                );
+
+
+        if (!reports.length) {
+
+            content.innerHTML =
+                `<div class="empty">
+                    گزارشی وجود ندارد.
+                </div>`;
+
+            return;
+        }
+
+
         content.innerHTML = `
 
-            <div class="report-card">
+            <div class="admin-reports">
 
-                <h3>📊 گزارش مدیریت</h3>
+                ${reports.map(
+                    report => {
 
-                <pre>
-${escapeHTML(
-    JSON.stringify(
-        data,
-        null,
-        2
-    )
-)}
-                </pre>
+                        const id =
+                            report.id ??
+                            "";
+
+
+                        const number =
+                            report.zardaloo_number ??
+                            "بدون شماره";
+
+
+                        const reason =
+                            report.reason ??
+                            "بدون دلیل";
+
+
+                        const details =
+                            report.details ??
+                            "";
+
+
+                        const phone =
+                            report.phone ??
+                            "ثبت نشده";
+
+
+                        return `
+
+                            <div class="report-card">
+
+                                <h3>
+                                    📋 گزارش
+                                </h3>
+
+                                <p>
+                                    <strong>
+                                        شماره کالا:
+                                    </strong>
+
+                                    ${escapeHTML(
+                                        String(number)
+                                    )}
+                                </p>
+
+                                <p>
+                                    <strong>
+                                        دلیل:
+                                    </strong>
+
+                                    ${escapeHTML(
+                                        String(reason)
+                                    )}
+                                </p>
+
+                                <p>
+                                    <strong>
+                                        توضیحات:
+                                    </strong>
+
+                                    ${escapeHTML(
+                                        String(details)
+                                    )}
+                                </p>
+
+                                <p>
+                                    <strong>
+                                        شماره تماس:
+                                    </strong>
+
+                                    ${escapeHTML(
+                                        String(phone)
+                                    )}
+                                </p>
+
+                                <div class="admin-report-actions">
+
+                                    <button
+                                        class="primary"
+                                        onclick="updateReportStatus(
+                                            '${escapeAttribute(
+                                                String(id)
+                                            )}',
+                                            'reviewed'
+                                        )"
+                                    >
+                                        تأیید گزارش
+                                    </button>
+
+                                    <button
+                                        class="danger"
+                                        onclick="updateReportStatus(
+                                            '${escapeAttribute(
+                                                String(id)
+                                            )}',
+                                            'rejected'
+                                        )"
+                                    >
+                                        رد گزارش
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        `;
+
+                    }
+                ).join("")}
 
             </div>
 
@@ -1358,7 +2163,9 @@ ${escapeHTML(
 
         content.innerHTML =
             `<div class="error">
-                ${escapeHTML(error.message)}
+                ${escapeHTML(
+                    error.message
+                )}
             </div>`;
 
     }
@@ -1366,9 +2173,61 @@ ${escapeHTML(
 }
 
 
-/* ==============================
-   HELPERS
-================================ */
+/* ==================================================
+   UPDATE REPORT
+================================================== */
+
+async function updateReportStatus(
+    id,
+    action
+) {
+
+    if (!id) {
+        return;
+    }
+
+
+    try {
+
+        await adminRequest(
+            "/report",
+            {
+                method: "PATCH",
+
+                body:
+                    JSON.stringify({
+
+                        id: id,
+
+                        action: action
+
+                    })
+            }
+        );
+
+
+        alert(
+            "✅ گزارش با موفقیت پردازش شد."
+        );
+
+
+        await loadAdminReports();
+
+
+    } catch (error) {
+
+        alert(
+            error.message
+        );
+
+    }
+
+}
+
+
+/* ==================================================
+   FORMAT PRICE
+================================================== */
 
 function formatPrice(number) {
 
@@ -1381,22 +2240,58 @@ function formatPrice(number) {
 }
 
 
+/* ==================================================
+   ESCAPE HTML
+================================================== */
+
 function escapeHTML(value) {
 
     return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
 
 }
 
 
+/* ==================================================
+   ESCAPE ATTRIBUTE
+================================================== */
+
 function escapeAttribute(value) {
 
     return String(value)
-        .replaceAll("\\", "\\\\")
-        .replaceAll("'", "\\'");
+
+        .replaceAll(
+            "\\",
+            "\\\\"
+        )
+
+        .replaceAll(
+            "'",
+            "\\'"
+        );
 
 }
