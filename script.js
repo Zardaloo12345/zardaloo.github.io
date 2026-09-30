@@ -1,8 +1,8 @@
 "use strict";
 
-/* =========================
+/* =========================================================
    SUPABASE
-========================= */
+========================================================= */
 
 const SUPABASE_URL =
     "https://ovqldknqpaiczrddcrxp.supabase.co";
@@ -19,11 +19,6 @@ const REPORT_URL =
 const MESSAGES_URL =
     SUPABASE_URL + "/functions/v1/messages";
 
-
-/* =========================
-   ADMIN
-========================= */
-
 const ADMIN_NUMBER =
     "0994051777";
 
@@ -31,23 +26,23 @@ const ADMIN_PASSWORD =
     "ERFAN";
 
 
-/* =========================
-   STORAGE
-========================= */
+/* =========================================================
+   LOCAL STORAGE
+========================================================= */
 
-const PROFILE_KEY =
-    "zardaloo_profile_final_v8";
+const PROFILE_STORAGE_KEY =
+    "zardaloo_profile_final";
 
-const CART_KEY =
-    "zardaloo_cart_final_v8";
+const CART_STORAGE_KEY =
+    "zardaloo_cart_final";
 
-const DISCOUNT_KEY =
-    "zardaloo_discount_final_v8";
+const DISCOUNT_STORAGE_KEY =
+    "zardaloo_discount_final";
 
 
-/* =========================
-   DATA
-========================= */
+/* =========================================================
+   VARIABLES
+========================================================= */
 
 let profile = {
     name: "",
@@ -65,18 +60,18 @@ let discountPercent = 0;
 let adminLoggedIn = false;
 
 
-/* =========================
-   HELPER
-========================= */
+/* =========================================================
+   SHORTCUT
+========================================================= */
 
 function el(id) {
     return document.getElementById(id);
 }
 
 
-/* =========================
-   ESCAPE
-========================= */
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
 
 function escapeHTML(value) {
 
@@ -89,16 +84,16 @@ function escapeHTML(value) {
 }
 
 
-/* =========================
-   PROFILE SAVE
-========================= */
+/* =========================================================
+   PROFILE - SAVE
+========================================================= */
 
 function saveProfile() {
 
     try {
 
         localStorage.setItem(
-            PROFILE_KEY,
+            PROFILE_STORAGE_KEY,
             JSON.stringify(profile)
         );
 
@@ -106,60 +101,38 @@ function saveProfile() {
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Profile save error:",
+            error
+        );
 
         return false;
     }
 }
 
 
-/* =========================
-   PROFILE LOAD
-========================= */
+/* =========================================================
+   PROFILE - LOAD
+========================================================= */
 
 function loadProfile() {
 
     try {
 
-        let saved =
+        const saved =
             localStorage.getItem(
-                PROFILE_KEY
+                PROFILE_STORAGE_KEY
             );
 
-
-        /*
-           پشتیبانی از نسخه‌های قبلی
-        */
-
         if (!saved) {
 
-            const oldKeys = [
-                "zardaloo_profile_v5",
-                "zardaloo_profile_v3",
-                "zardaloo_profile_final_v2"
-            ];
+            profile = {
+                name: "",
+                phone: "",
+                zardalooNumber: "",
+                avatar: "👤"
+            };
 
-            for (
-                const key of oldKeys
-            ) {
-
-                const oldData =
-                    localStorage.getItem(
-                        key
-                    );
-
-                if (oldData) {
-
-                    saved =
-                        oldData;
-
-                    break;
-                }
-            }
-        }
-
-
-        if (!saved) {
             return false;
         }
 
@@ -173,19 +146,17 @@ function loadProfile() {
             name:
                 String(
                     data.name ?? ""
-                ).trim(),
+                ),
 
             phone:
                 String(
                     data.phone ?? ""
-                ).trim(),
+                ),
 
             zardalooNumber:
                 String(
-                    data.zardalooNumber ??
-                    data.zardaloo_number ??
-                    ""
-                ).trim(),
+                    data.zardalooNumber ?? ""
+                ),
 
             avatar:
                 data.avatar ||
@@ -193,43 +164,56 @@ function loadProfile() {
         };
 
 
-        return (
-            profile.name !== "" &&
-            profile.phone !== "" &&
-            profile.zardalooNumber !== ""
-        );
-
+        return isProfileComplete();
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Profile load error:",
+            error
+        );
 
         return false;
     }
 }
 
 
-/* =========================
-   AVATAR EMOJI
-========================= */
+/* =========================================================
+   PROFILE COMPLETE
+========================================================= */
 
-function selectProfile(avatar) {
+function isProfileComplete() {
+
+    return (
+        profile.name.trim() !== "" &&
+        profile.phone.trim() !== "" &&
+        profile.zardalooNumber.trim() !== ""
+    );
+}
+
+
+/* =========================================================
+   SELECT EMOJI PROFILE
+========================================================= */
+
+function selectProfile(value) {
 
     profile.avatar =
-        avatar;
+        value;
 
     showProfilePreview();
 }
 
 
-/* =========================
-   IMAGE UPLOAD
-========================= */
+/* =========================================================
+   PROFILE IMAGE UPLOAD
+========================================================= */
 
 function loadProfileImage(event) {
 
     const file =
-        event.target.files?.[0];
+        event.target.files &&
+        event.target.files[0];
 
 
     if (!file) {
@@ -237,12 +221,10 @@ function loadProfileImage(event) {
     }
 
 
-    if (
-        !file.type.startsWith("image/")
-    ) {
+    if (!file.type.startsWith("image/")) {
 
         alert(
-            "لطفاً یک عکس انتخاب کن."
+            "لطفاً یک فایل تصویری انتخاب کن."
         );
 
         return;
@@ -253,101 +235,116 @@ function loadProfileImage(event) {
         new FileReader();
 
 
-    reader.onload =
-        function(e) {
+    reader.onload = function(e) {
 
-            compressImage(
-                e.target.result
-            );
-        };
+        resizeAndSaveImage(
+            e.target.result
+        );
+    };
+
+
+    reader.onerror = function() {
+
+        alert(
+            "خواندن عکس انجام نشد."
+        );
+    };
 
 
     reader.readAsDataURL(file);
 }
 
 
-/* =========================
-   COMPRESS IMAGE
-========================= */
+/* =========================================================
+   RESIZE IMAGE
+========================================================= */
 
-function compressImage(source) {
+function resizeAndSaveImage(source) {
 
     const image =
         new Image();
 
 
-    image.onload =
-        function() {
+    image.onload = function() {
 
-            const maxSize =
-                500;
+        const max =
+            500;
 
-            let width =
-                image.width;
+        let width =
+            image.width;
 
-            let height =
-                image.height;
-
-
-            if (
-                width > maxSize ||
-                height > maxSize
-            ) {
-
-                const ratio =
-                    Math.min(
-                        maxSize / width,
-                        maxSize / height
-                    );
-
-                width =
-                    Math.round(
-                        width * ratio
-                    );
-
-                height =
-                    Math.round(
-                        height * ratio
-                    );
-            }
+        let height =
+            image.height;
 
 
-            const canvas =
-                document.createElement(
-                    "canvas"
+        if (
+            width > max ||
+            height > max
+        ) {
+
+            const ratio =
+                Math.min(
+                    max / width,
+                    max / height
                 );
 
-
-            canvas.width =
-                width;
-
-            canvas.height =
-                height;
-
-
-            const context =
-                canvas.getContext(
-                    "2d"
+            width =
+                Math.round(
+                    width * ratio
                 );
 
+            height =
+                Math.round(
+                    height * ratio
+                );
+        }
 
-            context.drawImage(
-                image,
-                0,
-                0,
-                width,
-                height
+
+        const canvas =
+            document.createElement(
+                "canvas"
             );
 
 
-            profile.avatar =
-                canvas.toDataURL(
-                    "image/jpeg",
-                    0.82
-                );
+        canvas.width =
+            width;
+
+        canvas.height =
+            height;
 
 
-            showProfilePreview();
+        const context =
+            canvas.getContext(
+                "2d"
+            );
+
+
+        context.drawImage(
+            image,
+            0,
+            0,
+            width,
+            height
+        );
+
+
+        profile.avatar =
+            canvas.toDataURL(
+                "image/jpeg",
+                0.82
+            );
+
+
+        showProfilePreview();
+    };
+
+
+    image.onerror =
+        function() {
+
+            alert(
+                "تصویر قابل خواندن نیست."
+            );
         };
 
 
@@ -356,9 +353,9 @@ function compressImage(source) {
 }
 
 
-/* =========================
+/* =========================================================
    PROFILE PREVIEW
-========================= */
+========================================================= */
 
 function showProfilePreview() {
 
@@ -390,6 +387,10 @@ function showProfilePreview() {
         image.src =
             profile.avatar;
 
+        image.alt =
+            "تصویر پروفایل";
+
+
         preview.appendChild(
             image
         );
@@ -403,9 +404,9 @@ function showProfilePreview() {
 }
 
 
-/* =========================
-   AVATAR RENDER
-========================= */
+/* =========================================================
+   RENDER AVATAR ANYWHERE
+========================================================= */
 
 function renderAvatar(container) {
 
@@ -433,6 +434,10 @@ function renderAvatar(container) {
         image.src =
             profile.avatar;
 
+        image.alt =
+            "تصویر پروفایل";
+
+
         container.appendChild(
             image
         );
@@ -446,68 +451,82 @@ function renderAvatar(container) {
 }
 
 
-/* =========================
+/* =========================================================
    UPDATE PROFILE UI
-========================= */
+========================================================= */
 
 function updateProfileUI() {
 
-    if (el("accountName")) {
+    const homeName =
+        el("homeName");
 
-        el("accountName")
-            .textContent =
-            profile.name || "---";
+    const homePhone =
+        el("homePhone");
+
+    const homeNumber =
+        el("homeZardaloo");
+
+
+    if (homeName) {
+
+        homeName.textContent =
+            profile.name ||
+            "---";
     }
 
 
-    if (el("accountPhone")) {
+    if (homePhone) {
 
-        el("accountPhone")
-            .textContent =
-            profile.phone || "---";
+        homePhone.textContent =
+            profile.phone ||
+            "---";
     }
 
 
-    if (el("accountZardaloo")) {
+    if (homeNumber) {
 
-        el("accountZardaloo")
-            .textContent =
-            profile.zardalooNumber || "---";
+        homeNumber.textContent =
+            profile.zardalooNumber ||
+            "---";
     }
 
+
+    renderAvatar(
+        el("homeProfileImage")
+    );
 
     renderAvatar(
         el("headerProfileImage")
     );
 
 
-    renderAvatar(
-        el("accountProfileImage")
-    );
+    /* اطلاعات فروشنده */
+
+    const sellerName =
+        el("sellerName");
+
+    const sellerPhone =
+        el("sellerPhone");
 
 
-    /*
-       فرم ثبت کالا
-    */
+    if (sellerName) {
 
-    if (el("sellerName")) {
-
-        el("sellerName").value =
+        sellerName.value =
             profile.name;
     }
 
 
-    if (el("sellerPhone")) {
+    if (sellerPhone) {
 
-        el("sellerPhone").value =
+        sellerPhone.value =
             profile.phone;
     }
 }
 
 
-/* =========================
-   ENTER
-========================= */
+/* =========================================================
+   ENTER ZARDALOO
+========================================================= */
 
 function enterZardaloo() {
 
@@ -516,12 +535,10 @@ function enterZardaloo() {
             ?.value
             .trim() || "";
 
-
     const phone =
         el("firstPhone")
             ?.value
             .trim() || "";
-
 
     const zardalooNumber =
         el("firstZardaloo")
@@ -576,10 +593,14 @@ function enterZardaloo() {
     }
 
 
-    if (!saveProfile()) {
+    const saved =
+        saveProfile();
+
+
+    if (!saved) {
 
         alert(
-            "ذخیره اطلاعات انجام نشد."
+            "ذخیره پروفایل انجام نشد."
         );
 
         return;
@@ -587,7 +608,14 @@ function enterZardaloo() {
 
 
     /*
-       مخفی کردن ورود
+       اول UI را آپدیت می‌کنیم
+    */
+
+    updateProfileUI();
+
+
+    /*
+       بعد صفحه ورود را مخفی می‌کنیم
     */
 
     const setup =
@@ -597,39 +625,68 @@ function enterZardaloo() {
         el("app");
 
 
-    setup.style.display =
-        "none";
+    if (setup) {
 
-    app.style.display =
-        "block";
+        setup.classList.add(
+            "hidden"
+        );
+    }
 
 
-    updateProfileUI();
+    if (app) {
+
+        app.classList.remove(
+            "hidden"
+        );
+    }
+
+
+    /*
+       ورود مستقیم به خانه
+    */
 
     showPage("home");
+
+
+    /*
+       عکس هدر را صریحاً دوباره رندر می‌کنیم
+    */
+
+    renderAvatar(
+        el("headerProfileImage")
+    );
+
+    renderAvatar(
+        el("homeProfileImage")
+    );
+
+
+    /*
+       فرم ثبت کالا
+    */
+
+    updateProfileUI();
 }
 
 
-/* =========================
-   PAGE
-========================= */
+/* =========================================================
+   SHOW PAGE
+========================================================= */
 
-function showPage(pageName) {
+function showPage(name) {
 
     document
         .querySelectorAll(".page")
-        .forEach(
-            function(page) {
+        .forEach(function(page) {
 
-                page.classList.remove(
-                    "active"
-                );
-            }
-        );
+            page.classList.remove(
+                "active"
+            );
+        });
 
 
     const page =
-        el(pageName);
+        el(name);
 
 
     if (!page) {
@@ -642,93 +699,133 @@ function showPage(pageName) {
     );
 
 
-    if (
-        pageName === "account"
-    ) {
+    if (name === "home") {
 
         updateProfileUI();
     }
 
 
-    if (
-        pageName === "market"
-    ) {
+    if (name === "market") {
 
         loadProducts();
     }
 
 
-    if (
-        pageName === "cart"
-    ) {
+    if (name === "cart") {
 
         renderCart();
     }
 }
 
 
-/* =========================
+/* =========================================================
    PRODUCT HELPERS
-========================= */
+========================================================= */
 
-function productId(product) {
+function getProductId(product) {
 
     return (
         product?.id ??
         product?.product_id ??
+        product?.uuid ??
         ""
     );
 }
 
 
-function productName(product) {
+function getProductName(product) {
 
     return (
         product?.name ??
+        product?.product_name ??
         ""
     );
 }
 
 
-function productPrice(product) {
+function getProductPrice(product) {
 
     return Number(
         product?.price ??
+        product?.product_price ??
         0
     );
 }
 
 
-function sellerName(product) {
+function getSellerName(product) {
 
     return (
         product?.seller ??
+        product?.seller_name ??
         ""
     );
 }
 
 
-function sellerPhone(product) {
+function getSellerPhone(product) {
 
     return (
         product?.phone ??
+        product?.seller_phone ??
         ""
     );
 }
 
 
-function sellerNumber(product) {
+function getSellerNumber(product) {
 
     return (
         product?.zardaloo_number ??
+        product?.seller_zardaloo_number ??
         ""
     );
 }
 
 
-/* =========================
+function isGiftProduct(product) {
+
+    const value =
+        product?.is_gift ??
+        product?.isGift ??
+        false;
+
+
+    if (
+        typeof value ===
+        "boolean"
+    ) {
+
+        return value;
+    }
+
+
+    if (
+        typeof value ===
+        "number"
+    ) {
+
+        return value === 1;
+    }
+
+
+    return [
+        "true",
+        "1",
+        "yes",
+        "دارد",
+        "gift"
+    ].includes(
+        String(value)
+            .trim()
+            .toLowerCase()
+    );
+}
+
+
+/* =========================================================
    LOAD PRODUCTS
-========================= */
+========================================================= */
 
 async function loadProducts() {
 
@@ -749,9 +846,11 @@ async function loadProducts() {
             await fetch(
                 PRODUCTS_URL,
                 {
+
                     method: "GET",
 
                     headers: {
+
                         "apikey":
                             SUPABASE_KEY,
 
@@ -798,24 +897,26 @@ async function loadProducts() {
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            error
+        );
 
 
         if (status) {
 
             status.textContent =
-                "خطا در دریافت کالاها: " +
+                "دریافت کالاها انجام نشد: " +
                 error.message;
         }
     }
 }
 
 
-/* =========================
-   FILTER
-========================= */
+/* =========================================================
+   FILTER PRODUCTS
+========================================================= */
 
-function filteredProducts() {
+function getFilteredProducts() {
 
     const search =
         el("searchName")
@@ -854,23 +955,21 @@ function filteredProducts() {
         function(product) {
 
             const name =
-                productName(product)
+                getProductName(product)
                     .toLowerCase();
 
 
             const price =
-                productPrice(product);
+                getProductPrice(product);
 
 
-            const sellerText =
-                sellerName(product)
+            const sellerName =
+                getSellerName(product)
                     .toLowerCase();
 
 
             const isGift =
-                Boolean(
-                    product.is_gift
-                );
+                isGiftProduct(product);
 
 
             if (
@@ -883,7 +982,7 @@ function filteredProducts() {
 
 
             if (
-                min &&
+                min > 0 &&
                 price < min
             ) {
 
@@ -892,7 +991,7 @@ function filteredProducts() {
 
 
             if (
-                max &&
+                max > 0 &&
                 price > max
             ) {
 
@@ -902,7 +1001,7 @@ function filteredProducts() {
 
             if (
                 seller &&
-                !sellerText.includes(
+                !sellerName.includes(
                     seller
                 )
             ) {
@@ -935,9 +1034,9 @@ function filteredProducts() {
 }
 
 
-/* =========================
+/* =========================================================
    RENDER PRODUCTS
-========================= */
+========================================================= */
 
 function renderProducts() {
 
@@ -950,15 +1049,15 @@ function renderProducts() {
     }
 
 
+    const list =
+        getFilteredProducts();
+
+
     container.innerHTML =
         "";
 
 
-    const list =
-        filteredProducts();
-
-
-    if (!list.length) {
+    if (list.length === 0) {
 
         container.innerHTML =
             `<div class="card">
@@ -983,19 +1082,37 @@ function renderProducts() {
 
 
             const id =
-                productId(product);
+                getProductId(product);
+
+
+            const name =
+                getProductName(product);
 
 
             const price =
-                productPrice(product);
+                getProductPrice(product);
+
+
+            const seller =
+                getSellerName(product);
+
+
+            const phone =
+                getSellerPhone(product);
+
+
+            const number =
+                getSellerNumber(product);
+
+
+            const gift =
+                isGiftProduct(product);
 
 
             card.innerHTML = `
 
                 <h3>
-                    ${escapeHTML(
-                        productName(product)
-                    )}
+                    ${escapeHTML(name)}
                 </h3>
 
                 <p class="product-price">
@@ -1005,30 +1122,31 @@ function renderProducts() {
 
                 <p>
                     فروشنده:
-                    ${escapeHTML(
-                        sellerName(product)
-                    )}
+                    ${escapeHTML(seller)}
                 </p>
 
                 <p>
                     شماره زردآلو:
-                    ${escapeHTML(
-                        sellerNumber(product)
-                    )}
+                    ${escapeHTML(number)}
                 </p>
 
                 <p>
                     تلفن:
-                    ${escapeHTML(
-                        sellerPhone(product)
-                    )}
+                    ${escapeHTML(phone)}
                 </p>
 
                 ${
-                    product.is_gift
+                    gift
                     ? `
                         <p class="gift">
                             🎁 هدیه
+                        </p>
+
+                        <p>
+                            ${escapeHTML(
+                                product.gift_description ||
+                                ""
+                            )}
                         </p>
                     `
                     : ""
@@ -1036,17 +1154,16 @@ function renderProducts() {
 
                 <button
                     class="yellow-button"
-                    onclick="addToCart('${String(id)}')"
+                    onclick="addToCart('${escapeHTML(String(id))}')"
                 >
                     افزودن به سبد
                 </button>
+
             `;
 
 
             if (
-                String(
-                    sellerNumber(product)
-                ) ===
+                String(number) ===
                 String(
                     profile.zardalooNumber
                 )
@@ -1089,9 +1206,9 @@ function renderProducts() {
 }
 
 
-/* =========================
+/* =========================================================
    REGISTER PRODUCT
-========================= */
+========================================================= */
 
 function toggleGiftDescription() {
 
@@ -1146,6 +1263,23 @@ async function registerProduct() {
         profile.phone;
 
 
+    const description =
+        el("productDescription")
+            ?.value
+            .trim() || "";
+
+
+    const gift =
+        el("isGift")
+            ?.checked || false;
+
+
+    const giftDescription =
+        el("giftDescription")
+            ?.value
+            .trim() || "";
+
+
     if (!name) {
 
         message.textContent =
@@ -1167,13 +1301,93 @@ async function registerProduct() {
     }
 
 
-    if (!seller || !phone) {
+    if (!seller) {
 
         message.textContent =
-            "اطلاعات فروشنده کامل نیست.";
+            "نام فروشنده مشخص نیست.";
 
         return;
     }
+
+
+    if (!phone) {
+
+        message.textContent =
+            "شماره تماس فروشنده مشخص نیست.";
+
+        return;
+    }
+
+
+    if (
+        !profile.zardalooNumber
+    ) {
+
+        message.textContent =
+            "شماره زردآلو مشخص نیست.";
+
+        return;
+    }
+
+
+    if (
+        gift &&
+        !giftDescription
+    ) {
+
+        message.textContent =
+            "توضیحات هدیه را وارد کن.";
+
+        return;
+    }
+
+
+    const button =
+        el("registerProductButton");
+
+
+    if (button) {
+
+        button.disabled =
+            true;
+
+        button.textContent =
+            "در حال ثبت...";
+    }
+
+
+    /*
+       دقیقاً مطابق Edge Function
+    */
+
+    const productData = {
+
+        name:
+            name,
+
+        price:
+            price,
+
+        seller:
+            seller,
+
+        zardaloo_number:
+            profile.zardalooNumber,
+
+        phone:
+            phone,
+
+        description:
+            description,
+
+        is_gift:
+            gift,
+
+        gift_description:
+            gift
+                ? giftDescription
+                : ""
+    };
 
 
     try {
@@ -1199,37 +1413,9 @@ async function registerProduct() {
                     },
 
                     body:
-                        JSON.stringify({
-
-                            name:
-                                name,
-
-                            price:
-                                price,
-
-                            seller:
-                                seller,
-
-                            zardaloo_number:
-                                profile.zardalooNumber,
-
-                            phone:
-                                phone,
-
-                            description:
-                                el("productDescription")
-                                    ?.value
-                                    .trim() || "",
-
-                            is_gift:
-                                el("isGift")
-                                    ?.checked || false,
-
-                            gift_description:
-                                el("giftDescription")
-                                    ?.value
-                                    .trim() || ""
-                        })
+                        JSON.stringify(
+                            productData
+                        )
                 }
             );
 
@@ -1260,28 +1446,59 @@ async function registerProduct() {
         el("productDescription").value =
             "";
 
-        el("giftDescription").value =
-            "";
-
         el("isGift").checked =
             false;
+
+        el("giftDescription").value =
+            "";
 
 
         toggleGiftDescription();
 
 
+        await loadProducts();
+
+
+        setTimeout(
+            function() {
+
+                showPage("market");
+
+            },
+            500
+        );
+
+
     } catch (error) {
+
+        console.error(
+            "REGISTER ERROR:",
+            error
+        );
+
 
         message.textContent =
             "ثبت کالا انجام نشد: " +
             error.message;
+
+
+    } finally {
+
+        if (button) {
+
+            button.disabled =
+                false;
+
+            button.textContent =
+                "ثبت کالا";
+        }
     }
 }
 
 
-/* =========================
-   DELETE
-========================= */
+/* =========================================================
+   DELETE PRODUCT
+========================================================= */
 
 async function deleteProduct(id) {
 
@@ -1307,7 +1524,6 @@ async function deleteProduct(id) {
                 PRODUCTS_URL +
                 "?id=" +
                 encodeURIComponent(id),
-
                 {
 
                     method: "DELETE",
@@ -1351,14 +1567,14 @@ async function deleteProduct(id) {
 }
 
 
-/* =========================
+/* =========================================================
    CART
-========================= */
+========================================================= */
 
 function saveCart() {
 
     localStorage.setItem(
-        CART_KEY,
+        CART_STORAGE_KEY,
         JSON.stringify(cart)
     );
 }
@@ -1370,7 +1586,7 @@ function loadCart() {
 
         const saved =
             localStorage.getItem(
-                CART_KEY
+                CART_STORAGE_KEY
             );
 
 
@@ -1399,9 +1615,8 @@ function addToCart(id) {
             function(item) {
 
                 return String(
-                    productId(item)
-                ) ===
-                String(id);
+                    getProductId(item)
+                ) === String(id);
             }
         );
 
@@ -1465,7 +1680,7 @@ function renderCart() {
         function(product, index) {
 
             const price =
-                productPrice(product);
+                getProductPrice(product);
 
 
             total +=
@@ -1486,12 +1701,11 @@ function renderCart() {
 
                 <h3>
                     ${escapeHTML(
-                        productName(product)
+                        getProductName(product)
                     )}
                 </h3>
 
                 <p>
-                    قیمت:
                     ${price.toLocaleString("fa-IR")}
                     ریال
                 </p>
@@ -1525,44 +1739,54 @@ function renderCart() {
         discountAmount;
 
 
-    summary.innerHTML = `
+    if (summary) {
 
-        <p>
-            قیمت کل:
-            ${total.toLocaleString("fa-IR")}
-            ریال
-        </p>
+        summary.innerHTML = `
 
-        <p>
-            تخفیف:
-            ${discountPercent}٪
-        </p>
-
-        <p>
-            مبلغ تخفیف:
-            ${discountAmount.toLocaleString("fa-IR")}
-            ریال
-        </p>
-
-        <p>
-            قیمت نهایی:
-            <strong>
-                ${finalPrice.toLocaleString("fa-IR")}
+            <p>
+                قیمت کل:
+                ${total.toLocaleString("fa-IR")}
                 ریال
-            </strong>
-        </p>
-    `;
+            </p>
+
+            <p>
+                تخفیف:
+                ${discountPercent.toLocaleString("fa-IR")}٪
+            </p>
+
+            <p>
+                مبلغ تخفیف:
+                ${discountAmount.toLocaleString("fa-IR")}
+                ریال
+            </p>
+
+            <p>
+                قیمت نهایی:
+                <strong>
+                    ${finalPrice.toLocaleString("fa-IR")}
+                    ریال
+                </strong>
+            </p>
+        `;
+    }
 }
 
 
-/* =========================
+/* =========================================================
    DISCOUNT
-========================= */
+========================================================= */
 
 function applyCartDiscount() {
 
+    const input =
+        el("cartDiscountCode");
+
+    const message =
+        el("cartDiscountMessage");
+
+
     const code =
-        el("cartDiscountCode")
+        input
             ?.value
             .trim()
             .toUpperCase() || "";
@@ -1592,15 +1816,14 @@ function applyCartDiscount() {
 
 
         localStorage.setItem(
-            DISCOUNT_KEY,
+            DISCOUNT_STORAGE_KEY,
             String(
                 discountPercent
             )
         );
 
 
-        el("cartDiscountMessage")
-            .textContent =
+        message.textContent =
             `تخفیف ${discountPercent}٪ اعمال شد.`;
 
     } else {
@@ -1609,8 +1832,13 @@ function applyCartDiscount() {
             0;
 
 
-        el("cartDiscountMessage")
-            .textContent =
+        localStorage.setItem(
+            DISCOUNT_STORAGE_KEY,
+            "0"
+        );
+
+
+        message.textContent =
             "کد تخفیف نامعتبر است.";
     }
 
@@ -1619,9 +1847,31 @@ function applyCartDiscount() {
 }
 
 
-/* =========================
+function loadDiscount() {
+
+    discountPercent =
+        Number(
+            localStorage.getItem(
+                DISCOUNT_STORAGE_KEY
+            ) || 0
+        );
+
+
+    if (
+        !Number.isFinite(
+            discountPercent
+        )
+    ) {
+
+        discountPercent =
+            0;
+    }
+}
+
+
+/* =========================================================
    MESSAGES
-========================= */
+========================================================= */
 
 async function sendMessage() {
 
@@ -1641,10 +1891,19 @@ async function sendMessage() {
         el("messageSendStatus");
 
 
-    if (!receiver || !text) {
+    if (!receiver) {
 
         status.textContent =
-            "شماره گیرنده و پیام را وارد کن.";
+            "شماره گیرنده را وارد کن.";
+
+        return;
+    }
+
+
+    if (!text) {
+
+        status.textContent =
+            "متن پیام را وارد کن.";
 
         return;
     }
@@ -1704,6 +1963,7 @@ async function sendMessage() {
         status.textContent =
             "پیام ارسال شد. ✅";
 
+
         el("messageText").value =
             "";
 
@@ -1717,13 +1977,13 @@ async function sendMessage() {
 }
 
 
-/* =========================
+/* =========================================================
    REPORT
-========================= */
+========================================================= */
 
 async function submitReport() {
 
-    const seller =
+    const sellerNumber =
         el("reportSellerNumber")
             ?.value
             .trim() || "";
@@ -1744,7 +2004,7 @@ async function submitReport() {
         el("reportMessage");
 
 
-    if (!seller) {
+    if (!sellerNumber) {
 
         message.textContent =
             "شماره زردآلو فروشنده را وارد کن.";
@@ -1782,7 +2042,7 @@ async function submitReport() {
                                 profile.zardalooNumber,
 
                             seller_zardaloo_number:
-                                seller,
+                                sellerNumber,
 
                             reason:
                                 reason,
@@ -1820,9 +2080,9 @@ async function submitReport() {
 }
 
 
-/* =========================
+/* =========================================================
    ADMIN
-========================= */
+========================================================= */
 
 function adminLogin() {
 
@@ -1837,6 +2097,10 @@ function adminLogin() {
             ?.value || "";
 
 
+    const message =
+        el("adminMessage");
+
+
     if (
         number === ADMIN_NUMBER &&
         password === ADMIN_PASSWORD
@@ -1847,13 +2111,12 @@ function adminLogin() {
 
 
         el("adminPanel")
-            .classList.remove(
+            ?.classList.remove(
                 "hidden"
             );
 
 
-        el("adminMessage")
-            .textContent =
+        message.textContent =
             "ورود مدیریت موفق بود. ✅";
 
 
@@ -1861,9 +2124,8 @@ function adminLogin() {
 
     } else {
 
-        el("adminMessage")
-            .textContent =
-            "شماره یا رمز مدیریت اشتباه است.";
+        message.textContent =
+            "شماره یا رمز اشتباه است.";
     }
 }
 
@@ -1875,6 +2137,19 @@ function loadAdminProducts() {
     }
 
 
+    const content =
+        el("adminContent");
+
+
+    if (!content) {
+        return;
+    }
+
+
+    content.innerHTML =
+        "";
+
+
     el("adminProductCount")
         .textContent =
         String(
@@ -1882,52 +2157,44 @@ function loadAdminProducts() {
         );
 
 
-    const content =
-        el("adminContent");
-
-
-    content.innerHTML =
-        "";
-
-
     products.forEach(
         function(product) {
 
-            const card =
+            const item =
                 document.createElement(
                     "div"
                 );
 
 
-            card.className =
+            item.className =
                 "card";
 
 
-            card.innerHTML = `
+            item.innerHTML = `
 
                 <strong>
                     ${escapeHTML(
-                        productName(product)
+                        getProductName(product)
                     )}
                 </strong>
 
                 <p>
                     فروشنده:
                     ${escapeHTML(
-                        sellerName(product)
+                        getSellerName(product)
                     )}
                 </p>
 
                 <p>
                     قیمت:
-                    ${productPrice(product).toLocaleString("fa-IR")}
+                    ${getProductPrice(product).toLocaleString("fa-IR")}
                     ریال
                 </p>
             `;
 
 
             content.appendChild(
-                card
+                item
             );
         }
     );
@@ -1941,28 +2208,24 @@ function loadAdminReports() {
     }
 
 
-    el("adminContent")
-        .innerHTML =
-        "<p>گزارش‌ها از بخش مدیریت گزارش‌ها دریافت می‌شوند.</p>";
+    el("adminContent").innerHTML =
+        "<p>گزارش‌های مدیریت از Edge Function مربوط به گزارش‌ها دریافت می‌شوند.</p>";
 }
 
 
-/* =========================
+/* =========================================================
    FILTER EVENTS
-========================= */
+========================================================= */
 
 function setupFilters() {
 
-    const ids = [
+    [
         "searchName",
         "minPrice",
         "maxPrice",
         "sellerFilter",
         "giftFilter"
-    ];
-
-
-    ids.forEach(
+    ].forEach(
         function(id) {
 
             const input =
@@ -1989,64 +2252,77 @@ function setupFilters() {
 }
 
 
-/* =========================
-   START
-========================= */
+/* =========================================================
+   START APP
+========================================================= */
 
 function initializeApp() {
+
+    /*
+       اول پروفایل را بخوان
+    */
 
     const hasProfile =
         loadProfile();
 
 
+    /*
+       اطلاعات دیگر
+    */
+
     loadCart();
 
-
-    const savedDiscount =
-        Number(
-            localStorage.getItem(
-                DISCOUNT_KEY
-            ) || 0
-        );
+    loadDiscount();
 
 
-    discountPercent =
-        Number.isFinite(
-            savedDiscount
-        )
-            ? savedDiscount
-            : 0;
-
+    /*
+       آواتار اولیه
+    */
 
     showProfilePreview();
 
 
+    /*
+       اگر پروفایل قبلاً کامل است:
+       مستقیم وارد برنامه شو
+    */
+
     if (hasProfile) {
 
         el("profileSetup")
-            .style.display =
-            "none";
+            ?.classList.add(
+                "hidden"
+            );
 
 
         el("app")
-            .style.display =
-            "block";
+            ?.classList.remove(
+                "hidden"
+            );
 
 
         updateProfileUI();
 
+
         showPage("home");
+
 
     } else {
 
+        /*
+           اولین ورود
+        */
+
         el("profileSetup")
-            .style.display =
-            "flex";
+            ?.classList.remove(
+                "hidden"
+            );
 
 
         el("app")
-            .style.display =
-            "none";
+            ?.classList.add(
+                "hidden"
+            );
     }
 
 
@@ -2056,9 +2332,9 @@ function initializeApp() {
 }
 
 
-/* =========================
+/* =========================================================
    DOM READY
-========================= */
+========================================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
@@ -2066,9 +2342,9 @@ document.addEventListener(
 );
 
 
-/* =========================
-   GLOBAL
-========================= */
+/* =========================================================
+   GLOBAL FUNCTIONS
+========================================================= */
 
 window.selectProfile =
     selectProfile;
@@ -2087,6 +2363,9 @@ window.registerProduct =
 
 window.toggleGiftDescription =
     toggleGiftDescription;
+
+window.loadProducts =
+    loadProducts;
 
 window.deleteProduct =
     deleteProduct;
