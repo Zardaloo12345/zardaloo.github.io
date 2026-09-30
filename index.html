@@ -3,112 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <meta name="google-site-verification"
-          content="UHyWcDnDhze8ecSFEKaZHgCLC7Gs5Zkwq770-CsEe_Y">
-
     <title>زردآلو | با زردآلو خرید راحته!</title>
-
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- ================= PROFILE FIRST LOGIN ================= -->
+<!-- ================= FIRST LOGIN ================= -->
 
 <section id="profileSetup" class="profile-setup">
 
     <div class="profile-box">
 
         <div class="brand-big">
+
             <div class="yellow-logo"></div>
+
             <h1>زردآلو</h1>
+
         </div>
 
         <h2>خوش آمدی 👋</h2>
 
         <p class="profile-intro">
-            برای ورود به زردآلو، اطلاعات پروفایلت را وارد کن.
+            برای اولین ورود، اطلاعاتت را وارد کن.
         </p>
 
         <input
             id="firstName"
             type="text"
             placeholder="نام و نام خانوادگی"
-            autocomplete="name"
         >
 
         <input
             id="firstPhone"
             type="tel"
             placeholder="شماره تماس"
-            autocomplete="tel"
         >
 
         <input
             id="firstZardaloo"
             type="text"
             placeholder="شماره زردآلو"
-            autocomplete="off"
         >
 
-        <h3>انتخاب تصویر پروفایل</h3>
+        <h3>تصویر پروفایل</h3>
 
         <div class="profile-options">
 
-            <button class="profile-option"
-                    data-profile="football"
-                    onclick="selectProfile('football')">
+            <button
+                class="profile-option"
+                data-profile="football"
+                onclick="selectProfile('football')">
                 ⚽
-                <span>توپ فوتبال</span>
             </button>
 
-            <button class="profile-option"
-                    data-profile="volleyball"
-                    onclick="selectProfile('volleyball')">
+            <button
+                class="profile-option"
+                data-profile="volleyball"
+                onclick="selectProfile('volleyball')">
                 🏐
-                <span>توپ والیبال</span>
             </button>
 
-            <button class="profile-option"
-                    data-profile="coffee"
-                    onclick="selectProfile('coffee')">
+            <button
+                class="profile-option"
+                data-profile="coffee"
+                onclick="selectProfile('coffee')">
                 ☕
-                <span>قهوه</span>
             </button>
 
-            <button class="profile-option"
-                    data-profile="flask"
-                    onclick="selectProfile('flask')">
+            <button
+                class="profile-option"
+                data-profile="flask"
+                onclick="selectProfile('flask')">
                 🧉
-                <span>فلاسک چای</span>
             </button>
 
-            <button class="profile-option"
-                    data-profile="store"
-                    onclick="selectProfile('store')">
+            <button
+                class="profile-option"
+                data-profile="store"
+                onclick="selectProfile('store')">
                 🏪
-                <span>فروشگاه</span>
             </button>
 
-            <button class="profile-option"
-                    data-profile="sandwich"
-                    onclick="selectProfile('sandwich')">
+            <button
+                class="profile-option"
+                data-profile="sandwich"
+                onclick="selectProfile('sandwich')">
                 🥪
-                <span>ساندویچ</span>
             </button>
 
-            <button class="profile-option"
-                    data-profile="pizza"
-                    onclick="selectProfile('pizza')">
+            <button
+                class="profile-option"
+                data-profile="pizza"
+                onclick="selectProfile('pizza')">
                 🍕
-                <span>پیتزا</span>
             </button>
 
         </div>
 
         <label class="gallery-button">
-            🖼️ انتخاب تصویر از گالری
+
+            🖼️ انتخاب عکس از گالری
+
             <input
                 id="profileImageInput"
                 type="file"
@@ -116,38 +113,55 @@
                 hidden
                 onchange="loadProfileImage(event)"
             >
+
         </label>
 
-        <div id="profilePreview" class="profile-preview">
-            ⚪
+        <div
+            id="profilePreview"
+            class="profile-preview">
+            ⚽
         </div>
 
         <button
-            class="main-yellow-button"
+            class="main-yellow-button enter-button"
             onclick="enterZardaloo()">
+
             ورود به زردآلو
+
         </button>
 
-        <div id="profileMessage" class="message"></div>
+        <div
+            id="profileMessage"
+            class="message">
+        </div>
 
     </div>
 
 </section>
 
 
-<!-- ================= MAIN APP ================= -->
+<!-- ================= APP ================= -->
 
 <div id="app" class="hidden">
 
 <header class="header">
 
-    <div class="logo-area" onclick="showPage('home')">
+    <div
+        class="logo-area"
+        onclick="showPage('home')">
+
+        <div
+            id="headerProfileImage"
+            class="header-profile-image">
+            👤
+        </div>
 
         <div class="logo-circle"></div>
 
         <span>زردآلو</span>
 
     </div>
+
 
     <nav>
 
@@ -164,7 +178,7 @@
         </button>
 
         <button onclick="showPage('gifts')">
-            🎁 اشانتیون‌ها
+            🎁 اشانتیون
         </button>
 
         <button onclick="showPage('cart')">
@@ -176,7 +190,7 @@
         </button>
 
         <button onclick="showPage('report')">
-            🚨 گزارش فروشنده
+            🚨 گزارش
         </button>
 
         <button onclick="showPage('admin')">
@@ -194,9 +208,12 @@
 
 <main>
 
+
 <!-- ================= HOME ================= -->
 
-<section id="home" class="page active">
+<section
+    id="home"
+    class="page active">
 
     <div class="home-card">
 
@@ -233,11 +250,13 @@
 
         </div>
 
+
         <div class="home-profile-card">
 
             <div
                 id="homeProfileImage"
                 class="home-profile-image">
+                👤
             </div>
 
             <h3 id="homeName">
@@ -267,14 +286,18 @@
 
 <!-- ================= MARKET ================= -->
 
-<section id="market" class="page">
+<section
+    id="market"
+    class="page">
 
     <div class="section-title">
 
-        <h2>🛍️ بازار زردآلو</h2>
+        <h2>
+            🛍️ بازار زردآلو
+        </h2>
 
         <p>
-            کالاهای موجود در زردآلو
+            همه کالاهای ثبت‌شده
         </p>
 
     </div>
@@ -331,13 +354,17 @@
         <button
             class="secondary-button"
             onclick="loadProducts()">
-            🔄 دریافت کالاها
+            🔄 دریافت
         </button>
 
     </div>
 
 
-    <div id="marketStatus" class="message"></div>
+    <div
+        id="marketStatus"
+        class="message">
+    </div>
+
 
     <div
         id="products"
@@ -349,17 +376,22 @@
 
 <!-- ================= GIFTS ================= -->
 
-<section id="gifts" class="page">
+<section
+    id="gifts"
+    class="page">
 
     <div class="section-title">
 
-        <h2>🎁 اشانتیون‌ها</h2>
+        <h2>
+            🎁 اشانتیون‌ها
+        </h2>
 
         <p>
-            کالاهایی که فروشنده برای آن‌ها اشانتیون تعیین کرده است.
+            کالاهای دارای اشانتیون
         </p>
 
     </div>
+
 
     <div
         id="giftProducts"
@@ -371,15 +403,15 @@
 
 <!-- ================= REGISTER ================= -->
 
-<section id="register" class="page">
+<section
+    id="register"
+    class="page">
 
     <div class="form-card">
 
-        <h2>📦 ثبت کالا</h2>
-
-        <p>
-            اطلاعات کالا را وارد کنید.
-        </p>
+        <h2>
+            📦 ثبت کالا
+        </h2>
 
         <input
             id="productName"
@@ -391,7 +423,7 @@
             id="productPrice"
             type="number"
             min="0"
-            placeholder="قیمت کالا به ریال"
+            placeholder="قیمت به ریال"
         >
 
         <input
@@ -403,7 +435,7 @@
         <input
             id="sellerPhone"
             type="tel"
-            placeholder="شماره تماس فروشنده"
+            placeholder="شماره فروشنده"
         >
 
         <textarea
@@ -420,7 +452,7 @@
                 onchange="toggleGiftDescription()"
             >
 
-            این کالا اشانتیون دارد
+            اشانتیون دارد
 
         </label>
 
@@ -438,6 +470,7 @@
             ثبت کالا
         </button>
 
+
         <div
             id="registerMessage"
             class="message">
@@ -450,11 +483,15 @@
 
 <!-- ================= CART ================= -->
 
-<section id="cart" class="page">
+<section
+    id="cart"
+    class="page">
 
     <div class="section-title">
 
-        <h2>🛒 سبد خرید</h2>
+        <h2>
+            🛒 سبد خرید
+        </h2>
 
     </div>
 
@@ -470,7 +507,7 @@
             <input
                 id="cartDiscountCode"
                 type="text"
-                placeholder="کد تخفیف را وارد کنید"
+                placeholder="کد تخفیف"
             >
 
             <button
@@ -480,6 +517,7 @@
             </button>
 
         </div>
+
 
         <div
             id="cartDiscountMessage"
@@ -501,15 +539,15 @@
 
 <!-- ================= MESSAGES ================= -->
 
-<section id="messages" class="page">
+<section
+    id="messages"
+    class="page">
 
     <div class="section-title">
 
-        <h2>💬 پیام‌ها</h2>
-
-        <p>
-            ارتباط با کاربران زردآلو
-        </p>
+        <h2>
+            💬 پیام‌ها
+        </h2>
 
     </div>
 
@@ -542,6 +580,7 @@
 
         </div>
 
+
         <div
             id="messageList"
             class="message-list">
@@ -554,11 +593,15 @@
 
 <!-- ================= REPORT ================= -->
 
-<section id="report" class="page">
+<section
+    id="report"
+    class="page">
 
     <div class="form-card">
 
-        <h2>🚨 گزارش فروشنده</h2>
+        <h2>
+            🚨 گزارش فروشنده
+        </h2>
 
         <input
             id="reportSellerNumber"
@@ -569,7 +612,7 @@
         <select id="reportReason">
 
             <option value="">
-                دلیل گزارش را انتخاب کنید
+                دلیل گزارش
             </option>
 
             <option value="کلاهبرداری">
@@ -594,16 +637,19 @@
 
         </select>
 
+
         <textarea
             id="reportDescription"
             placeholder="توضیحات گزارش">
         </textarea>
+
 
         <button
             class="main-yellow-button"
             onclick="submitReport()">
             ثبت گزارش
         </button>
+
 
         <div
             id="reportMessage"
@@ -617,26 +663,28 @@
 
 <!-- ================= ADMIN ================= -->
 
-<section id="admin" class="page">
+<section
+    id="admin"
+    class="page">
 
     <div
         id="adminLoginBox"
         class="form-card">
 
-        <h2>⚙️ ورود به مدیریت</h2>
+        <h2>
+            ⚙️ مدیریت
+        </h2>
 
         <input
             id="adminNumber"
             type="text"
             placeholder="رمز مدیریت"
-            autocomplete="off"
         >
 
         <input
             id="adminPassword"
             type="password"
             placeholder="پسورد"
-            autocomplete="off"
         >
 
         <button
@@ -706,7 +754,7 @@
                 </strong>
 
                 <small>
-                    کالای سبد
+                    سبد
                 </small>
 
             </div>
@@ -721,7 +769,7 @@
                 </strong>
 
                 <small>
-                    کاربران
+                    کاربر
                 </small>
 
             </div>
@@ -740,7 +788,7 @@
             </button>
 
             <button onclick="loadAdminCarts()">
-                🛒 سبد کاربران
+                🛒 سبدها
             </button>
 
             <button onclick="loadAdminUsers()">
@@ -748,7 +796,7 @@
             </button>
 
             <button onclick="clearAllCart()">
-                🗑️ خالی کردن سبد
+                🗑️ حذف سبدها
             </button>
 
         </div>
@@ -763,7 +811,9 @@
 
 <!-- ================= ABOUT ================= -->
 
-<section id="about" class="page">
+<section
+    id="about"
+    class="page">
 
     <div class="info-card">
 
@@ -772,7 +822,7 @@
         </h2>
 
         <p>
-            زردآلو یک بازار آنلاین برای خرید و فروش ساده و راحت کالاهاست.
+            زردآلو یک بازار آنلاین ساده برای خرید و فروش کالا است.
         </p>
 
     </div>
@@ -782,7 +832,9 @@
 
 <!-- ================= CREATORS ================= -->
 
-<section id="creators" class="page">
+<section
+    id="creators"
+    class="page">
 
     <div class="info-card">
 
@@ -790,23 +842,36 @@
             👨🏻‍💻 سازندگان
         </h2>
 
-        <p class="creator-list">
+        <p>
 
-            🧑🏻‍💻 سازنده: عرفان ریاحی<br><br>
+            🧑🏻‍💻 سازنده: عرفان ریاحی
+            <br><br>
 
-            با تشکر از:<br><br>
+            با تشکر از:
+            <br><br>
 
-            🌹 جناب آقای شهاب الدین ریاحی<br>
-            🌹 جناب دکتر عباس امیدی<br>
-            🌹 جناب آقای زارعی<br>
-            🌹 جناب آقای کوشان طلائی<br>
-            🌹 سرکار خانم ملیحه همت گیر<br>
-            🌹 جناب آقای سپهر میر قادری<br>
-            🌹 جناب آقای سید ابولفضل صمصام شریعت<br>
-            🌹 جناب آقای محمد پارسا آیتی<br>
-            🌹 جناب آقای محمد طاها نیرومند<br>
-            🌹 جناب آقای یاسین قاسمی<br>
-            🌹 جناب آقای کیان عسگری<br>
+            🌹 جناب آقای شهاب الدین ریاحی
+            <br>
+            🌹 جناب دکتر عباس امیدی
+            <br>
+            🌹 جناب آقای زارعی
+            <br>
+            🌹 جناب آقای کوشان طلائی
+            <br>
+            🌹 سرکار خانم ملیحه همت گیر
+            <br>
+            🌹 جناب آقای سپهر میر قادری
+            <br>
+            🌹 جناب آقای سید ابولفضل صمصام شریعت
+            <br>
+            🌹 جناب آقای محمد پارسا آیتی
+            <br>
+            🌹 جناب آقای محمد طاها نیرومند
+            <br>
+            🌹 جناب آقای یاسین قاسمی
+            <br>
+            🌹 جناب آقای کیان عسگری
+            <br>
             🌹 جناب آقای مانی شیروی
 
         </p>
@@ -818,7 +883,9 @@
 
 <!-- ================= CONTACT ================= -->
 
-<section id="contact" class="page">
+<section
+    id="contact"
+    class="page">
 
     <div class="info-card">
 
@@ -834,6 +901,7 @@
     </div>
 
 </section>
+
 
 </main>
 
