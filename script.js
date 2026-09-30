@@ -1,7 +1,7 @@
 "use strict";
 
 /* =========================================================
-   ZARDALOO WEB APP
+   ZARDALOO
    ========================================================= */
 
 const SUPABASE_URL =
@@ -24,31 +24,49 @@ const REPORTS_URL =
 
 
 /* =========================================================
-   LOCAL STORAGE
+   STORAGE
    ========================================================= */
 
-const PROFILE_KEY = "zardaloo_profile";
-const CART_KEY = "zardaloo_cart";
-const THEME_KEY = "zardaloo_theme";
-const DISCOUNT_KEY = "zardaloo_discount";
-const ADMIN_SESSION_KEY = "zardaloo_admin_session";
+const PROFILE_KEY =
+    "zardaloo_profile";
+
+const CART_KEY =
+    "zardaloo_cart";
+
+const THEME_KEY =
+    "zardaloo_theme";
+
+const DISCOUNT_KEY =
+    "zardaloo_discount";
+
+const ADMIN_SESSION_KEY =
+    "zardaloo_admin_session";
 
 
 let products = [];
+
 let filteredProducts = [];
+
 let cart = [];
 
-let selectedProfile = "football";
-let uploadedProfileImage = "";
+let selectedProfile =
+    "football";
 
-let discountPercent = 0;
-let discountCode = "";
+let uploadedProfileImage =
+    "";
 
-let adminToken = "";
+let discountPercent =
+    0;
+
+let discountCode =
+    "";
+
+let adminToken =
+    "";
 
 
 /* =========================================================
-   HELPERS
+   BASIC FUNCTIONS
    ========================================================= */
 
 function $(id) {
@@ -56,18 +74,25 @@ function $(id) {
 }
 
 
-function setMessage(id, text, type = "") {
+function setMessage(
+    id,
+    text,
+    type = ""
+) {
 
-    const el = $(id);
+    const element =
+        $(id);
 
-    if (!el) return;
+    if (!element) return;
 
-    el.textContent = text;
+    element.textContent =
+        text;
 
-    el.className = "message";
+    element.className =
+        "message";
 
     if (type) {
-        el.classList.add(type);
+        element.classList.add(type);
     }
 }
 
@@ -85,31 +110,46 @@ function escapeHTML(value) {
 
 function numberValue(value) {
 
-    const n = Number(
-        String(value ?? "")
-            .replaceAll(",", "")
-            .replaceAll("٬", "")
-            .trim()
-    );
+    const number =
+        Number(
+            String(value ?? "")
+                .replaceAll(",", "")
+                .replaceAll("٬", "")
+                .trim()
+        );
 
-    return Number.isFinite(n) ? n : 0;
+    return Number.isFinite(number)
+        ? number
+        : 0;
 }
 
 
 function formatPrice(value) {
 
-    return numberValue(value).toLocaleString("fa-IR") + " ریال";
+    return (
+        numberValue(value)
+            .toLocaleString("fa-IR")
+        + " ریال"
+    );
 }
 
+
+/* =========================================================
+   PROFILE
+   ========================================================= */
 
 function getProfile() {
 
     try {
+
         return JSON.parse(
-            localStorage.getItem(PROFILE_KEY)
+            localStorage.getItem(
+                PROFILE_KEY
+            )
         ) || null;
 
     } catch {
+
         return null;
     }
 }
@@ -126,47 +166,62 @@ function saveProfile(profile) {
 
 function getCurrentZardalooNumber() {
 
-    const profile = getProfile();
+    const profile =
+        getProfile();
 
     return profile?.zardalooNumber || "";
 }
 
 
-/* =========================================================
-   PROFILE
-   ========================================================= */
-
 function selectProfile(name) {
 
-    selectedProfile = name;
+    selectedProfile =
+        name;
+
 
     document
         .querySelectorAll(".profile-option")
         .forEach(button => {
+
             button.classList.toggle(
                 "selected",
                 button.dataset.profile === name
             );
+
         });
 
-    uploadedProfileImage = "";
 
-    const preview = $("profilePreview");
+    uploadedProfileImage =
+        "";
+
+
+    const preview =
+        $("profilePreview");
 
     if (!preview) return;
 
+
     const icons = {
+
         football: "⚽",
+
         volleyball: "🏐",
+
         coffee: "☕",
+
         flask: "🧉",
+
         store: "🏪",
+
         sandwich: "🥪",
+
         pizza: "🍕"
+
     };
 
+
     preview.innerHTML =
-        icons[name] || "⚪";
+        icons[name] || "👤";
 }
 
 
@@ -177,60 +232,73 @@ function loadProfileImage(event) {
 
     if (!file) return;
 
+
     if (!file.type.startsWith("image/")) {
 
         setMessage(
             "profileMessage",
-            "فقط فایل تصویری انتخاب کنید.",
+            "فقط تصویر انتخاب کنید.",
             "error"
         );
 
         return;
     }
 
+
     const reader =
         new FileReader();
 
-    reader.onload = function () {
 
-        uploadedProfileImage =
-            reader.result;
+    reader.onload =
+        function () {
 
-        $("profilePreview").innerHTML =
-            `<img src="${uploadedProfileImage}" alt="پروفایل">`;
-    };
+            uploadedProfileImage =
+                reader.result;
+
+
+            $("profilePreview").innerHTML =
+                `<img src="${uploadedProfileImage}" alt="پروفایل">`;
+
+        };
+
 
     reader.readAsDataURL(file);
 }
 
 
+/* =========================================================
+   ENTER ZARDALOO
+   ========================================================= */
+
 function enterZardaloo() {
 
     const name =
-        $("firstName").value.trim();
+        $("firstName")
+            .value
+            .trim();
+
 
     const phone =
-        $("firstPhone").value.trim();
+        $("firstPhone")
+            .value
+            .trim();
+
 
     const zardalooNumber =
-        $("firstZardaloo").value.trim();
+        $("firstZardaloo")
+            .value
+            .trim();
 
-    if (!name || !phone || !zardalooNumber) {
 
-        setMessage(
-            "profileMessage",
-            "لطفاً نام، شماره تماس و شماره زردآلو را کامل وارد کنید.",
-            "error"
-        );
-
-        return;
-    }
-
-    if (zardalooNumber.length < 3) {
+    if (
+        !name ||
+        !phone ||
+        !zardalooNumber
+    ) {
 
         setMessage(
             "profileMessage",
-            "شماره زردآلو معتبر نیست.",
+            "لطفاً همه اطلاعات را وارد کنید.",
             "error"
         );
 
@@ -240,66 +308,38 @@ function enterZardaloo() {
 
     const profile = {
 
-        name: name,
+        name:
+            name,
 
-        phone: phone,
+        phone:
+            phone,
 
-        zardalooNumber: zardalooNumber,
+        zardalooNumber:
+            zardalooNumber,
 
-        profileType: selectedProfile,
+        profileType:
+            selectedProfile,
 
-        profileImage: uploadedProfileImage || ""
+        profileImage:
+            uploadedProfileImage
 
     };
 
 
     saveProfile(profile);
 
-    initializeApp();
-
-}
-
-
-function initializeProfile() {
-
-    const profile =
-        getProfile();
 
     /*
-     * فقط وقتی پروفایل وجود ندارد،
-     * صفحه پروفایل نمایش داده می‌شود.
+     * پروفایل ذخیره شد.
+     * از اینجا مستقیماً وارد صفحه اصلی می‌شویم.
      */
 
-    if (profile) {
-
-        $("profileSetup")
-            ?.classList.add("hidden");
-
-        $("app")
-            ?.classList.remove("hidden");
-
-        updateHomeProfile();
-
-    } else {
-
-        $("profileSetup")
-            ?.classList.remove("hidden");
-
-        $("app")
-            ?.classList.add("hidden");
-
-        selectProfile("football");
-    }
-}
-
-
-function initializeApp() {
-
     $("profileSetup")
-        ?.classList.add("hidden");
+        .classList.add("hidden");
 
     $("app")
-        ?.classList.remove("hidden");
+        .classList.remove("hidden");
+
 
     updateHomeProfile();
 
@@ -313,12 +353,17 @@ function initializeApp() {
 }
 
 
+/* =========================================================
+   HOME PROFILE
+   ========================================================= */
+
 function updateHomeProfile() {
 
     const profile =
         getProfile();
 
     if (!profile) return;
+
 
     $("homeName").textContent =
         profile.name;
@@ -328,21 +373,6 @@ function updateHomeProfile() {
 
     $("homeZardaloo").textContent =
         profile.zardalooNumber;
-
-
-    const image =
-        $("homeProfileImage");
-
-    if (!image) return;
-
-
-    if (profile.profileImage) {
-
-        image.innerHTML =
-            `<img src="${profile.profileImage}" alt="پروفایل">`;
-
-        return;
-    }
 
 
     const icons = {
@@ -364,8 +394,54 @@ function updateHomeProfile() {
     };
 
 
-    image.textContent =
-        icons[profile.profileType] || "👤";
+    /*
+     * تصویر بالای صفحه
+     */
+
+    const header =
+        $("headerProfileImage");
+
+
+    if (header) {
+
+        if (profile.profileImage) {
+
+            header.innerHTML =
+                `<img src="${profile.profileImage}" alt="پروفایل">`;
+
+        } else {
+
+            header.textContent =
+                icons[
+                    profile.profileType
+                ] || "👤";
+        }
+    }
+
+
+    /*
+     * تصویر کارت صفحه اصلی
+     */
+
+    const home =
+        $("homeProfileImage");
+
+
+    if (home) {
+
+        if (profile.profileImage) {
+
+            home.innerHTML =
+                `<img src="${profile.profileImage}" alt="پروفایل">`;
+
+        } else {
+
+            home.textContent =
+                icons[
+                    profile.profileType
+                ] || "👤";
+        }
+    }
 }
 
 
@@ -373,21 +449,29 @@ function updateHomeProfile() {
    NAVIGATION
    ========================================================= */
 
-function showPage(pageName) {
+function showPage(name) {
 
     document
         .querySelectorAll(".page")
         .forEach(page => {
-            page.classList.remove("active");
+
+            page.classList.remove(
+                "active"
+            );
+
         });
 
 
     const page =
-        $(pageName);
+        $(name);
 
     if (!page) return;
 
-    page.classList.add("active");
+
+    page.classList.add(
+        "active"
+    );
+
 
     window.scrollTo({
         top: 0,
@@ -395,15 +479,15 @@ function showPage(pageName) {
     });
 
 
-    if (pageName === "cart") {
+    if (name === "cart") {
         renderCart();
     }
 
-    if (pageName === "gifts") {
+    if (name === "gifts") {
         renderGifts();
     }
 
-    if (pageName === "messages") {
+    if (name === "messages") {
         loadMessages();
     }
 }
@@ -421,84 +505,103 @@ async function apiFetch(
     const controller =
         new AbortController();
 
-    const timeout =
+
+    const timer =
         setTimeout(
             () => controller.abort(),
             15000
         );
 
 
-    const headers = {
-
-        "apikey": SUPABASE_KEY,
-
-        "Authorization":
-            "Bearer " + SUPABASE_KEY,
-
-        "Content-Type":
-            "application/json",
-
-        ...(options.headers || {})
-
-    };
-
-
     try {
 
         const response =
-            await fetch(url, {
-                ...options,
-                headers,
-                signal: controller.signal
-            });
+            await fetch(
+                url,
+                {
+                    ...options,
+
+                    headers: {
+
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY,
+
+                        "Content-Type":
+                            "application/json",
+
+                        ...(options.headers || {})
+
+                    },
+
+                    signal:
+                        controller.signal
+                }
+            );
 
 
         const text =
             await response.text();
 
 
-        let data = null;
+        let data =
+            null;
+
 
         if (text) {
 
             try {
-                data = JSON.parse(text);
-            } catch {
-                data = text;
-            }
 
+                data =
+                    JSON.parse(text);
+
+            } catch {
+
+                data =
+                    text;
+            }
         }
 
 
         if (!response.ok) {
 
-            const errorText =
+            throw new Error(
                 typeof data === "string"
                     ? data
-                    : data?.error ||
-                      data?.message ||
-                      `HTTP ${response.status}`;
-
-            throw new Error(errorText);
+                    : (
+                        data?.message ||
+                        data?.error ||
+                        `HTTP ${response.status}`
+                    )
+            );
         }
 
 
         return data;
 
+
     } catch (error) {
 
-        if (error.name === "AbortError") {
+        if (
+            error.name ===
+            "AbortError"
+        ) {
 
             throw new Error(
-                "ارتباط با سرور بیش از حد طول کشید."
+                "ارتباط با سرور طول کشید."
             );
         }
 
+
         throw error;
+
 
     } finally {
 
-        clearTimeout(timeout);
+        clearTimeout(timer);
     }
 }
 
@@ -513,11 +616,19 @@ function normalizeProducts(data) {
         return data;
     }
 
-    if (Array.isArray(data?.products)) {
+    if (
+        Array.isArray(
+            data?.products
+        )
+    ) {
         return data.products;
     }
 
-    if (Array.isArray(data?.data)) {
+    if (
+        Array.isArray(
+            data?.data
+        )
+    ) {
         return data.data;
     }
 
@@ -534,12 +645,18 @@ function isGiftProduct(product) {
         false;
 
 
-    if (typeof value === "boolean") {
+    if (
+        typeof value ===
+        "boolean"
+    ) {
         return value;
     }
 
 
-    if (typeof value === "number") {
+    if (
+        typeof value ===
+        "number"
+    ) {
         return value === 1;
     }
 
@@ -606,7 +723,6 @@ function getSellerNumber(product) {
     return (
         product?.zardaloo_number ??
         product?.zardalooNumber ??
-        product?.seller_zardaloo_number ??
         product?.seller_number ??
         "-"
     );
@@ -630,16 +746,6 @@ async function loadProducts() {
         "marketStatus",
         "در حال دریافت کالاها..."
     );
-
-
-    const container =
-        $("products");
-
-    if (container) {
-
-        container.innerHTML =
-            `<div class="loading">در حال دریافت کالاها...</div>`;
-    }
 
 
     try {
@@ -680,28 +786,33 @@ async function loadProducts() {
         console.error(error);
 
 
-        if (container) {
+        $("products").innerHTML = `
 
-            container.innerHTML = `
-                <div class="form-card">
-                    <h3>دریافت کالاها انجام نشد</h3>
-                    <p>
-                        ${escapeHTML(error.message)}
-                    </p>
-                    <button
-                        class="main-yellow-button"
-                        onclick="loadProducts()">
-                        تلاش دوباره
-                    </button>
-                </div>
-            `;
-        }
+            <div class="form-card">
+
+                <h3>
+                    دریافت کالاها ناموفق بود
+                </h3>
+
+                <p>
+                    ${escapeHTML(
+                        error.message
+                    )}
+                </p>
+
+                <button
+                    class="main-yellow-button"
+                    onclick="loadProducts()">
+                    تلاش دوباره
+                </button>
+
+            </div>
+        `;
 
 
         setMessage(
             "marketStatus",
-            "ارتباط با سرور برقرار نشد: " +
-            error.message,
+            "خطا در دریافت کالاها.",
             "error"
         );
     }
@@ -709,7 +820,7 @@ async function loadProducts() {
 
 
 /* =========================================================
-   PRODUCT FILTER
+   FILTER
    ========================================================= */
 
 function filterProducts() {
@@ -745,81 +856,88 @@ function filterProducts() {
 
 
     filteredProducts =
-        products.filter(product => {
+        products.filter(
+            product => {
 
-            const productName =
-                getProductName(product)
-                    .toLowerCase();
-
-
-            const sellerName =
-                getSellerName(product)
-                    .toLowerCase();
+                const productName =
+                    getProductName(product)
+                        .toLowerCase();
 
 
-            const price =
-                getProductPrice(product);
+                const sellerName =
+                    getSellerName(product)
+                        .toLowerCase();
 
 
-            const giftValue =
-                isGiftProduct(product);
+                const price =
+                    getProductPrice(product);
 
 
-            if (
-                name &&
-                !productName.includes(name)
-            ) {
-                return false;
+                const giftValue =
+                    isGiftProduct(product);
+
+
+                if (
+                    name &&
+                    !productName.includes(name)
+                ) {
+                    return false;
+                }
+
+
+                if (
+                    seller &&
+                    !sellerName.includes(seller)
+                ) {
+                    return false;
+                }
+
+
+                if (
+                    min > 0 &&
+                    price < min
+                ) {
+                    return false;
+                }
+
+
+                if (
+                    max > 0 &&
+                    price > max
+                ) {
+                    return false;
+                }
+
+
+                if (
+                    gift === "yes" &&
+                    !giftValue
+                ) {
+                    return false;
+                }
+
+
+                if (
+                    gift === "no" &&
+                    giftValue
+                ) {
+                    return false;
+                }
+
+
+                return true;
+
             }
-
-
-            if (
-                seller &&
-                !sellerName.includes(seller)
-            ) {
-                return false;
-            }
-
-
-            if (
-                min > 0 &&
-                price < min
-            ) {
-                return false;
-            }
-
-
-            if (
-                max > 0 &&
-                price > max
-            ) {
-                return false;
-            }
-
-
-            if (
-                gift === "yes" &&
-                !giftValue
-            ) {
-                return false;
-            }
-
-
-            if (
-                gift === "no" &&
-                giftValue
-            ) {
-                return false;
-            }
-
-
-            return true;
-        });
+        );
 
 
     renderProducts();
 }
 
+
+/* =========================================================
+   PRODUCT CARD
+   ========================================================= */
 
 function productCard(product) {
 
@@ -838,31 +956,32 @@ function productCard(product) {
     const phone =
         getSellerPhone(product);
 
-    const zardaloo =
+    const number =
         getSellerNumber(product);
 
     const description =
-        product?.description ??
-        product?.product_description ??
+        product?.description ||
+        product?.product_description ||
         "";
 
     const gift =
         isGiftProduct(product);
 
     const giftDescription =
-        product?.gift_description ??
-        product?.giftDescription ??
+        product?.gift_description ||
+        product?.giftDescription ||
         "";
 
 
-    const myNumber =
+    const owner =
         getCurrentZardalooNumber();
 
 
     const isOwner =
-        myNumber &&
-        zardaloo &&
-        String(myNumber) === String(zardaloo);
+        owner &&
+        number &&
+        String(owner) ===
+        String(number);
 
 
     return `
@@ -892,41 +1011,45 @@ function productCard(product) {
                 <br>
 
                 شماره زردآلو:
-                ${escapeHTML(zardaloo)}
+                ${escapeHTML(number)}
 
             </div>
 
 
             ${
                 description
-                ? `
-                    <p class="product-meta">
-                        ${escapeHTML(description)}
-                    </p>
-                `
-                : ""
+                    ? `
+                        <p class="product-meta">
+                            ${escapeHTML(
+                                description
+                            )}
+                        </p>
+                    `
+                    : ""
             }
 
 
             ${
                 gift
-                ? `
-                    <span class="gift-badge">
-                        🎁 اشانتیون دارد
-                    </span>
+                    ? `
+                        <span class="gift-badge">
+                            🎁 اشانتیون دارد
+                        </span>
 
-                    ${
-                        giftDescription
-                        ? `
-                            <p class="product-meta">
-                                🎁
-                                ${escapeHTML(giftDescription)}
-                            </p>
-                        `
-                        : ""
-                    }
-                `
-                : ""
+                        ${
+                            giftDescription
+                                ? `
+                                    <p class="product-meta">
+                                        🎁
+                                        ${escapeHTML(
+                                            giftDescription
+                                        )}
+                                    </p>
+                                `
+                                : ""
+                        }
+                    `
+                    : ""
             }
 
 
@@ -934,26 +1057,32 @@ function productCard(product) {
 
                 <button
                     class="main-yellow-button"
-                    onclick="addToCart('${escapeHTML(String(id))}')">
+                    onclick="addToCart('${escapeHTML(
+                        String(id)
+                    )}')">
                     🛒 افزودن
                 </button>
 
                 <button
                     class="secondary-button"
-                    onclick="openMessageTo('${escapeHTML(String(zardaloo))}')">
+                    onclick="openMessageTo('${escapeHTML(
+                        String(number)
+                    )}')">
                     💬 پیام
                 </button>
 
                 ${
                     isOwner
-                    ? `
-                        <button
-                            class="secondary-button"
-                            onclick="deleteOwnProduct('${escapeHTML(String(id))}')">
-                            🗑️ حذف
-                        </button>
-                    `
-                    : ""
+                        ? `
+                            <button
+                                class="secondary-button"
+                                onclick="deleteOwnProduct('${escapeHTML(
+                                    String(id)
+                                )}')">
+                                🗑️ حذف
+                            </button>
+                        `
+                        : ""
                 }
 
             </div>
@@ -968,17 +1097,22 @@ function renderProducts() {
     const container =
         $("products");
 
+
     if (!container) return;
 
 
     if (!filteredProducts.length) {
 
-        container.innerHTML =
-            `
+        container.innerHTML = `
+
             <div class="form-card">
-                <h3>کالایی پیدا نشد.</h3>
+
+                <h3>
+                    کالایی پیدا نشد.
+                </h3>
+
             </div>
-            `;
+        `;
 
         return;
     }
@@ -996,46 +1130,49 @@ function renderGifts() {
     const container =
         $("giftProducts");
 
+
     if (!container) return;
 
 
     const gifts =
-        products.filter(isGiftProduct);
+        products.filter(
+            isGiftProduct
+        );
 
 
     if (!gifts.length) {
 
-        container.innerHTML =
-            `
+        container.innerHTML = `
+
             <div class="form-card">
+
                 <h3>
-                    هنوز کالای اشانتیونی ثبت نشده است.
+                    هنوز کالای اشانتیونی وجود ندارد.
                 </h3>
+
             </div>
-            `;
+        `;
 
         return;
     }
 
 
     container.innerHTML =
-        gifts.map(productCard).join("");
+        gifts.map(productCard)
+            .join("");
 }
 
 
 /* =========================================================
-   REGISTER PRODUCT
+   REGISTER
    ========================================================= */
 
 function toggleGiftDescription() {
 
-    const checked =
-        $("isGift").checked;
-
     $("giftDescription")
         .classList.toggle(
             "hidden",
-            !checked
+            !$("isGift").checked
         );
 }
 
@@ -1054,51 +1191,50 @@ async function registerProduct() {
             "error"
         );
 
-        showPage("home");
-
         return;
     }
 
 
     const name =
-        $("productName").value.trim();
+        $("productName")
+            .value
+            .trim();
+
 
     const price =
         numberValue(
             $("productPrice").value
         );
 
+
     const sellerName =
-        $("sellerName").value.trim();
+        $("sellerName")
+            .value
+            .trim() ||
+        profile.name;
+
 
     const sellerPhone =
-        $("sellerPhone").value.trim();
+        $("sellerPhone")
+            .value
+            .trim() ||
+        profile.phone;
+
 
     const description =
         $("productDescription")
             .value
             .trim();
 
-    const isGift =
+
+    const gift =
         $("isGift").checked;
+
 
     const giftDescription =
         $("giftDescription")
             .value
             .trim();
-
-
-    /*
-     * نام فروشنده اگر خالی باشد
-     * از پروفایل استفاده می‌شود.
-     */
-
-    const finalSellerName =
-        sellerName || profile.name;
-
-
-    const finalSellerPhone =
-        sellerPhone || profile.phone;
 
 
     if (!name || price <= 0) {
@@ -1113,11 +1249,14 @@ async function registerProduct() {
     }
 
 
-    if (isGift && !giftDescription) {
+    if (
+        gift &&
+        !giftDescription
+    ) {
 
         setMessage(
             "registerMessage",
-            "برای اشانتیون توضیحات وارد کنید.",
+            "توضیحات اشانتیون را وارد کنید.",
             "error"
         );
 
@@ -1127,15 +1266,17 @@ async function registerProduct() {
 
     const payload = {
 
-        name: name,
+        name:
+            name,
 
-        price: price,
+        price:
+            price,
 
         seller_name:
-            finalSellerName,
+            sellerName,
 
         seller_phone:
-            finalSellerPhone,
+            sellerPhone,
 
         zardaloo_number:
             profile.zardalooNumber,
@@ -1144,10 +1285,10 @@ async function registerProduct() {
             description,
 
         is_gift:
-            isGift,
+            gift,
 
         gift_description:
-            isGift
+            gift
                 ? giftDescription
                 : ""
 
@@ -1166,7 +1307,11 @@ async function registerProduct() {
             PRODUCTS_URL,
             {
                 method: "POST",
-                body: JSON.stringify(payload)
+
+                body:
+                    JSON.stringify(
+                        payload
+                    )
             }
         );
 
@@ -1179,9 +1324,13 @@ async function registerProduct() {
 
 
         $("productName").value = "";
+
         $("productPrice").value = "";
+
         $("productDescription").value = "";
+
         $("isGift").checked = false;
+
         $("giftDescription").value = "";
 
         toggleGiftDescription();
@@ -1191,8 +1340,6 @@ async function registerProduct() {
 
 
     } catch (error) {
-
-        console.error(error);
 
         setMessage(
             "registerMessage",
@@ -1214,7 +1361,9 @@ function loadCart() {
 
         cart =
             JSON.parse(
-                localStorage.getItem(CART_KEY)
+                localStorage.getItem(
+                    CART_KEY
+                )
             ) || [];
 
     } catch {
@@ -1223,30 +1372,32 @@ function loadCart() {
     }
 
 
-    const savedDiscount =
-        localStorage.getItem(
-            DISCOUNT_KEY
-        );
+    try {
+
+        const saved =
+            JSON.parse(
+                localStorage.getItem(
+                    DISCOUNT_KEY
+                )
+            );
 
 
-    if (savedDiscount) {
-
-        try {
-
-            const parsed =
-                JSON.parse(savedDiscount);
+        if (saved) {
 
             discountCode =
-                parsed.code || "";
+                saved.code || "";
 
             discountPercent =
-                numberValue(parsed.percent);
-
-        } catch {
-
-            discountCode = "";
-            discountPercent = 0;
+                numberValue(
+                    saved.percent
+                );
         }
+
+    } catch {
+
+        discountCode = "";
+
+        discountPercent = 0;
     }
 }
 
@@ -1264,7 +1415,9 @@ function findProduct(id) {
 
     return products.find(
         product =>
-            String(getProductId(product)) ===
+            String(
+                getProductId(product)
+            ) ===
             String(id)
     );
 }
@@ -1279,7 +1432,7 @@ function addToCart(id) {
     if (!product) {
 
         alert(
-            "این کالا دیگر در بازار موجود نیست."
+            "کالا پیدا نشد."
         );
 
         return;
@@ -1302,7 +1455,8 @@ function addToCart(id) {
 
         cart.push({
 
-            id: id,
+            id:
+                id,
 
             name:
                 getProductName(product),
@@ -1310,7 +1464,8 @@ function addToCart(id) {
             price:
                 getProductPrice(product),
 
-            quantity: 1
+            quantity:
+                1
 
         });
     }
@@ -1343,7 +1498,10 @@ function removeFromCart(id) {
 }
 
 
-function changeQuantity(id, amount) {
+function changeQuantity(
+    id,
+    amount
+) {
 
     const item =
         cart.find(
@@ -1381,6 +1539,7 @@ function calculateCart() {
                 sum +
                 numberValue(item.price) *
                 numberValue(item.quantity),
+
             0
         );
 
@@ -1388,7 +1547,8 @@ function calculateCart() {
     const discount =
         Math.round(
             original *
-            (discountPercent / 100)
+            discountPercent /
+            100
         );
 
 
@@ -1421,14 +1581,16 @@ function renderCart() {
 
     if (!cart.length) {
 
-        items.innerHTML =
-            `
+        items.innerHTML = `
+
             <div class="form-card">
+
                 <h3>
                     سبد خرید خالی است.
                 </h3>
+
             </div>
-            `;
+        `;
 
         summary.innerHTML = "";
 
@@ -1437,54 +1599,72 @@ function renderCart() {
 
 
     items.innerHTML =
-        cart.map(item => `
+        cart.map(
+            item => `
 
-            <div class="cart-item">
+                <div class="cart-item">
 
-                <div>
+                    <div>
 
-                    <strong>
-                        ${escapeHTML(item.name)}
-                    </strong>
+                        <strong>
+                            ${escapeHTML(
+                                item.name
+                            )}
+                        </strong>
 
-                    <p>
-                        قیمت:
-                        ${formatPrice(item.price)}
-                    </p>
+                        <p>
+                            ${formatPrice(
+                                item.price
+                            )}
+                        </p>
 
-                </div>
+                    </div>
 
 
-                <div>
+                    <div>
+
+                        <button
+                            class="secondary-button"
+                            onclick="changeQuantity(
+                                '${escapeHTML(
+                                    String(item.id)
+                                )}',
+                                -1
+                            )">
+                            −
+                        </button>
+
+                        <strong>
+                            ${item.quantity}
+                        </strong>
+
+                        <button
+                            class="secondary-button"
+                            onclick="changeQuantity(
+                                '${escapeHTML(
+                                    String(item.id)
+                                )}',
+                                1
+                            )">
+                            +
+                        </button>
+
+                    </div>
+
 
                     <button
                         class="secondary-button"
-                        onclick="changeQuantity('${escapeHTML(String(item.id))}', -1)">
-                        −
-                    </button>
-
-                    <strong>
-                        ${item.quantity}
-                    </strong>
-
-                    <button
-                        class="secondary-button"
-                        onclick="changeQuantity('${escapeHTML(String(item.id))}', 1)">
-                        +
+                        onclick="removeFromCart(
+                            '${escapeHTML(
+                                String(item.id)
+                            )}'
+                        )">
+                        حذف
                     </button>
 
                 </div>
-
-
-                <button
-                    class="secondary-button"
-                    onclick="removeFromCart('${escapeHTML(String(item.id))}')">
-                    حذف
-                </button>
-
-            </div>
-
-        `).join("");
+            `
+        ).join("");
 
 
     const totals =
@@ -1496,11 +1676,13 @@ function renderCart() {
         <div class="summary-row">
 
             <span>
-                قیمت کل کالاها
+                قیمت کل
             </span>
 
             <strong>
-                ${formatPrice(totals.original)}
+                ${formatPrice(
+                    totals.original
+                )}
             </strong>
 
         </div>
@@ -1512,13 +1694,15 @@ function renderCart() {
                 تخفیف
                 ${
                     discountPercent
-                    ? `(${discountPercent}%)`
-                    : ""
+                        ? `(${discountPercent}٪)`
+                        : ""
                 }
             </span>
 
             <strong>
-                ${formatPrice(totals.discount)}
+                ${formatPrice(
+                    totals.discount
+                )}
             </strong>
 
         </div>
@@ -1531,7 +1715,9 @@ function renderCart() {
             </span>
 
             <strong>
-                ${formatPrice(totals.final)}
+                ${formatPrice(
+                    totals.final
+                )}
             </strong>
 
         </div>
@@ -1539,17 +1725,18 @@ function renderCart() {
 
         ${
             discountCode
-            ? `
-                <p>
-                    کد اعمال‌شده:
-                    <strong>
-                        ${escapeHTML(discountCode)}
-                    </strong>
-                </p>
-            `
-            : ""
+                ? `
+                    <p>
+                        کد:
+                        <strong>
+                            ${escapeHTML(
+                                discountCode
+                            )}
+                        </strong>
+                    </p>
+                `
+                : ""
         }
-
     `;
 }
 
@@ -1580,18 +1767,6 @@ function applyCartDiscount() {
             .toUpperCase();
 
 
-    if (!code) {
-
-        setMessage(
-            "cartDiscountMessage",
-            "کد تخفیف را وارد کنید.",
-            "error"
-        );
-
-        return;
-    }
-
-
     const percent =
         DISCOUNT_CODES[code];
 
@@ -1604,35 +1779,34 @@ function applyCartDiscount() {
             "error"
         );
 
-        discountCode = "";
-        discountPercent = 0;
-
-        localStorage.removeItem(
-            DISCOUNT_KEY
-        );
-
-        renderCart();
-
         return;
     }
 
 
-    discountCode = code;
-    discountPercent = percent;
+    discountCode =
+        code;
+
+    discountPercent =
+        percent;
 
 
     localStorage.setItem(
         DISCOUNT_KEY,
         JSON.stringify({
-            code: code,
-            percent: percent
+
+            code:
+                code,
+
+            percent:
+                percent
+
         })
     );
 
 
     setMessage(
         "cartDiscountMessage",
-        `کد تخفیف ${percent}% اعمال شد.`,
+        `تخفیف ${percent}٪ اعمال شد.`,
         "success"
     );
 
@@ -1642,7 +1816,7 @@ function applyCartDiscount() {
 
 
 /* =========================================================
-   DELETE OWN PRODUCT
+   OWN PRODUCT DELETE
    ========================================================= */
 
 async function deleteOwnProduct(id) {
@@ -1650,11 +1824,13 @@ async function deleteOwnProduct(id) {
     const product =
         findProduct(id);
 
+
     if (!product) return;
 
 
     const owner =
         getCurrentZardalooNumber();
+
 
     const seller =
         getSellerNumber(product);
@@ -1662,7 +1838,8 @@ async function deleteOwnProduct(id) {
 
     if (
         !owner ||
-        String(owner) !== String(seller)
+        String(owner) !==
+        String(seller)
     ) {
 
         alert(
@@ -1675,7 +1852,7 @@ async function deleteOwnProduct(id) {
 
     if (
         !confirm(
-            "آیا از حذف این کالا مطمئن هستید؟"
+            "کالا حذف شود؟"
         )
     ) {
         return;
@@ -1690,7 +1867,8 @@ async function deleteOwnProduct(id) {
             encodeURIComponent(id),
 
             {
-                method: "DELETE"
+                method:
+                    "DELETE"
             }
         );
 
@@ -1701,7 +1879,7 @@ async function deleteOwnProduct(id) {
     } catch (error) {
 
         alert(
-            "حذف کالا انجام نشد: " +
+            "حذف انجام نشد: " +
             error.message
         );
     }
@@ -1714,9 +1892,12 @@ async function deleteOwnProduct(id) {
 
 function openMessageTo(number) {
 
-    showPage("messages");
+    showPage(
+        "messages"
+    );
 
-    $("messageReceiver").value =
+    $("messageReceiver")
+        .value =
         number || "";
 }
 
@@ -1725,9 +1906,6 @@ async function sendMessage() {
 
     const profile =
         getProfile();
-
-
-    if (!profile) return;
 
 
     const receiver =
@@ -1742,11 +1920,14 @@ async function sendMessage() {
             .trim();
 
 
-    if (!receiver || !text) {
+    if (
+        !receiver ||
+        !text
+    ) {
 
         setMessage(
             "messageSendStatus",
-            "شماره گیرنده و متن پیام را وارد کنید.",
+            "گیرنده و متن پیام را وارد کنید.",
             "error"
         );
 
@@ -1754,32 +1935,34 @@ async function sendMessage() {
     }
 
 
-    const payload = {
-
-        sender_zardaloo_number:
-            profile.zardalooNumber,
-
-        receiver_zardaloo_number:
-            receiver,
-
-        message:
-            text
-
-    };
-
-
     try {
 
         await apiFetch(
             MESSAGES_URL,
             {
-                method: "POST",
-                body: JSON.stringify(payload)
+
+                method:
+                    "POST",
+
+                body:
+                    JSON.stringify({
+
+                        sender_zardaloo_number:
+                            profile.zardalooNumber,
+
+                        receiver_zardaloo_number:
+                            receiver,
+
+                        message:
+                            text
+
+                    })
             }
         );
 
 
-        $("messageText").value = "";
+        $("messageText")
+            .value = "";
 
 
         setMessage(
@@ -1796,8 +1979,7 @@ async function sendMessage() {
 
         setMessage(
             "messageSendStatus",
-            "ارسال پیام انجام نشد: " +
-            error.message,
+            "ارسال پیام انجام نشد.",
             "error"
         );
     }
@@ -1809,11 +1991,17 @@ async function loadMessages() {
     const profile =
         getProfile();
 
-    const container =
+
+    const list =
         $("messageList");
 
 
-    if (!profile || !container) return;
+    if (
+        !profile ||
+        !list
+    ) {
+        return;
+    }
 
 
     try {
@@ -1836,47 +2024,43 @@ async function loadMessages() {
 
         if (!messages.length) {
 
-            container.innerHTML =
+            list.innerHTML =
                 "<p>هنوز پیامی ندارید.</p>";
 
             return;
         }
 
 
-        container.innerHTML =
-            messages.map(message => `
+        list.innerHTML =
+            messages.map(
+                message => `
 
-                <div class="chat-message">
+                    <div class="chat-message">
 
-                    <strong>
-                        ${escapeHTML(
-                            message.sender_zardaloo_number ||
-                            message.sender ||
-                            "-"
-                        )}
-                    </strong>
+                        <strong>
+                            ${escapeHTML(
+                                message.sender_zardaloo_number ||
+                                "-"
+                            )}
+                        </strong>
 
-                    <p>
-                        ${escapeHTML(
-                            message.message ||
-                            message.text ||
-                            ""
-                        )}
-                    </p>
+                        <p>
+                            ${escapeHTML(
+                                message.message ||
+                                ""
+                            )}
+                        </p>
 
-                </div>
+                    </div>
 
-            `).join("");
+                `
+            ).join("");
 
 
-    } catch (error) {
+    } catch {
 
-        container.innerHTML =
-            `
-            <p>
-                دریافت پیام‌ها انجام نشد.
-            </p>
-            `;
+        list.innerHTML =
+            "<p>دریافت پیام‌ها ناموفق بود.</p>";
     }
 }
 
@@ -1908,19 +2092,10 @@ async function submitReport() {
             .trim();
 
 
-    if (!profile) {
-
-        setMessage(
-            "reportMessage",
-            "ابتدا وارد زردآلو شوید.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    if (!seller || !reason) {
+    if (
+        !seller ||
+        !reason
+    ) {
 
         setMessage(
             "reportMessage",
@@ -1937,44 +2112,49 @@ async function submitReport() {
         await apiFetch(
             REPORTS_URL,
             {
-                method: "POST",
 
-                body: JSON.stringify({
+                method:
+                    "POST",
 
-                    reporter_zardaloo_number:
-                        profile.zardalooNumber,
+                body:
+                    JSON.stringify({
 
-                    seller_zardaloo_number:
-                        seller,
+                        reporter_zardaloo_number:
+                            profile.zardalooNumber,
 
-                    reason:
-                        reason,
+                        seller_zardaloo_number:
+                            seller,
 
-                    description:
-                        description
+                        reason:
+                            reason,
 
-                })
+                        description:
+                            description
+
+                    })
             }
         );
 
 
         setMessage(
             "reportMessage",
-            "گزارش با موفقیت ثبت شد.",
+            "گزارش ثبت شد.",
             "success"
         );
 
 
-        $("reportSellerNumber").value = "";
-        $("reportDescription").value = "";
+        $("reportSellerNumber")
+            .value = "";
+
+        $("reportDescription")
+            .value = "";
 
 
     } catch (error) {
 
         setMessage(
             "reportMessage",
-            "ثبت گزارش انجام نشد: " +
-            error.message,
+            "ثبت گزارش انجام نشد.",
             "error"
         );
     }
@@ -1999,6 +2179,7 @@ function adminLogin() {
             .value
             .trim();
 
+
     const password =
         $("adminPassword")
             .value;
@@ -2011,7 +2192,7 @@ function adminLogin() {
 
         setMessage(
             "adminMessage",
-            "اطلاعات مدیریت صحیح نیست.",
+            "رمز مدیریت اشتباه است.",
             "error"
         );
 
@@ -2080,21 +2261,28 @@ async function adminRequest(
     return apiFetch(
         ADMIN_URL + path,
         {
+
             ...options,
+
             headers: {
+
                 ...adminHeaders(),
+
                 ...(options.headers || {})
+
             }
         }
     );
 }
 
 
-/* ================= ADMIN PRODUCTS ================= */
+/* =========================================================
+   ADMIN PRODUCTS
+   ========================================================= */
 
 async function loadAdminProducts() {
 
-    const container =
+    const content =
         $("adminContent");
 
 
@@ -2117,99 +2305,77 @@ async function loadAdminProducts() {
             list.length;
 
 
-        container.innerHTML = `
+        content.innerHTML = `
 
             <h3>
-                کالاهای ثبت‌شده
+                کالاها
             </h3>
 
-            <table class="admin-table">
+            ${
+                list.map(
+                    product => `
 
-                <thead>
+                        <div class="cart-item">
 
-                    <tr>
+                            <div>
 
-                        <th>
-                            کالا
-                        </th>
-
-                        <th>
-                            فروشنده
-                        </th>
-
-                        <th>
-                            قیمت
-                        </th>
-
-                        <th>
-                            عملیات
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    ${
-                        list.map(product => `
-
-                            <tr>
-
-                                <td>
+                                <strong>
                                     ${escapeHTML(
-                                        getProductName(product)
+                                        getProductName(
+                                            product
+                                        )
                                     )}
-                                </td>
+                                </strong>
 
-                                <td>
-                                    ${escapeHTML(
-                                        getSellerName(product)
-                                    )}
-                                </td>
-
-                                <td>
+                                <p>
                                     ${formatPrice(
-                                        getProductPrice(product)
+                                        getProductPrice(
+                                            product
+                                        )
                                     )}
-                                </td>
+                                </p>
 
-                                <td>
+                            </div>
 
-                                    <button
-                                        onclick="adminDeleteProduct('${escapeHTML(String(getProductId(product)))}')">
-                                        حذف
-                                    </button>
+                            <button
+                                onclick="adminDeleteProduct(
+                                    '${escapeHTML(
+                                        String(
+                                            getProductId(
+                                                product
+                                            )
+                                        )
+                                    )}'
+                                )">
+                                حذف
+                            </button>
 
-                                </td>
+                        </div>
 
-                            </tr>
+                    `
+                ).join("")
+            }
 
-                        `).join("")
-                    }
-
-                </tbody>
-
-            </table>
         `;
 
 
     } catch (error) {
 
-        container.innerHTML =
-            `
-            <p>
-                دریافت کالاهای مدیریت انجام نشد:
-                ${escapeHTML(error.message)}
-            </p>
-            `;
+        content.innerHTML =
+            `<p>
+                دریافت کالاها ناموفق بود.
+            </p>`;
     }
 }
 
 
 async function adminDeleteProduct(id) {
 
-    if (!confirm("این کالا حذف شود؟")) {
+    if (
+        !confirm(
+            "کالا حذف شود؟"
+        )
+    ) {
         return;
     }
 
@@ -2221,7 +2387,8 @@ async function adminDeleteProduct(id) {
             encodeURIComponent(id),
 
             {
-                method: "DELETE"
+                method:
+                    "DELETE"
             }
         );
 
@@ -2234,18 +2401,19 @@ async function adminDeleteProduct(id) {
     } catch (error) {
 
         alert(
-            "حذف انجام نشد: " +
-            error.message
+            "حذف انجام نشد."
         );
     }
 }
 
 
-/* ================= ADMIN REPORTS ================= */
+/* =========================================================
+   ADMIN REPORTS
+   ========================================================= */
 
 async function loadAdminReports() {
 
-    const container =
+    const content =
         $("adminContent");
 
 
@@ -2263,7 +2431,7 @@ async function loadAdminReports() {
                 : data?.reports || [];
 
 
-        container.innerHTML = `
+        content.innerHTML = `
 
             <h3>
                 گزارش‌ها
@@ -2271,67 +2439,73 @@ async function loadAdminReports() {
 
             ${
                 reports.length
-                ? reports.map(report => `
+                    ? reports.map(
+                        report => `
 
-                    <div class="cart-item">
+                            <div class="cart-item">
 
-                        <div>
+                                <div>
 
-                            <strong>
-                                فروشنده:
-                                ${escapeHTML(
-                                    report.seller_zardaloo_number ||
-                                    report.seller_number ||
-                                    "-"
-                                )}
-                            </strong>
+                                    <strong>
+                                        ${escapeHTML(
+                                            report.seller_zardaloo_number ||
+                                            "-"
+                                        )}
+                                    </strong>
 
-                            <p>
-                                دلیل:
-                                ${escapeHTML(
-                                    report.reason || "-"
-                                )}
-                            </p>
+                                    <p>
+                                        دلیل:
+                                        ${escapeHTML(
+                                            report.reason ||
+                                            "-"
+                                        )}
+                                    </p>
 
-                            <p>
-                                ${escapeHTML(
-                                    report.description || ""
-                                )}
-                            </p>
+                                    <p>
+                                        ${escapeHTML(
+                                            report.description ||
+                                            ""
+                                        )}
+                                    </p>
 
-                        </div>
+                                </div>
 
-                        <button
-                            class="secondary-button"
-                            onclick="adminDeleteReport('${escapeHTML(String(report.id))}')">
-                            🗑️ حذف گزارش
-                        </button>
+                                <button
+                                    onclick="adminDeleteReport(
+                                        '${escapeHTML(
+                                            String(
+                                                report.id
+                                            )
+                                        )}'
+                                    )">
+                                    حذف گزارش
+                                </button>
 
-                    </div>
+                            </div>
 
-                `).join("")
-                : "<p>گزارشی وجود ندارد.</p>"
+                        `
+                    ).join("")
+                    : "<p>گزارشی وجود ندارد.</p>"
             }
 
         `;
 
 
-    } catch (error) {
+    } catch {
 
-        container.innerHTML =
-            `
-            <p>
-                دریافت گزارش‌ها انجام نشد:
-                ${escapeHTML(error.message)}
-            </p>
-            `;
+        content.innerHTML =
+            "<p>دریافت گزارش‌ها ناموفق بود.</p>";
     }
 }
 
 
 async function adminDeleteReport(id) {
 
-    if (!confirm("این گزارش حذف شود؟")) {
+    if (
+        !confirm(
+            "این گزارش حذف شود؟"
+        )
+    ) {
         return;
     }
 
@@ -2343,7 +2517,8 @@ async function adminDeleteReport(id) {
             encodeURIComponent(id),
 
             {
-                method: "DELETE"
+                method:
+                    "DELETE"
             }
         );
 
@@ -2351,21 +2526,22 @@ async function adminDeleteReport(id) {
         loadAdminReports();
 
 
-    } catch (error) {
+    } catch {
 
         alert(
-            "حذف گزارش انجام نشد: " +
-            error.message
+            "حذف گزارش انجام نشد."
         );
     }
 }
 
 
-/* ================= ADMIN CARTS ================= */
+/* =========================================================
+   ADMIN CARTS
+   ========================================================= */
 
 async function loadAdminCarts() {
 
-    const container =
+    const content =
         $("adminContent");
 
 
@@ -2383,61 +2559,28 @@ async function loadAdminCarts() {
                 : data?.carts || [];
 
 
-        const groups = {};
+        const users = {};
 
 
-        carts.forEach(item => {
+        carts.forEach(
+            item => {
 
-            const number =
-                item.zardaloo_number ||
-                item.user_zardaloo_number ||
-                "نامشخص";
-
-
-            if (!groups[number]) {
-                groups[number] = [];
-            }
+                const number =
+                    item.zardaloo_number ||
+                    item.user_zardaloo_number ||
+                    "نامشخص";
 
 
-            groups[number].push(item);
-
-        });
-
-
-        let html =
-            "<h3>سبد خرید کاربران</h3>";
-
-
-        Object.entries(groups)
-            .forEach(
-                ([number, items]) => {
-
-                    html += `
-
-                        <div class="cart-item">
-
-                            <div>
-
-                                <strong>
-                                    شماره زردآلو:
-                                    ${escapeHTML(number)}
-                                </strong>
-
-                                <p>
-                                    تعداد کالا:
-                                    ${items.length}
-                                </p>
-
-                            </div>
-
-                        </div>
-                    `;
+                if (!users[number]) {
+                    users[number] = [];
                 }
-            );
 
 
-        container.innerHTML =
-            html;
+                users[number].push(
+                    item
+                );
+            }
+        );
 
 
         $("adminCartCount")
@@ -2445,24 +2588,56 @@ async function loadAdminCarts() {
             carts.length;
 
 
-    } catch (error) {
+        content.innerHTML = `
 
-        container.innerHTML =
-            `
-            <p>
-                دریافت سبدها انجام نشد:
-                ${escapeHTML(error.message)}
-            </p>
-            `;
+            <h3>
+                سبد خرید کاربران
+            </h3>
+
+            ${
+                Object.entries(users)
+                    .map(
+                        ([number, items]) => `
+
+                            <div class="cart-item">
+
+                                <strong>
+                                    شماره زردآلو:
+                                    ${escapeHTML(
+                                        number
+                                    )}
+                                </strong>
+
+                                <span>
+                                    ${items.length}
+                                    کالا
+                                </span>
+
+                            </div>
+
+                        `
+                    )
+                    .join("")
+            }
+
+        `;
+
+
+    } catch {
+
+        content.innerHTML =
+            "<p>دریافت سبدها ناموفق بود.</p>";
     }
 }
 
 
-/* ================= ADMIN USERS ================= */
+/* =========================================================
+   ADMIN USERS
+   ========================================================= */
 
 async function loadAdminUsers() {
 
-    const container =
+    const content =
         $("adminContent");
 
 
@@ -2485,86 +2660,77 @@ async function loadAdminUsers() {
             users.length;
 
 
-        container.innerHTML = `
+        content.innerHTML = `
 
             <h3>
                 کاربران
             </h3>
 
             ${
-                users.length
-                ? users.map(user => `
+                users.map(
+                    user => {
 
-                    <div class="cart-item">
+                        const number =
+                            user.zardaloo_number ||
+                            user.zardalooNumber ||
+                            "";
 
-                        <div>
+                        return `
 
-                            <strong>
-                                ${escapeHTML(
-                                    user.name || "-"
-                                )}
-                            </strong>
+                            <div class="cart-item">
 
-                            <p>
-                                شماره زردآلو:
-                                ${escapeHTML(
-                                    user.zardaloo_number ||
-                                    user.zardalooNumber ||
-                                    "-"
-                                )}
-                            </p>
+                                <div>
 
-                            <p>
-                                شماره تماس:
-                                ${escapeHTML(
-                                    user.phone || "-"
-                                )}
-                            </p>
+                                    <strong>
+                                        ${escapeHTML(
+                                            user.name ||
+                                            "-"
+                                        )}
+                                    </strong>
 
-                        </div>
+                                    <p>
+                                        شماره زردآلو:
+                                        ${escapeHTML(
+                                            number
+                                        )}
+                                    </p>
 
-                        <button
-                            class="secondary-button"
-                            onclick="kickUser('${escapeHTML(
-                                String(
-                                    user.zardaloo_number ||
-                                    user.zardalooNumber ||
-                                    ""
-                                )
-                            )}')">
-                            بیرون کردن
-                        </button>
+                                </div>
 
-                    </div>
+                                <button
+                                    onclick="kickUser(
+                                        '${escapeHTML(
+                                            number
+                                        )}'
+                                    )">
+                                    بیرون کردن
+                                </button>
 
-                `).join("")
-                : "<p>کاربری وجود ندارد.</p>"
+                            </div>
+
+                        `;
+                    }
+                ).join("")
             }
 
         `;
 
 
-    } catch (error) {
+    } catch {
 
-        container.innerHTML =
-            `
-            <p>
-                دریافت کاربران انجام نشد:
-                ${escapeHTML(error.message)}
-            </p>
-            `;
+        content.innerHTML =
+            "<p>دریافت کاربران ناموفق بود.</p>";
     }
 }
 
 
 async function kickUser(number) {
 
-    if (!number) return;
-
-
-    if (!confirm(
-        "این کاربر از سیستم خارج شود؟"
-    )) {
+    if (
+        !confirm(
+            "این کاربر بیرون انداخته شود؟"
+        )
+    ) {
         return;
     }
 
@@ -2576,7 +2742,8 @@ async function kickUser(number) {
             encodeURIComponent(number),
 
             {
-                method: "DELETE"
+                method:
+                    "DELETE"
             }
         );
 
@@ -2584,23 +2751,26 @@ async function kickUser(number) {
         loadAdminUsers();
 
 
-    } catch (error) {
+    } catch {
 
         alert(
-            "خروج کاربر انجام نشد: " +
-            error.message
+            "خروج کاربر انجام نشد."
         );
     }
 }
 
 
-/* ================= CLEAR CART ================= */
+/* =========================================================
+   CLEAR CART
+   ========================================================= */
 
 async function clearAllCart() {
 
-    if (!confirm(
-        "سبد خرید همه کاربران خالی شود؟"
-    )) {
+    if (
+        !confirm(
+            "سبد همه کاربران حذف شود؟"
+        )
+    ) {
         return;
     }
 
@@ -2610,7 +2780,8 @@ async function clearAllCart() {
         await adminRequest(
             "/carts",
             {
-                method: "DELETE"
+                method:
+                    "DELETE"
             }
         );
 
@@ -2618,11 +2789,10 @@ async function clearAllCart() {
         loadAdminCarts();
 
 
-    } catch (error) {
+    } catch {
 
         alert(
-            "خالی کردن سبدها انجام نشد: " +
-            error.message
+            "حذف سبدها انجام نشد."
         );
     }
 }
@@ -2634,14 +2804,17 @@ async function clearAllCart() {
 
 function toggleTheme() {
 
-    document.body.classList.toggle(
-        "dark"
-    );
+    document.body
+        .classList
+        .toggle("dark");
 
 
     localStorage.setItem(
         THEME_KEY,
-        document.body.classList.contains("dark")
+
+        document.body
+            .classList
+            .contains("dark")
             ? "dark"
             : "light"
     );
@@ -2656,9 +2829,9 @@ function loadTheme() {
         ) === "dark"
     ) {
 
-        document.body.classList.add(
-            "dark"
-        );
+        document.body
+            .classList
+            .add("dark");
     }
 }
 
@@ -2671,35 +2844,76 @@ document.addEventListener(
     "DOMContentLoaded",
     () => {
 
+        const profile =
+            getProfile();
+
+
         /*
-         * این قسمت کلیدی است:
-         *
-         * اگر پروفایل قبلاً ذخیره شده باشد،
-         * صفحه پروفایل دیگر نمایش داده نمی‌شود.
-         *
-         * اگر ذخیره نشده باشد،
-         * فقط همان بار اول صفحه پروفایل می‌آید.
+         * فقط بار اول:
+         * پروفایل نمایش داده می‌شود.
          */
 
-        initializeProfile();
+        if (!profile) {
+
+            $("profileSetup")
+                .classList
+                .remove("hidden");
+
+            $("app")
+                .classList
+                .add("hidden");
+
+            selectProfile(
+                "football"
+            );
+
+            return;
+        }
 
 
-        const adminSaved =
+        /*
+         * اگر قبلاً وارد شده:
+         * مستقیم صفحه اصلی.
+         */
+
+        $("profileSetup")
+            .classList
+            .add("hidden");
+
+        $("app")
+            .classList
+            .remove("hidden");
+
+
+        updateHomeProfile();
+
+        loadCart();
+
+        loadTheme();
+
+        showPage("home");
+
+        loadProducts();
+
+
+        const savedAdmin =
             sessionStorage.getItem(
                 ADMIN_SESSION_KEY
             );
 
 
-        if (adminSaved) {
+        if (savedAdmin) {
 
             adminToken =
-                adminSaved;
+                savedAdmin;
 
             $("adminLoginBox")
-                ?.classList.add("hidden");
+                ?.classList
+                .add("hidden");
 
             $("adminPanel")
-                ?.classList.remove("hidden");
+                ?.classList
+                .remove("hidden");
         }
 
     }
