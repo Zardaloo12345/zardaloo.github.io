@@ -3,17 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>زردآلو | با زردآلو خرید راحته!</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- ================= FIRST LOGIN ================= -->
+<!-- =====================================================
+     ONBOARDING
+===================================================== -->
 
-<section id="profileSetup" class="profile-setup">
+<section id="onboarding" class="onboarding">
 
-    <div class="profile-box">
+    <div class="onboarding-card">
 
         <div class="brand-big">
 
@@ -25,78 +29,93 @@
 
         <h2>خوش آمدی 👋</h2>
 
-        <p class="profile-intro">
-            برای اولین ورود، اطلاعاتت را وارد کن.
+        <p class="muted">
+            برای شروع، اطلاعات پروفایلت را وارد کن.
         </p>
 
+        <div
+            id="profileAvatarPreview"
+            class="profile-avatar-preview">
+            👤
+        </div>
+
         <input
-            id="firstName"
+            id="profileName"
             type="text"
             placeholder="نام و نام خانوادگی"
+            autocomplete="name"
         >
 
         <input
-            id="firstPhone"
+            id="profilePhone"
             type="tel"
             placeholder="شماره تماس"
+            autocomplete="tel"
         >
 
         <input
-            id="firstZardaloo"
+            id="profileZardalooNumber"
             type="text"
             placeholder="شماره زردآلو"
         >
 
-        <h3>تصویر پروفایل</h3>
+        <h3>انتخاب تصویر پروفایل</h3>
 
-        <div class="profile-options">
+        <div class="avatar-options">
 
             <button
-                class="profile-option"
-                data-profile="football"
-                onclick="selectProfile('football')">
+                type="button"
+                class="avatar-option"
+                data-avatar="⚽"
+                onclick="selectAvatar('⚽')">
                 ⚽
             </button>
 
             <button
-                class="profile-option"
-                data-profile="volleyball"
-                onclick="selectProfile('volleyball')">
+                type="button"
+                class="avatar-option"
+                data-avatar="🏐"
+                onclick="selectAvatar('🏐')">
                 🏐
             </button>
 
             <button
-                class="profile-option"
-                data-profile="coffee"
-                onclick="selectProfile('coffee')">
+                type="button"
+                class="avatar-option"
+                data-avatar="☕"
+                onclick="selectAvatar('☕')">
                 ☕
             </button>
 
             <button
-                class="profile-option"
-                data-profile="flask"
-                onclick="selectProfile('flask')">
-                🧉
+                type="button"
+                class="avatar-option"
+                data-avatar="🫖"
+                onclick="selectAvatar('🫖')">
+                🫖
             </button>
 
             <button
-                class="profile-option"
-                data-profile="store"
-                onclick="selectProfile('store')">
+                type="button"
+                class="avatar-option"
+                data-avatar="🏪"
+                onclick="selectAvatar('🏪')">
                 🏪
             </button>
 
             <button
-                class="profile-option"
-                data-profile="sandwich"
-                onclick="selectProfile('sandwich')">
+                type="button"
+                class="avatar-option"
+                data-avatar="🥪"
+                onclick="selectAvatar('🥪')">
                 🥪
             </button>
 
             <button
-                class="profile-option"
-                data-profile="pizza"
-                onclick="selectProfile('pizza')">
+                type="button"
+                class="avatar-option"
+                data-avatar="🍕"
+                onclick="selectAvatar('🍕')">
                 🍕
             </button>
 
@@ -107,27 +126,18 @@
             🖼️ انتخاب عکس از گالری
 
             <input
-                id="profileImageInput"
+                id="profileImage"
                 type="file"
                 accept="image/*"
-                hidden
-                onchange="loadProfileImage(event)"
             >
 
         </label>
 
-        <div
-            id="profilePreview"
-            class="profile-preview">
-            ⚽
-        </div>
-
         <button
-            class="main-yellow-button enter-button"
-            onclick="enterZardaloo()">
-
+            type="button"
+            class="main-yellow-button"
+            onclick="saveProfileFromForm()">
             ورود به زردآلو
-
         </button>
 
         <div
@@ -140,791 +150,836 @@
 </section>
 
 
-<!-- ================= APP ================= -->
+<!-- =====================================================
+     APP
+===================================================== -->
 
 <div id="app" class="hidden">
 
-<header class="header">
+    <!-- HEADER -->
 
-    <div
-        class="logo-area"
-        onclick="showPage('home')">
+    <header class="header">
 
         <div
-            id="headerProfileImage"
-            class="header-profile-image">
-            👤
-        </div>
-
-        <div class="logo-circle"></div>
-
-        <span>زردآلو</span>
-
-    </div>
-
-
-    <nav>
-
-        <button onclick="showPage('home')">
-            خانه
-        </button>
-
-        <button onclick="showPage('market')">
-            🛍️ بازار
-        </button>
-
-        <button onclick="showPage('register')">
-            📦 ثبت کالا
-        </button>
-
-        <button onclick="showPage('gifts')">
-            🎁 اشانتیون
-        </button>
-
-        <button onclick="showPage('cart')">
-            🛒 سبد خرید
-        </button>
-
-        <button onclick="showPage('messages')">
-            💬 پیام‌ها
-        </button>
-
-        <button onclick="showPage('report')">
-            🚨 گزارش
-        </button>
-
-        <button onclick="showPage('admin')">
-            ⚙️ مدیریت
-        </button>
-
-        <button onclick="toggleTheme()">
-            🌙
-        </button>
-
-    </nav>
-
-</header>
-
-
-<main>
-
-
-<!-- ================= HOME ================= -->
-
-<section
-    id="home"
-    class="page active">
-
-    <div class="home-card">
-
-        <div>
-
-            <span class="small-title">
-                بازار آنلاین زردآلو
-            </span>
-
-            <h1>
-                با زردآلو<br>
-                خرید راحته!
-            </h1>
-
-            <p>
-                خرید و فروش ساده، سریع و راحت.
-            </p>
-
-            <div class="home-buttons">
-
-                <button
-                    class="main-yellow-button"
-                    onclick="showPage('market')">
-                    ورود به بازار
-                </button>
-
-                <button
-                    class="secondary-button"
-                    onclick="showPage('register')">
-                    ثبت کالا
-                </button>
-
-            </div>
-
-        </div>
-
-
-        <div class="home-profile-card">
+            class="logo-area"
+            onclick="showPage('home')">
 
             <div
-                id="homeProfileImage"
-                class="home-profile-image">
+                id="headerProfileImage"
+                class="header-profile-image">
                 👤
             </div>
 
-            <h3 id="homeName">
-                -
-            </h3>
+            <div class="logo-circle"></div>
 
-            <p>
-                شماره زردآلو:
-                <strong id="homeZardaloo">
-                    -
-                </strong>
-            </p>
-
-            <p>
-                شماره تماس:
-                <strong id="homePhone">
-                    -
-                </strong>
-            </p>
+            <span>زردآلو</span>
 
         </div>
 
-    </div>
+        <nav>
 
-</section>
-
-
-<!-- ================= MARKET ================= -->
-
-<section
-    id="market"
-    class="page">
-
-    <div class="section-title">
-
-        <h2>
-            🛍️ بازار زردآلو
-        </h2>
-
-        <p>
-            همه کالاهای ثبت‌شده
-        </p>
-
-    </div>
-
-
-    <div class="filters">
-
-        <input
-            id="searchName"
-            type="text"
-            placeholder="اسم کالا..."
-            oninput="filterProducts()"
-        >
-
-        <input
-            id="minPrice"
-            type="number"
-            placeholder="از قیمت..."
-            oninput="filterProducts()"
-        >
-
-        <input
-            id="maxPrice"
-            type="number"
-            placeholder="تا قیمت..."
-            oninput="filterProducts()"
-        >
-
-        <input
-            id="sellerFilter"
-            type="text"
-            placeholder="نام فروشنده..."
-            oninput="filterProducts()"
-        >
-
-        <select
-            id="giftFilter"
-            onchange="filterProducts()">
-
-            <option value="all">
-                اشانتیون: همه
-            </option>
-
-            <option value="yes">
-                اشانتیون: دارد
-            </option>
-
-            <option value="no">
-                اشانتیون: ندارد
-            </option>
-
-        </select>
-
-        <button
-            class="secondary-button"
-            onclick="loadProducts()">
-            🔄 دریافت
-        </button>
-
-    </div>
-
-
-    <div
-        id="marketStatus"
-        class="message">
-    </div>
-
-
-    <div
-        id="products"
-        class="products-grid">
-    </div>
-
-</section>
-
-
-<!-- ================= GIFTS ================= -->
-
-<section
-    id="gifts"
-    class="page">
-
-    <div class="section-title">
-
-        <h2>
-            🎁 اشانتیون‌ها
-        </h2>
-
-        <p>
-            کالاهای دارای اشانتیون
-        </p>
-
-    </div>
-
-
-    <div
-        id="giftProducts"
-        class="products-grid">
-    </div>
-
-</section>
-
-
-<!-- ================= REGISTER ================= -->
-
-<section
-    id="register"
-    class="page">
-
-    <div class="form-card">
-
-        <h2>
-            📦 ثبت کالا
-        </h2>
-
-        <input
-            id="productName"
-            type="text"
-            placeholder="نام کالا"
-        >
-
-        <input
-            id="productPrice"
-            type="number"
-            min="0"
-            placeholder="قیمت به ریال"
-        >
-
-        <input
-            id="sellerName"
-            type="text"
-            placeholder="نام فروشنده"
-        >
-
-        <input
-            id="sellerPhone"
-            type="tel"
-            placeholder="شماره فروشنده"
-        >
-
-        <textarea
-            id="productDescription"
-            placeholder="توضیحات کالا">
-        </textarea>
-
-
-        <label class="checkbox-row">
-
-            <input
-                id="isGift"
-                type="checkbox"
-                onchange="toggleGiftDescription()"
-            >
-
-            اشانتیون دارد
-
-        </label>
-
-
-        <textarea
-            id="giftDescription"
-            class="hidden"
-            placeholder="توضیحات اشانتیون">
-        </textarea>
-
-
-        <button
-            class="main-yellow-button"
-            onclick="registerProduct()">
-            ثبت کالا
-        </button>
-
-
-        <div
-            id="registerMessage"
-            class="message">
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- ================= CART ================= -->
-
-<section
-    id="cart"
-    class="page">
-
-    <div class="section-title">
-
-        <h2>
-            🛒 سبد خرید
-        </h2>
-
-    </div>
-
-
-    <div class="discount-box">
-
-        <h3>
-            🏷️ کد تخفیف
-        </h3>
-
-        <div class="discount-row">
-
-            <input
-                id="cartDiscountCode"
-                type="text"
-                placeholder="کد تخفیف"
-            >
-
-            <button
-                class="main-yellow-button"
-                onclick="applyCartDiscount()">
-                اعمال
+            <button onclick="showPage('home')">
+                خانه
             </button>
 
-        </div>
-
-
-        <div
-            id="cartDiscountMessage"
-            class="message">
-        </div>
-
-    </div>
-
-
-    <div id="cartItems"></div>
-
-    <div
-        id="cartSummary"
-        class="cart-summary">
-    </div>
-
-</section>
-
-
-<!-- ================= MESSAGES ================= -->
-
-<section
-    id="messages"
-    class="page">
-
-    <div class="section-title">
-
-        <h2>
-            💬 پیام‌ها
-        </h2>
-
-    </div>
-
-
-    <div class="message-layout">
-
-        <div class="form-card">
-
-            <input
-                id="messageReceiver"
-                type="text"
-                placeholder="شماره زردآلو گیرنده"
-            >
-
-            <textarea
-                id="messageText"
-                placeholder="پیام خود را بنویسید">
-            </textarea>
-
-            <button
-                class="main-yellow-button"
-                onclick="sendMessage()">
-                ارسال پیام
+            <button onclick="showPage('market')">
+                🛍️ بازار
             </button>
 
-            <div
-                id="messageSendStatus"
-                class="message">
+            <button onclick="showPage('register')">
+                📦 ثبت کالا
+            </button>
+
+            <button onclick="showPage('gifts')">
+                🎁 اشانتیون
+            </button>
+
+            <button onclick="showPage('cart')">
+                🛒 سبد خرید
+                <span
+                    class="cart-count"
+                    data-cart-count>
+                    ۰
+                </span>
+            </button>
+
+            <button onclick="showPage('messages')">
+                💬 پیام‌ها
+            </button>
+
+            <button onclick="showPage('report')">
+                🚨 گزارش
+            </button>
+
+            <button onclick="showPage('admin')">
+                ⚙️ مدیریت
+            </button>
+
+            <button onclick="toggleTheme()">
+                🌙
+            </button>
+
+        </nav>
+
+    </header>
+
+
+    <!-- =================================================
+         MAIN
+    ================================================= -->
+
+    <main>
+
+
+        <!-- HOME -->
+
+        <section
+            id="page-home"
+            class="page active">
+
+            <div class="home-card">
+
+                <div class="home-text">
+
+                    <span class="small-title">
+                        بازار آنلاین زردآلو
+                    </span>
+
+                    <h1>
+                        با زردآلو<br>
+                        خرید راحته!
+                    </h1>
+
+                    <p>
+                        خرید و فروش ساده، سریع و راحت.
+                    </p>
+
+                    <div class="home-buttons">
+
+                        <button
+                            class="main-yellow-button"
+                            onclick="showPage('market')">
+                            ورود به بازار
+                        </button>
+
+                        <button
+                            class="secondary-button"
+                            onclick="showPage('register')">
+                            ثبت کالا
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="home-profile-card">
+
+                    <div
+                        id="homeProfileImage"
+                        class="home-profile-image">
+                        👤
+                    </div>
+
+                    <h3
+                        id="homeName">
+                        -
+                    </h3>
+
+                    <p>
+                        شماره زردآلو:
+                        <strong id="homeZardaloo">
+                            -
+                        </strong>
+                    </p>
+
+                    <p>
+                        شماره تماس:
+                        <strong id="homePhone">
+                            -
+                        </strong>
+                    </p>
+
+                </div>
+
             </div>
 
-        </div>
+        </section>
 
 
-        <div
-            id="messageList"
-            class="message-list">
-        </div>
+        <!-- MARKET -->
 
-    </div>
+        <section
+            id="page-market"
+            class="page">
 
-</section>
+            <div class="section-title">
 
-
-<!-- ================= REPORT ================= -->
-
-<section
-    id="report"
-    class="page">
-
-    <div class="form-card">
-
-        <h2>
-            🚨 گزارش فروشنده
-        </h2>
-
-        <input
-            id="reportSellerNumber"
-            type="text"
-            placeholder="شماره زردآلو فروشنده"
-        >
-
-        <select id="reportReason">
-
-            <option value="">
-                دلیل گزارش
-            </option>
-
-            <option value="کلاهبرداری">
-                کلاهبرداری
-            </option>
-
-            <option value="اطلاعات جعلی">
-                اطلاعات جعلی
-            </option>
-
-            <option value="مشکل در معامله">
-                مشکل در معامله
-            </option>
-
-            <option value="مزاحمت">
-                مزاحمت
-            </option>
-
-            <option value="سایر">
-                سایر
-            </option>
-
-        </select>
-
-
-        <textarea
-            id="reportDescription"
-            placeholder="توضیحات گزارش">
-        </textarea>
-
-
-        <button
-            class="main-yellow-button"
-            onclick="submitReport()">
-            ثبت گزارش
-        </button>
-
-
-        <div
-            id="reportMessage"
-            class="message">
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- ================= ADMIN ================= -->
-
-<section
-    id="admin"
-    class="page">
-
-    <div
-        id="adminLoginBox"
-        class="form-card">
-
-        <h2>
-            ⚙️ مدیریت
-        </h2>
-
-        <input
-            id="adminNumber"
-            type="text"
-            placeholder="رمز مدیریت"
-        >
-
-        <input
-            id="adminPassword"
-            type="password"
-            placeholder="پسورد"
-        >
-
-        <button
-            class="main-yellow-button"
-            onclick="adminLogin()">
-            ورود
-        </button>
-
-        <div
-            id="adminMessage"
-            class="message">
-        </div>
-
-    </div>
-
-
-    <div
-        id="adminPanel"
-        class="hidden">
-
-        <div class="admin-header">
-
-            <div>
-
-                <h2>
-                    ⚙️ پنل مدیریت
-                </h2>
+                <h2>🛍️ بازار زردآلو</h2>
 
                 <p>
-                    مدیریت زردآلو
+                    همه کالاهای ثبت‌شده
                 </p>
 
             </div>
 
-            <button
-                class="secondary-button"
-                onclick="adminLogout()">
-                خروج
-            </button>
 
-        </div>
+            <div class="filters">
+
+                <input
+                    id="marketSearchName"
+                    type="text"
+                    placeholder="اسم کالا..."
+                >
+
+                <input
+                    id="marketMinPrice"
+                    type="number"
+                    min="0"
+                    placeholder="از قیمت..."
+                >
+
+                <input
+                    id="marketMaxPrice"
+                    type="number"
+                    min="0"
+                    placeholder="تا قیمت..."
+                >
+
+                <input
+                    id="marketSellerName"
+                    type="text"
+                    placeholder="نام فروشنده..."
+                >
+
+                <select id="marketGiftFilter">
+
+                    <option value="all">
+                        اشانتیون: همه
+                    </option>
+
+                    <option value="yes">
+                        اشانتیون: دارد
+                    </option>
+
+                    <option value="no">
+                        اشانتیون: ندارد
+                    </option>
+
+                </select>
+
+                <button
+                    class="secondary-button"
+                    onclick="loadProducts()">
+                    🔄 دریافت کالاها
+                </button>
+
+            </div>
 
 
-        <div class="admin-stats">
+            <div
+                id="marketStatus"
+                class="message">
+            </div>
 
-            <div class="stat-card">
 
-                <span>📦</span>
+            <div
+                id="productsContainer"
+                class="products-grid">
+            </div>
 
-                <strong id="adminProductCount">
-                    0
-                </strong>
+        </section>
 
-                <small>
-                    کالا
-                </small>
+
+        <!-- GIFTS -->
+
+        <section
+            id="page-gifts"
+            class="page">
+
+            <div class="section-title">
+
+                <h2>🎁 اشانتیون‌ها</h2>
+
+                <p>
+                    کالاهای دارای اشانتیون
+                </p>
+
+            </div>
+
+            <div
+                id="giftsContainer"
+                class="products-grid">
+            </div>
+
+        </section>
+
+
+        <!-- REGISTER -->
+
+        <section
+            id="page-register"
+            class="page">
+
+            <div class="form-card">
+
+                <h2>📦 ثبت کالا</h2>
+
+                <p class="form-help">
+                    اطلاعات فروشنده از پروفایل شما گرفته می‌شود.
+                </p>
+
+                <label>
+                    نام کالا
+                </label>
+
+                <input
+                    id="productName"
+                    type="text"
+                    placeholder="مثلاً گوشی موبایل"
+                >
+
+
+                <label>
+                    قیمت
+                </label>
+
+                <input
+                    id="productPrice"
+                    type="number"
+                    min="1"
+                    inputmode="numeric"
+                    placeholder="قیمت به تومان"
+                >
+
+
+                <label>
+                    نام فروشنده
+                </label>
+
+                <input
+                    id="sellerName"
+                    type="text"
+                    readonly
+                >
+
+
+                <label>
+                    شماره فروشنده
+                </label>
+
+                <input
+                    id="sellerPhone"
+                    type="tel"
+                >
+
+
+                <label>
+                    شماره زردآلو فروشنده
+                </label>
+
+                <input
+                    id="sellerZardalooNumber"
+                    type="text"
+                    readonly
+                >
+
+
+                <label>
+                    توضیحات کالا
+                </label>
+
+                <textarea
+                    id="productDescription"
+                    placeholder="توضیحات کالا...">
+                </textarea>
+
+
+                <label class="checkbox-row">
+
+                    <input
+                        id="isGift"
+                        type="checkbox"
+                    >
+
+                    <span>
+                        این کالا اشانتیون دارد
+                    </span>
+
+                </label>
+
+
+                <div
+                    id="giftDescriptionBox"
+                    class="hidden">
+
+                    <label>
+                        توضیحات اشانتیون
+                    </label>
+
+                    <textarea
+                        id="giftDescription"
+                        placeholder="مثلاً ارسال رایگان">
+                    </textarea>
+
+                </div>
+
+
+                <button
+                    id="registerProductButton"
+                    type="button"
+                    class="main-yellow-button"
+                    onclick="registerProduct()">
+                    ثبت کالا
+                </button>
+
+
+                <div
+                    id="registerMessage"
+                    class="message">
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- PRODUCT DETAIL -->
+
+        <section
+            id="page-product"
+            class="page">
+
+            <div
+                id="productDetailContainer">
+            </div>
+
+        </section>
+
+
+        <!-- CART -->
+
+        <section
+            id="page-cart"
+            class="page">
+
+            <div class="section-title">
+
+                <h2>🛒 سبد خرید</h2>
+
+                <p>
+                    کالاهای انتخاب‌شده
+                </p>
+
+            </div>
+
+            <div
+                id="cartContainer">
+            </div>
+
+        </section>
+
+
+        <!-- MESSAGES -->
+
+        <section
+            id="page-messages"
+            class="page">
+
+            <div class="section-title">
+
+                <h2>💬 پیام‌ها</h2>
+
+            </div>
+
+            <div class="message-layout">
+
+                <div class="form-card">
+
+                    <label>
+                        شماره زردآلو گیرنده
+                    </label>
+
+                    <input
+                        id="messageTargetNumber"
+                        type="text"
+                        placeholder="شماره زردآلو"
+                    >
+
+                    <label>
+                        پیام
+                    </label>
+
+                    <textarea
+                        id="messageInput"
+                        placeholder="پیام خود را بنویسید">
+                    </textarea>
+
+                    <button
+                        class="main-yellow-button"
+                        onclick="sendMessage()">
+                        ارسال پیام
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="messagesContainer"
+                    class="message-list">
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- REPORT -->
+
+        <section
+            id="page-report"
+            class="page">
+
+            <div class="form-card">
+
+                <h2>🚨 گزارش فروشنده</h2>
+
+                <label>
+                    شماره زردآلو فروشنده
+                </label>
+
+                <input
+                    id="reportSellerNumber"
+                    type="text"
+                    placeholder="شماره زردآلو فروشنده"
+                >
+
+
+                <label>
+                    نام فروشنده
+                </label>
+
+                <input
+                    id="reportSellerName"
+                    type="text"
+                    placeholder="نام فروشنده"
+                >
+
+
+                <label>
+                    دلیل گزارش
+                </label>
+
+                <select id="reportReason">
+
+                    <option value="">
+                        دلیل گزارش
+                    </option>
+
+                    <option value="کلاهبرداری">
+                        کلاهبرداری
+                    </option>
+
+                    <option value="اطلاعات جعلی">
+                        اطلاعات جعلی
+                    </option>
+
+                    <option value="مشکل در معامله">
+                        مشکل در معامله
+                    </option>
+
+                    <option value="مزاحمت">
+                        مزاحمت
+                    </option>
+
+                    <option value="سایر">
+                        سایر
+                    </option>
+
+                </select>
+
+
+                <label>
+                    توضیحات
+                </label>
+
+                <textarea
+                    id="reportDescription"
+                    placeholder="توضیحات گزارش">
+                </textarea>
+
+
+                <button
+                    class="main-yellow-button"
+                    onclick="submitReport()">
+                    ثبت گزارش
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- ADMIN -->
+
+        <section
+            id="page-admin"
+            class="page">
+
+            <div
+                id="adminLoginBox"
+                class="form-card">
+
+                <h2>⚙️ مدیریت</h2>
+
+                <input
+                    id="adminNumber"
+                    type="text"
+                    placeholder="شماره مدیریت"
+                >
+
+                <input
+                    id="adminPassword"
+                    type="password"
+                    placeholder="رمز مدیریت"
+                >
+
+                <button
+                    class="main-yellow-button"
+                    onclick="adminLogin()">
+                    ورود
+                </button>
+
+                <div
+                    id="adminMessage"
+                    class="message">
+                </div>
 
             </div>
 
 
-            <div class="stat-card">
+            <div
+                id="adminPanel"
+                class="hidden">
 
-                <span>🛒</span>
+                <div class="admin-header">
 
-                <strong id="adminCartCount">
-                    0
-                </strong>
+                    <div>
+                        <h2>⚙️ پنل مدیریت</h2>
 
-                <small>
-                    سبد
-                </small>
+                        <p>
+                            مدیریت زردآلو
+                        </p>
+                    </div>
+
+                    <button
+                        class="secondary-button"
+                        onclick="adminLogout()">
+                        خروج
+                    </button>
+
+                </div>
+
+
+                <div class="admin-stats">
+
+                    <div class="stat-card">
+                        <span>📦</span>
+                        <strong id="adminProductCount">۰</strong>
+                        <small>کالا</small>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>🛒</span>
+                        <strong id="adminCartCount">۰</strong>
+                        <small>سبد</small>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>👥</span>
+                        <strong id="adminUserCount">۰</strong>
+                        <small>کاربر</small>
+                    </div>
+
+                </div>
+
+
+                <div class="admin-actions">
+
+                    <button onclick="loadAdminProducts()">
+                        📦 کالاها
+                    </button>
+
+                    <button onclick="loadAdminReports()">
+                        🚨 گزارش‌ها
+                    </button>
+
+                    <button onclick="loadAdminCarts()">
+                        🛒 سبدها
+                    </button>
+
+                    <button onclick="loadAdminUsers()">
+                        👥 کاربران
+                    </button>
+
+                    <button onclick="clearAllCart()">
+                        🗑️ حذف سبدها
+                    </button>
+
+                </div>
+
+
+                <div id="adminContent">
+
+                    <div
+                        id="adminProductsContainer"
+                        class="admin-section">
+                    </div>
+
+                    <div
+                        id="adminReportsContainer"
+                        class="admin-section">
+                    </div>
+
+                    <div
+                        id="adminCartsContainer"
+                        class="admin-section">
+                    </div>
+
+                    <div
+                        id="adminUsersContainer"
+                        class="admin-section">
+                    </div>
+
+                </div>
 
             </div>
 
+        </section>
 
-            <div class="stat-card">
 
-                <span>👥</span>
+        <!-- ABOUT -->
 
-                <strong id="adminUserCount">
-                    0
-                </strong>
+        <section
+            id="page-about"
+            class="page">
 
-                <small>
-                    کاربر
-                </small>
+            <div class="info-card">
+
+                <h2>
+                    درباره زردآلو
+                </h2>
+
+                <p>
+                    زردآلو یک بازار آنلاین ساده برای خرید و فروش کالا است.
+                </p>
 
             </div>
 
-        </div>
+        </section>
 
 
-        <div class="admin-actions">
+        <!-- CREATORS -->
 
-            <button onclick="loadAdminProducts()">
-                📦 کالاها
-            </button>
+        <section
+            id="page-creators"
+            class="page">
 
-            <button onclick="loadAdminReports()">
-                🚨 گزارش‌ها
-            </button>
+            <div class="info-card">
 
-            <button onclick="loadAdminCarts()">
-                🛒 سبدها
-            </button>
+                <h2>
+                    👨🏻‍💻 سازندگان
+                </h2>
 
-            <button onclick="loadAdminUsers()">
-                👥 کاربران
-            </button>
+                <p>
 
-            <button onclick="clearAllCart()">
-                🗑️ حذف سبدها
-            </button>
+                    🧑🏻‍💻 سازنده: عرفان ریاحی
 
-        </div>
+                    <br><br>
 
+                    با تشکر از:
 
-        <div id="adminContent"></div>
+                    <br><br>
 
-    </div>
+                    🌹 جناب آقای شهاب الدین ریاحی
+                    <br>
+                    🌹 جناب دکتر عباس امیدی
+                    <br>
+                    🌹 جناب آقای زارعی
+                    <br>
+                    🌹 جناب آقای کوشان طلائی
+                    <br>
+                    🌹 سرکار خانم ملیحه همت گیر
+                    <br>
+                    🌹 جناب آقای سپهر میر قادری
+                    <br>
+                    🌹 جناب آقای سید ابولفضل صمصام شریعت
+                    <br>
+                    🌹 جناب آقای محمد پارسا آیتی
+                    <br>
+                    🌹 جناب آقای محمد طاها نیرومند
+                    <br>
+                    🌹 جناب آقای یاسین قاسمی
+                    <br>
+                    🌹 جناب آقای کیان عسگری
+                    <br>
+                    🌹 جناب آقای مانی شیروی
 
-</section>
+                </p>
 
+            </div>
 
-<!-- ================= ABOUT ================= -->
-
-<section
-    id="about"
-    class="page">
-
-    <div class="info-card">
-
-        <h2>
-            درباره زردآلو
-        </h2>
-
-        <p>
-            زردآلو یک بازار آنلاین ساده برای خرید و فروش کالا است.
-        </p>
-
-    </div>
-
-</section>
-
-
-<!-- ================= CREATORS ================= -->
-
-<section
-    id="creators"
-    class="page">
-
-    <div class="info-card">
-
-        <h2>
-            👨🏻‍💻 سازندگان
-        </h2>
-
-        <p>
-
-            🧑🏻‍💻 سازنده: عرفان ریاحی
-            <br><br>
-
-            با تشکر از:
-            <br><br>
-
-            🌹 جناب آقای شهاب الدین ریاحی
-            <br>
-            🌹 جناب دکتر عباس امیدی
-            <br>
-            🌹 جناب آقای زارعی
-            <br>
-            🌹 جناب آقای کوشان طلائی
-            <br>
-            🌹 سرکار خانم ملیحه همت گیر
-            <br>
-            🌹 جناب آقای سپهر میر قادری
-            <br>
-            🌹 جناب آقای سید ابولفضل صمصام شریعت
-            <br>
-            🌹 جناب آقای محمد پارسا آیتی
-            <br>
-            🌹 جناب آقای محمد طاها نیرومند
-            <br>
-            🌹 جناب آقای یاسین قاسمی
-            <br>
-            🌹 جناب آقای کیان عسگری
-            <br>
-            🌹 جناب آقای مانی شیروی
-
-        </p>
-
-    </div>
-
-</section>
+        </section>
 
 
-<!-- ================= CONTACT ================= -->
+        <!-- CONTACT -->
 
-<section
-    id="contact"
-    class="page">
+        <section
+            id="page-contact"
+            class="page">
 
-    <div class="info-card">
+            <div class="info-card">
 
-        <h2>
-            📞 ارتباط با ما
-        </h2>
+                <h2>
+                    📞 ارتباط با ما
+                </h2>
+
+                <p>
+                    ایمیل سازنده:
+                </p>
+
+                <strong>
+                    erfancity2014@gmail.com
+                </strong>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <button onclick="showPage('about')">
+            درباره ما
+        </button>
+
+        <button onclick="showPage('creators')">
+            سازندگان
+        </button>
+
+        <button onclick="showPage('contact')">
+            ارتباط
+        </button>
 
         <p>
-            ایمیل سازنده:
-            erfancity2014@gmail.com
+            © 2026 زردآلو
         </p>
 
-    </div>
-
-</section>
-
-
-</main>
-
-
-<footer>
-
-    <button onclick="showPage('about')">
-        درباره ما
-    </button>
-
-    <button onclick="showPage('creators')">
-        سازندگان
-    </button>
-
-    <button onclick="showPage('contact')">
-        ارتباط
-    </button>
-
-    <p>
-        © 2026 زردآلو
-    </p>
-
-</footer>
+    </footer>
 
 </div>
 
