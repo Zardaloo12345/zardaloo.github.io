@@ -2,41 +2,29 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
-
     "Access-Control-Allow-Headers":
         "authorization, x-client-info, apikey, content-type",
-
     "Access-Control-Allow-Methods":
-        "GET, POST, DELETE, OPTIONS"
+        "GET, POST, DELETE, OPTIONS",
 };
 
-
-const supabaseUrl =
+const supabaseUrl: string =
     Deno.env.get("SUPABASE_URL") ?? "";
 
-
-const secretKeysText =
+const secretKeysText: string =
     Deno.env.get("SUPABASE_SECRET_KEYS") ?? "{}";
-
 
 let secretKeys: Record<string, string> = {};
 
 try {
-
     secretKeys =
-        JSON.parse(
-            secretKeysText
-        );
-
+        JSON.parse(secretKeysText);
 } catch {
-
     secretKeys = {};
 }
 
-
-const secretKey =
+const secretKey: string =
     secretKeys["default"] ?? "";
-
 
 const supabase =
     createClient(
@@ -47,20 +35,18 @@ const supabase =
 
 function response(
     data: Record<string, unknown>,
-    status = 200
+    status: number = 200
 ): Response {
 
     return new Response(
         JSON.stringify(data),
         {
-            status,
-
+            status: status,
             headers: {
                 ...corsHeaders,
-
                 "Content-Type":
-                    "application/json"
-            }
+                    "application/json",
+            },
         }
     );
 }
@@ -71,10 +57,6 @@ Deno.serve(
         request: Request
     ): Promise<Response> => {
 
-        /* =========================
-           CORS
-        ========================= */
-
         if (
             request.method ===
             "OPTIONS"
@@ -84,11 +66,10 @@ Deno.serve(
                 "ok",
                 {
                     headers:
-                        corsHeaders
+                        corsHeaders,
                 }
             );
         }
-
 
         try {
 
@@ -109,10 +90,9 @@ Deno.serve(
                             "created_at",
                             {
                                 ascending:
-                                    false
+                                    false,
                             }
                         );
-
 
                 if (result.error) {
 
@@ -121,31 +101,23 @@ Deno.serve(
                         result.error
                     );
 
-
                     return response(
                         {
                             ok: false,
-
                             error:
                                 "دریافت کالاها انجام نشد.",
-
                             details:
-                                result.error.message
+                                result.error.message,
                         },
-
                         500
                     );
                 }
 
-
-                return response(
-                    {
-                        ok: true,
-
-                        products:
-                            result.data ?? []
-                    }
-                );
+                return response({
+                    ok: true,
+                    products:
+                        result.data ?? [],
+                });
             }
 
 
@@ -158,67 +130,64 @@ Deno.serve(
                 "POST"
             ) {
 
-                const body =
+                const body:
+                    Record<string, unknown> =
                     await request.json();
 
-
-                const name =
+                const name: string =
                     String(
-                        body?.name ?? ""
-                    ).trim();
-
-
-                const price =
-                    String(
-                        body?.price ?? ""
-                    ).trim();
-
-
-                const seller =
-                    String(
-                        body?.seller ?? ""
-                    ).trim();
-
-
-                const zardalooNumber =
-                    String(
-                        body?.zardaloo_number ??
+                        body["name"] ??
                         ""
                     ).trim();
 
-
-                const phone =
+                const price: string =
                     String(
-                        body?.phone ?? ""
-                    ).trim();
-
-
-                const description =
-                    String(
-                        body?.description ??
+                        body["price"] ??
                         ""
                     ).trim();
 
-
-                const isGift =
-                    body?.is_gift === true ||
-                    body?.is_gift === 1 ||
+                const seller: string =
                     String(
-                        body?.is_gift ?? ""
-                    ).toLowerCase() ===
-                        "true";
-
-
-                const giftDescription =
-                    String(
-                        body?.gift_description ??
+                        body["seller"] ??
                         ""
                     ).trim();
 
+                const zardalooNumber:
+                    string =
+                    String(
+                        body[
+                            "zardaloo_number"
+                        ] ?? ""
+                    ).trim();
 
-                /* =========================
-                   VALIDATION
-                ========================= */
+                const phone: string =
+                    String(
+                        body["phone"] ??
+                        ""
+                    ).trim();
+
+                const description:
+                    string =
+                    String(
+                        body[
+                            "description"
+                        ] ?? ""
+                    ).trim();
+
+                const isGift: boolean =
+                    Boolean(
+                        body["is_gift"] ??
+                        false
+                    );
+
+                const giftDescription:
+                    string =
+                    String(
+                        body[
+                            "gift_description"
+                        ] ?? ""
+                    ).trim();
+
 
                 if (
                     name === "" ||
@@ -231,82 +200,42 @@ Deno.serve(
                     return response(
                         {
                             ok: false,
-
                             error:
-                                "اطلاعات کالا کامل نیست."
+                                "اطلاعات کالا کامل نیست.",
                         },
-
                         400
                     );
                 }
-
-
-                const numericPrice =
-                    Number(
-                        price
-                    );
-
-
-                if (
-                    !Number.isFinite(
-                        numericPrice
-                    ) ||
-                    numericPrice <= 0
-                ) {
-
-                    return response(
-                        {
-                            ok: false,
-
-                            error:
-                                "قیمت کالا نامعتبر است."
-                        },
-
-                        400
-                    );
-                }
-
-
-                /* =========================
-                   INSERT
-                ========================= */
-
-                const insertData = {
-
-                    name:
-                        name,
-
-                    price:
-                        numericPrice,
-
-                    seller:
-                        seller,
-
-                    zardaloo_number:
-                        zardalooNumber,
-
-                    phone:
-                        phone,
-
-                    description:
-                        description,
-
-                    is_gift:
-                        isGift,
-
-                    gift_description:
-                        isGift
-                            ? giftDescription
-                            : ""
-                };
 
 
                 const result =
                     await supabase
                         .from("products")
-                        .insert(
-                            insertData
-                        )
+                        .insert({
+                            name:
+                                name,
+
+                            price:
+                                price,
+
+                            seller:
+                                seller,
+
+                            zardaloo_number:
+                                zardalooNumber,
+
+                            phone:
+                                phone,
+
+                            description:
+                                description,
+
+                            is_gift:
+                                isGift,
+
+                            gift_description:
+                                giftDescription,
+                        })
                         .select()
                         .single();
 
@@ -318,42 +247,32 @@ Deno.serve(
                         result.error
                     );
 
-
                     return response(
                         {
                             ok: false,
-
                             error:
                                 "ثبت کالا در سرور انجام نشد.",
-
                             details:
                                 result.error.message,
-
                             code:
                                 result.error.code ??
                                 "",
-
                             hint:
                                 result.error.hint ??
-                                ""
+                                "",
                         },
-
                         500
                     );
                 }
 
 
-                return response(
-                    {
-                        ok: true,
-
-                        message:
-                            "کالا با موفقیت ثبت شد.",
-
-                        product:
-                            result.data
-                    }
-                );
+                return response({
+                    ok: true,
+                    message:
+                        "کالا با موفقیت ثبت شد.",
+                    product:
+                        result.data,
+                });
             }
 
 
@@ -371,17 +290,14 @@ Deno.serve(
                         request.url
                     );
 
+                const idText:
+                    string =
+                    url.searchParams
+                        .get("id") ??
+                    "";
 
-                const idText =
-                    url.searchParams.get(
-                        "id"
-                    ) ?? "";
-
-
-                const id =
-                    Number(
-                        idText
-                    );
+                const id: number =
+                    Number(idText);
 
 
                 if (
@@ -392,11 +308,9 @@ Deno.serve(
                     return response(
                         {
                             ok: false,
-
                             error:
-                                "شناسه کالا نامعتبر است."
+                                "شناسه کالا نامعتبر است.",
                         },
-
                         400
                     );
                 }
@@ -419,53 +333,38 @@ Deno.serve(
                         result.error
                     );
 
-
                     return response(
                         {
                             ok: false,
-
                             error:
                                 "حذف کالا انجام نشد.",
-
                             details:
                                 result.error.message,
-
                             code:
                                 result.error.code ??
-                                ""
+                                "",
                         },
-
                         500
                     );
                 }
 
 
-                return response(
-                    {
-                        ok: true,
-
-                        message:
-                            "کالا حذف شد."
-                    }
-                );
+                return response({
+                    ok: true,
+                    message:
+                        "کالا حذف شد.",
+                });
             }
 
-
-            /* =========================
-               METHOD NOT ALLOWED
-            ========================= */
 
             return response(
                 {
                     ok: false,
-
                     error:
-                        "Method پشتیبانی نمی‌شود."
+                        "Method پشتیبانی نمی‌شود.",
                 },
-
                 405
             );
-
 
         } catch (error) {
 
@@ -474,24 +373,19 @@ Deno.serve(
                 error
             );
 
-
             const errorText =
                 error instanceof Error
                     ? error.message
                     : String(error);
 
-
             return response(
                 {
                     ok: false,
-
                     error:
                         "خطای داخلی سرور.",
-
                     details:
-                        errorText
+                        errorText,
                 },
-
                 500
             );
         }
