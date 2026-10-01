@@ -4,10 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>زردآلو</title>
-
-    <!-- آیکون سایت -->
-    <link rel="icon" type="image/png" href="favicon.png">
+    <title>زردآلو | با زردآلو خرید راحته!</title>
 
     <style>
         * {
@@ -37,9 +34,9 @@
             display: none !important;
         }
 
-        /* =========================
-           صفحه خوش‌آمدگویی
-        ========================= */
+        /* =========================================
+           صفحه اول
+        ========================================= */
 
         #welcomeScreen {
             min-height: 100vh;
@@ -58,10 +55,9 @@
             border: 2px solid #ffd400;
             border-radius: 30px;
             background: #fff;
-            box-shadow: 0 15px 45px rgba(0, 0, 0, .08);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.08);
         }
 
-        /* لوگو کاملاً بدون نوشته */
         .welcome-logo {
             width: 105px;
             height: 105px;
@@ -95,7 +91,7 @@
             border-radius: 15px;
             font-size: 17px;
             font-weight: bold;
-            transition: .2s ease;
+            transition: 0.2s ease;
         }
 
         .welcome-button:hover {
@@ -105,9 +101,9 @@
             transform: translateY(-2px);
         }
 
-        /* =========================
+        /* =========================================
            پروفایل
-        ========================= */
+        ========================================= */
 
         #profileSetup {
             min-height: 100vh;
@@ -125,11 +121,10 @@
             border: 2px solid #ffd400;
             border-radius: 24px;
             padding: 30px;
-            box-shadow: 0 10px 35px rgba(0, 0, 0, .08);
+            box-shadow: 0 10px 35px rgba(0,0,0,.08);
             text-align: center;
         }
 
-        /* لوگوی پروفایل بدون نوشته */
         .main-logo {
             width: 90px;
             height: 90px;
@@ -155,9 +150,11 @@
             background: #fff7b0;
             margin: 0 auto 18px;
             overflow: hidden;
+
             display: flex;
             justify-content: center;
             align-items: center;
+
             font-size: 50px;
         }
 
@@ -252,9 +249,9 @@
             color: white;
         }
 
-        /* =========================
-           برنامه
-        ========================= */
+        /* =========================================
+           APP
+        ========================================= */
 
         #app {
             min-height: 100vh;
@@ -272,6 +269,7 @@
             max-width: 1200px;
             margin: auto;
             padding: 10px 18px;
+
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -285,7 +283,6 @@
             font-weight: bold;
         }
 
-        /* لوگوی هدر بدون نوشته */
         .brand-logo {
             width: 43px;
             height: 43px;
@@ -300,9 +297,11 @@
             border: 3px solid #ffd400;
             background: #fff7b0;
             overflow: hidden;
+
             display: flex;
             justify-content: center;
             align-items: center;
+
             font-size: 25px;
         }
 
@@ -310,6 +309,7 @@
             max-width: 1200px;
             margin: auto;
             padding: 10px 15px;
+
             display: flex;
             gap: 8px;
             overflow-x: auto;
@@ -321,7 +321,6 @@
             padding: 10px 15px;
             border-radius: 12px;
             white-space: nowrap;
-            transition: .2s ease;
         }
 
         nav button:hover {
@@ -352,7 +351,7 @@
             border-radius: 18px;
             padding: 20px;
             margin-bottom: 18px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, .04);
+            box-shadow: 0 5px 20px rgba(0,0,0,.04);
         }
 
         .home-profile {
@@ -368,9 +367,11 @@
             border: 4px solid #ffd400;
             background: #fff7b0;
             overflow: hidden;
+
             display: flex;
             justify-content: center;
             align-items: center;
+
             font-size: 50px;
             flex-shrink: 0;
         }
@@ -379,16 +380,13 @@
             margin-bottom: 10px;
         }
 
-        /* =========================
-           فیلتر بازار
-        ========================= */
+        /* =========================================
+           محصولات
+        ========================================= */
 
         .filters {
             display: grid;
-            grid-template-columns: repeat(
-                auto-fit,
-                minmax(180px, 1fr)
-            );
+            grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
             gap: 10px;
         }
 
@@ -402,10 +400,7 @@
 
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(
-                auto-fill,
-                minmax(230px, 1fr)
-            );
+            grid-template-columns: repeat(auto-fill,minmax(230px,1fr));
             gap: 15px;
         }
 
@@ -434,10 +429,6 @@
             margin-top: 10px;
         }
 
-        /* =========================
-           سبد خرید
-        ========================= */
-
         .cart-item {
             border-bottom: 1px solid #eee;
             padding: 15px 0;
@@ -450,10 +441,6 @@
             margin-top: 20px;
             line-height: 2;
         }
-
-        /* =========================
-           پیام‌رسان
-        ========================= */
 
         .message-item {
             padding: 14px;
@@ -469,14 +456,9 @@
             color: #777;
         }
 
-        /* =========================
-           موبایل
-        ========================= */
-
         @media (max-width: 600px) {
-
             .avatar-options {
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(4,1fr);
             }
 
             .home-profile {
@@ -501,15 +483,14 @@
 
 <body>
 
-<!-- =========================
+<!-- =========================================
      صفحه اول
-========================= -->
+========================================= -->
 
 <section id="welcomeScreen">
 
     <div class="welcome-box">
 
-        <!-- فقط لوگوی زرد؛ بدون هیچ نوشته داخل تصویر -->
         <div class="welcome-logo"></div>
 
         <h1>زردآلو</h1>
@@ -520,13 +501,15 @@
 
             <button
                 class="welcome-button"
-                onclick="openProfileFromWelcome()">
+                onclick="openProfileFromWelcome()"
+            >
                 ورود به فروشگاه
             </button>
 
             <button
                 class="welcome-button"
-                onclick="openMarketFromWelcome()">
+                onclick="openMarketFromWelcome()"
+            >
                 بازار
             </button>
 
@@ -537,15 +520,14 @@
 </section>
 
 
-<!-- =========================
-     ساخت پروفایل
-========================= -->
+<!-- =========================================
+     پروفایل
+========================================= -->
 
 <section id="profileSetup" class="hidden">
 
     <div class="profile-box">
 
-        <!-- لوگوی بدون نوشته -->
         <div class="main-logo"></div>
 
         <h1>زردآلو</h1>
@@ -554,53 +536,22 @@
             برای ورود، پروفایل خودت را بساز.
         </p>
 
-        <div id="profilePreview" class="profile-preview">
+        <div
+            id="profilePreview"
+            class="profile-preview"
+        >
             👤
         </div>
 
         <div class="avatar-options">
 
-            <button
-                class="avatar-option"
-                onclick="selectProfile('⚽')">
-                ⚽
-            </button>
-
-            <button
-                class="avatar-option"
-                onclick="selectProfile('🏐')">
-                🏐
-            </button>
-
-            <button
-                class="avatar-option"
-                onclick="selectProfile('☕')">
-                ☕
-            </button>
-
-            <button
-                class="avatar-option"
-                onclick="selectProfile('🧪')">
-                🧪
-            </button>
-
-            <button
-                class="avatar-option"
-                onclick="selectProfile('🏪')">
-                🏪
-            </button>
-
-            <button
-                class="avatar-option"
-                onclick="selectProfile('🥪')">
-                🥪
-            </button>
-
-            <button
-                class="avatar-option"
-                onclick="selectProfile('🍕')">
-                🍕
-            </button>
+            <button class="avatar-option" onclick="selectProfile('⚽')">⚽</button>
+            <button class="avatar-option" onclick="selectProfile('🏐')">🏐</button>
+            <button class="avatar-option" onclick="selectProfile('☕')">☕</button>
+            <button class="avatar-option" onclick="selectProfile('🧪')">🧪</button>
+            <button class="avatar-option" onclick="selectProfile('🏪')">🏪</button>
+            <button class="avatar-option" onclick="selectProfile('🥪')">🥪</button>
+            <button class="avatar-option" onclick="selectProfile('🍕')">🍕</button>
 
         </div>
 
@@ -613,46 +564,42 @@
                 type="file"
                 accept="image/*"
                 hidden
-                onchange="loadProfileImage(event)">
+                onchange="loadProfileImage(event)"
+            >
 
         </label>
 
         <div class="field">
-
             <label>نام</label>
-
             <input
                 id="firstName"
                 type="text"
-                placeholder="نام شما">
-
+                placeholder="نام شما"
+            >
         </div>
 
         <div class="field">
-
             <label>شماره تماس</label>
-
             <input
                 id="firstPhone"
                 type="tel"
-                placeholder="شماره تماس">
-
+                placeholder="شماره تماس"
+            >
         </div>
 
         <div class="field">
-
             <label>شماره زردآلو</label>
-
             <input
                 id="firstZardaloo"
                 type="text"
-                placeholder="شماره زردآلو">
-
+                placeholder="شماره زردآلو"
+            >
         </div>
 
         <button
             class="yellow-button"
-            onclick="enterZardaloo()">
+            onclick="enterZardaloo()"
+        >
             ورود به زردآلو
         </button>
 
@@ -661,9 +608,9 @@
 </section>
 
 
-<!-- =========================
-     برنامه اصلی
-========================= -->
+<!-- =========================================
+     برنامه
+========================================= -->
 
 <div id="app" class="hidden">
 
@@ -673,7 +620,6 @@
 
             <div class="brand">
 
-                <!-- لوگوی بدون نوشته -->
                 <div class="brand-logo"></div>
 
                 <span>زردآلو</span>
@@ -682,7 +628,8 @@
 
             <div
                 id="headerProfileImage"
-                class="header-avatar">
+                class="header-avatar"
+            >
                 👤
             </div>
 
@@ -691,52 +638,23 @@
     </header>
 
 
-    <!-- =========================
-         منوی اصلی
-    ========================= -->
-
     <nav>
 
-        <button onclick="showPage('home')">
-            خانه
-        </button>
-
-        <button onclick="showPage('market')">
-            بازار
-        </button>
-
-        <button onclick="showPage('register')">
-            ثبت کالا
-        </button>
-
-        <button onclick="showPage('cart')">
-            سبد خرید
-        </button>
-
-        <button onclick="showPage('messages')">
-            پیام‌رسان
-        </button>
-
-        <button onclick="showPage('report')">
-            گزارش فروشنده
-        </button>
-
-        <button onclick="showPage('admin')">
-            مدیریت
-        </button>
-
-        <button onclick="showPage('about')">
-            درباره
-        </button>
+        <button onclick="showPage('home')">خانه</button>
+        <button onclick="showPage('market')">بازار</button>
+        <button onclick="showPage('register')">ثبت کالا</button>
+        <button onclick="showPage('cart')">سبد خرید</button>
+        <button onclick="showPage('messages')">پیام‌رسان</button>
+        <button onclick="showPage('report')">گزارش فروشنده</button>
+        <button onclick="showPage('admin')">مدیریت</button>
+        <button onclick="showPage('about')">درباره</button>
 
     </nav>
 
 
     <main>
 
-        <!-- =========================
-             خانه
-        ========================= -->
+        <!-- HOME -->
 
         <section id="home" class="page active">
 
@@ -750,7 +668,8 @@
 
                     <div
                         id="homeProfileImage"
-                        class="home-avatar">
+                        class="home-avatar"
+                    >
                         👤
                     </div>
 
@@ -780,9 +699,7 @@
         </section>
 
 
-        <!-- =========================
-             بازار
-        ========================= -->
+        <!-- MARKET -->
 
         <section id="market" class="page">
 
@@ -796,35 +713,31 @@
 
                     <input
                         id="searchName"
-                        placeholder="جستجوی نام کالا">
+                        placeholder="جستجوی نام کالا"
+                    >
 
                     <input
                         id="minPrice"
                         type="number"
-                        placeholder="حداقل قیمت">
+                        placeholder="حداقل قیمت"
+                    >
 
                     <input
                         id="maxPrice"
                         type="number"
-                        placeholder="حداکثر قیمت">
+                        placeholder="حداکثر قیمت"
+                    >
 
                     <input
                         id="sellerFilter"
-                        placeholder="نام فروشنده">
+                        placeholder="نام فروشنده"
+                    >
 
                     <select id="giftFilter">
 
-                        <option value="">
-                            همه کالاها
-                        </option>
-
-                        <option value="yes">
-                            فقط هدیه
-                        </option>
-
-                        <option value="no">
-                            بدون هدیه
-                        </option>
+                        <option value="">همه کالاها</option>
+                        <option value="yes">فقط هدیه</option>
+                        <option value="no">بدون هدیه</option>
 
                     </select>
 
@@ -836,15 +749,13 @@
 
             <div
                 id="products"
-                class="products-grid">
-            </div>
+                class="products-grid"
+            ></div>
 
         </section>
 
 
-        <!-- =========================
-             ثبت کالا
-        ========================= -->
+        <!-- REGISTER -->
 
         <section id="register" class="page">
 
@@ -855,93 +766,60 @@
             <div class="card">
 
                 <div class="field">
-
                     <label>نام کالا</label>
-
-                    <input
-                        id="productName"
-                        type="text">
-
+                    <input id="productName" type="text">
                 </div>
 
                 <div class="field">
-
                     <label>قیمت به ریال</label>
-
-                    <input
-                        id="productPrice"
-                        type="number">
-
+                    <input id="productPrice" type="number">
                 </div>
 
                 <div class="field">
-
                     <label>نام فروشنده</label>
-
-                    <input
-                        id="sellerName"
-                        type="text">
-
+                    <input id="sellerName" type="text">
                 </div>
 
                 <div class="field">
-
-                    <label>
-                        شماره تماس فروشنده
-                    </label>
-
-                    <input
-                        id="sellerPhone"
-                        type="tel">
-
+                    <label>شماره تماس فروشنده</label>
+                    <input id="sellerPhone" type="tel">
                 </div>
 
                 <div class="field">
-
                     <label>توضیحات</label>
-
-                    <textarea
-                        id="productDescription">
-                    </textarea>
-
+                    <textarea id="productDescription"></textarea>
                 </div>
 
                 <div class="field">
 
                     <label>
-
                         <input
                             id="isGift"
                             type="checkbox"
-                            onchange="toggleGiftDescription()">
-
+                            onchange="toggleGiftDescription()"
+                        >
                         کالا هدیه است
-
                     </label>
 
                 </div>
 
                 <div
                     id="giftDescriptionBox"
-                    class="field hidden">
+                    class="field hidden"
+                >
 
-                    <label>
-                        توضیحات هدیه
-                    </label>
+                    <label>توضیحات هدیه</label>
 
-                    <textarea
-                        id="giftDescription">
-                    </textarea>
+                    <textarea id="giftDescription"></textarea>
 
                 </div>
 
                 <button
                     id="registerProductButton"
                     class="yellow-button"
-                    onclick="registerProduct()">
-
+                    onclick="registerProduct()"
+                >
                     ثبت کالا
-
                 </button>
 
                 <p id="registerMessage"></p>
@@ -951,9 +829,7 @@
         </section>
 
 
-        <!-- =========================
-             سبد خرید
-        ========================= -->
+        <!-- CART -->
 
         <section id="cart" class="page">
 
@@ -965,22 +841,20 @@
 
                 <div class="field">
 
-                    <label>
-                        کد تخفیف
-                    </label>
+                    <label>کد تخفیف</label>
 
                     <input
                         id="cartDiscountCode"
-                        placeholder="کد تخفیف">
+                        placeholder="کد تخفیف"
+                    >
 
                 </div>
 
                 <button
                     class="yellow-button"
-                    onclick="applyCartDiscount()">
-
+                    onclick="applyCartDiscount()"
+                >
                     اعمال تخفیف
-
                 </button>
 
                 <p id="cartDiscountMessage"></p>
@@ -991,15 +865,13 @@
 
             <div
                 id="cartSummary"
-                class="cart-summary">
-            </div>
+                class="cart-summary"
+            ></div>
 
         </section>
 
 
-        <!-- =========================
-             پیام‌رسان
-        ========================= -->
+        <!-- MESSAGES -->
 
         <section id="messages" class="page">
 
@@ -1011,9 +883,7 @@
 
                 <div class="field">
 
-                    <label>
-                        شماره زردآلو گیرنده
-                    </label>
+                    <label>شماره زردآلو گیرنده</label>
 
                     <input id="messageReceiver">
 
@@ -1021,9 +891,7 @@
 
                 <div class="field">
 
-                    <label>
-                        پیام
-                    </label>
+                    <label>پیام</label>
 
                     <textarea id="messageText"></textarea>
 
@@ -1031,10 +899,9 @@
 
                 <button
                     class="yellow-button"
-                    onclick="sendMessage()">
-
+                    onclick="sendMessage()"
+                >
                     ارسال پیام
-
                 </button>
 
                 <p id="messageSendStatus"></p>
@@ -1046,9 +913,7 @@
         </section>
 
 
-        <!-- =========================
-             گزارش فروشنده
-        ========================= -->
+        <!-- REPORT -->
 
         <section id="report" class="page">
 
@@ -1060,9 +925,7 @@
 
                 <div class="field">
 
-                    <label>
-                        شماره زردآلو فروشنده
-                    </label>
+                    <label>شماره زردآلو فروشنده</label>
 
                     <input id="reportSellerNumber">
 
@@ -1070,31 +933,15 @@
 
                 <div class="field">
 
-                    <label>
-                        دلیل
-                    </label>
+                    <label>دلیل</label>
 
                     <select id="reportReason">
 
-                        <option>
-                            کلاهبرداری
-                        </option>
-
-                        <option>
-                            اطلاعات جعلی
-                        </option>
-
-                        <option>
-                            مشکل در معامله
-                        </option>
-
-                        <option>
-                            مزاحمت
-                        </option>
-
-                        <option>
-                            سایر
-                        </option>
+                        <option>کلاهبرداری</option>
+                        <option>اطلاعات جعلی</option>
+                        <option>مشکل در معامله</option>
+                        <option>مزاحمت</option>
+                        <option>سایر</option>
 
                     </select>
 
@@ -1102,22 +949,17 @@
 
                 <div class="field">
 
-                    <label>
-                        توضیحات
-                    </label>
+                    <label>توضیحات</label>
 
-                    <textarea
-                        id="reportDescription">
-                    </textarea>
+                    <textarea id="reportDescription"></textarea>
 
                 </div>
 
                 <button
                     class="yellow-button"
-                    onclick="submitReport()">
-
+                    onclick="submitReport()"
+                >
                     ارسال گزارش
-
                 </button>
 
                 <p id="reportMessage"></p>
@@ -1127,9 +969,7 @@
         </section>
 
 
-        <!-- =========================
-             مدیریت
-        ========================= -->
+        <!-- ADMIN -->
 
         <section id="admin" class="page">
 
@@ -1141,9 +981,7 @@
 
                 <div class="field">
 
-                    <label>
-                        شماره مدیریت
-                    </label>
+                    <label>شماره مدیریت</label>
 
                     <input id="adminNumber">
 
@@ -1151,59 +989,52 @@
 
                 <div class="field">
 
-                    <label>
-                        رمز مدیریت
-                    </label>
+                    <label>رمز مدیریت</label>
 
                     <input
                         id="adminPassword"
-                        type="password">
+                        type="password"
+                    >
 
                 </div>
 
                 <button
                     class="yellow-button"
-                    onclick="adminLogin()">
-
+                    onclick="adminLogin()"
+                >
                     ورود مدیریت
-
                 </button>
 
                 <p id="adminMessage"></p>
 
             </div>
 
-
             <div
                 id="adminPanel"
-                class="card hidden">
+                class="card hidden"
+            >
 
                 <p>
                     تعداد کالاها:
-                    <strong id="adminProductCount">
-                        0
-                    </strong>
+                    <strong id="adminProductCount">0</strong>
                 </p>
 
                 <br>
 
                 <button
                     class="yellow-button"
-                    onclick="loadAdminProducts()">
-
+                    onclick="loadAdminProducts()"
+                >
                     نمایش کالاها
-
                 </button>
 
-                <br>
-                <br>
+                <br><br>
 
                 <button
                     class="yellow-button"
-                    onclick="loadAdminReports()">
-
+                    onclick="loadAdminReports()"
+                >
                     نمایش گزارش‌ها
-
                 </button>
 
                 <div id="adminContent"></div>
@@ -1213,9 +1044,7 @@
         </section>
 
 
-        <!-- =========================
-             درباره
-        ========================= -->
+        <!-- ABOUT -->
 
         <section id="about" class="page">
 
@@ -1226,25 +1055,33 @@
             <div class="card">
 
                 <p>
-
                     🧑🏻‍💻 سازنده: عرفان ریاحی
-
                     <br>
                     با تشکر از:
-
-                    <br>🌹 جناب آقای شهاب الدین ریاحی
-                    <br>🌹 جناب دکتر عباس امیدی
-                    <br>🌹 جناب آقای زارعی
-                    <br>🌹 جناب آقای کوشان طلائی
-                    <br>🌹 سرکار خانم ملیحه همت گیر
-                    <br>🌹 جناب آقای سپهر میر قادری
-                    <br>🌹 جناب آقای سید ابولفضل صمصام شریعت
-                    <br>🌹 جناب آقای محمد پارسا آیتی
-                    <br>🌹 جناب آقای محمد طاها نیرومند
-                    <br>🌹 جناب آقای قاسمی
-                    <br>🌹 جناب آقای کیان عسگری
-                    <br>🌹 جناب آقای مانی شیروی
-
+                    <br>
+                    🌹 جناب آقای شهاب الدین ریاحی
+                    <br>
+                    🌹 جناب دکتر عباس امیدی
+                    <br>
+                    🌹 جناب آقای زارعی
+                    <br>
+                    🌹 جناب آقای کوشان طلائی
+                    <br>
+                    🌹 سرکار خانم ملیحه همت گیر
+                    <br>
+                    🌹 جناب آقای سپهر میر قادری
+                    <br>
+                    🌹 جناب آقای سید ابولفضل صمصام شریعت
+                    <br>
+                    🌹 جناب آقای محمد پارسا آیتی
+                    <br>
+                    🌹 جناب آقای محمد طاها نیرومند
+                    <br>
+                    🌹 جناب آقای قاسمی
+                    <br>
+                    🌹 جناب آقای کیان عسگری
+                    <br>
+                    🌹 جناب آقای مانی شیروی
                 </p>
 
                 <br>
@@ -1274,7 +1111,6 @@
 </div>
 
 
-<!-- فایل جاوااسکریپت اصلی -->
 <script src="script.js?v=8"></script>
 
 </body>
