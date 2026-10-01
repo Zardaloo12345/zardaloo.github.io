@@ -1059,7 +1059,7 @@ function applyCartDiscount() {
 /* =========================================
    پیام‌رسان
 ========================================= */
-
+```js
 async function sendMessage() {
 
     if (!profile) {
@@ -1079,9 +1079,7 @@ async function sendMessage() {
             .trim();
 
     const status =
-        document.getElementById(
-            "messageSendStatus"
-        );
+        document.getElementById("messageSendStatus");
 
     if (!receiver || !text) {
 
@@ -1092,36 +1090,54 @@ async function sendMessage() {
     }
 
     status.textContent =
-        "در حال ارسال...";
+        "در حال اتصال به پیام‌رسان...";
 
     try {
 
-        const response =
-            await fetch(MESSAGES_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type":
-                        "application/json",
-                    "apikey":
-                        SUPABASE_KEY
-                },
-                body: JSON.stringify({
+        const response = await fetch(MESSAGES_URL, {
+            method: "POST",
 
-                    sender:
-                        profile.zardaloo_number,
+            headers: {
+                "Content-Type": "application/json",
+                "apikey": SUPABASE_KEY,
+                "Authorization": "Bearer " + SUPABASE_KEY
+            },
 
-                    receiver:
-                        receiver,
+            body: JSON.stringify({
+                sender: profile.zardaloo_number,
+                receiver: receiver,
+                message: text
+            })
+        });
 
-                    message:
-                        text
-                })
-            });
+        const responseText =
+            await response.text();
 
-        const data =
-            await response.json();
+        let data = {};
 
-        if (!response.ok || data.ok === false) {
+        try {
+            data = responseText
+                ? JSON.parse(responseText)
+                : {};
+        } catch {
+            data = {
+                raw: responseText
+            };
+        }
+
+        console.log("MESSAGE STATUS:", response.status);
+        console.log("MESSAGE RESPONSE:", data);
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                data.message ||
+                `خطای سرور: ${response.status}`
+            );
+        }
+
+        if (data.ok === false) {
 
             throw new Error(
                 data.error ||
@@ -1130,7 +1146,7 @@ async function sendMessage() {
         }
 
         status.textContent =
-            "پیام ارسال شد.";
+            "✅ پیام با موفقیت ارسال شد.";
 
         document
             .getElementById("messageText")
@@ -1138,13 +1154,26 @@ async function sendMessage() {
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "MESSAGE ERROR:",
+            error
+        );
 
-        status.textContent =
-            error.message ||
-            "ارسال پیام انجام نشد.";
+        if (error instanceof TypeError) {
+
+            status.textContent =
+                "❌ اتصال به پیام‌رسان برقرار نشد. تابع messages در Supabase یا دسترسی آن را بررسی کنید.";
+
+        } else {
+
+            status.textContent =
+                "❌ " +
+                (error.message ||
+                "ارسال پیام انجام نشد.");
+        }
     }
 }
+```
 
 
 /* =========================================
