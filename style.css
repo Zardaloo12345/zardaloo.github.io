@@ -6,7 +6,7 @@
 
 body {
     font-family: Tahoma, Arial, sans-serif;
-    background: #ffffff;
+    background: #fff;
     color: #222;
     direction: rtl;
 }
@@ -22,579 +22,557 @@ button {
     cursor: pointer;
 }
 
-
-/* ==================== عمومی ==================== */
-
 .hidden {
     display: none !important;
 }
 
-.screen {
+
+/* =========================
+   صفحه اول
+========================= */
+
+#welcomeScreen {
     min-height: 100vh;
-    display: none;
+    background: #fff;
+    display: flex;
     align-items: center;
     justify-content: center;
-    background: #ffffff;
+    padding: 25px;
 }
-
-.screen.active {
-    display: flex;
-}
-
-
-/* ==================== صفحه اول ==================== */
 
 .welcome-box {
-    width: min(520px, 92%);
+    width: 100%;
+    max-width: 650px;
     text-align: center;
-    padding: 45px 30px;
-    border-radius: 28px;
-    background: #ffffff;
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.10);
+    padding: 55px 30px;
+    border: 2px solid #ffd400;
+    border-radius: 30px;
+    background: #fff;
+    box-shadow: 0 15px 45px rgba(0,0,0,.08);
 }
 
 .welcome-logo {
-    width: 130px;
-    height: 130px;
+    width: 105px;
+    height: 105px;
     object-fit: contain;
-    margin-bottom: 20px;
+    display: block;
+    margin: 0 auto 25px;
 }
 
 .welcome-box h1 {
     font-size: 38px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
 .welcome-box h2 {
-    font-size: 20px;
-    font-weight: normal;
-    margin-bottom: 30px;
+    font-size: 24px;
+    margin-bottom: 35px;
+    color: #555;
 }
 
 .welcome-buttons {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 15px;
-    justify-content: center;
-    flex-wrap: wrap;
 }
 
-.main-button {
-    border: 2px solid #ffd21c;
-    background: #ffd21c;
+.welcome-button {
+    border: 2px solid #ffd400;
+    background: #ffd400;
     color: #222;
-    padding: 14px 30px;
-    border-radius: 14px;
+    padding: 16px;
+    border-radius: 15px;
     font-size: 17px;
     font-weight: bold;
-    transition: 0.2s;
+    transition: .2s ease;
 }
 
-.main-button:hover {
+.welcome-button:hover {
     background: #222;
-    color: #ffd21c;
-    transform: translateY(-3px);
-}
-
-
-/* ==================== پروفایل ==================== */
-
-.profile-box {
-    width: min(500px, 92%);
-    padding: 35px;
-    background: #fff;
-    border-radius: 25px;
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.10);
-    text-align: center;
-}
-
-.profile-logo {
-    width: 100px;
-    height: 100px;
-    object-fit: contain;
-    margin-bottom: 15px;
-}
-
-.profile-box h2 {
-    margin-bottom: 10px;
-}
-
-.small-text {
-    color: #777;
-    margin-bottom: 20px;
-}
-
-
-/* ==================== ورودی‌ها ==================== */
-
-input,
-textarea,
-select {
-    width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    padding: 13px;
-    margin-bottom: 12px;
-    font-size: 15px;
-    background: #fff;
-    outline: none;
-}
-
-input:focus,
-textarea:focus,
-select:focus {
-    border-color: #ffd21c;
-}
-
-textarea {
-    min-height: 120px;
-    resize: vertical;
-}
-
-
-/* ==================== دکمه زرد ==================== */
-
-.yellow-button {
-    width: 100%;
-    border: 2px solid #ffd21c;
-    background: #ffd21c;
-    color: #222;
-    padding: 13px;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: bold;
-    transition: 0.2s;
-}
-
-.yellow-button:hover {
-    background: #222;
-    color: #ffd21c;
+    color: #ffd400;
+    border-color: #222;
     transform: translateY(-2px);
 }
 
 
-/* ==================== هدر ==================== */
+/* =========================
+   پروفایل
+========================= */
+
+#profileSetup {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: #fff;
+}
+
+.profile-box {
+    width: 100%;
+    max-width: 480px;
+    background: #fff;
+    border: 2px solid #ffd400;
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: 0 10px 35px rgba(0,0,0,.08);
+    text-align: center;
+}
+
+.main-logo {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 18px;
+}
+
+.profile-box h1 {
+    margin-bottom: 8px;
+}
+
+.profile-box > p {
+    color: #777;
+    margin-bottom: 22px;
+}
+
+.profile-preview {
+    width: 115px;
+    height: 115px;
+    border-radius: 50%;
+    border: 4px solid #ffd400;
+    background: #fff7b0;
+    margin: 0 auto 18px;
+    overflow: hidden;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 50px;
+}
+
+.profile-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-options {
+    display: grid;
+    grid-template-columns: repeat(7,1fr);
+    gap: 6px;
+    margin-bottom: 15px;
+}
+
+.avatar-option {
+    height: 45px;
+    border: none;
+    border-radius: 12px;
+    background: #fff3a0;
+    font-size: 24px;
+}
+
+.avatar-option:hover {
+    background: #ffd400;
+}
+
+.image-picker {
+    display: block;
+    background: #f2f2f2;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 18px;
+    cursor: pointer;
+}
+
+.field {
+    margin-bottom: 15px;
+    text-align: right;
+}
+
+.field label {
+    display: block;
+    margin-bottom: 7px;
+    font-weight: bold;
+}
+
+.field input,
+.field textarea,
+.field select {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 13px;
+    outline: none;
+    background: #fff;
+}
+
+.field textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+    border-color: #ffd400;
+}
+
+.yellow-button {
+    width: 100%;
+    border: none;
+    border-radius: 13px;
+    background: #ffd400;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: .2s;
+}
+
+.yellow-button:hover {
+    background: #f0c500;
+    transform: translateY(-1px);
+}
+
+
+/* =========================
+   APP
+========================= */
 
 #app {
     min-height: 100vh;
 }
 
-.top-header {
-    min-height: 75px;
-    padding: 10px 25px;
+header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: white;
+    border-bottom: 1px solid #eee;
+}
+
+.header-inner {
+    max-width: 1200px;
+    margin: auto;
+    padding: 10px 18px;
+
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    background: #ffd21c;
+    align-items: center;
 }
 
 .brand {
     display: flex;
     align-items: center;
-    gap: 12px;
-}
-
-.brand img {
-    width: 52px;
-    height: 52px;
-    object-fit: contain;
-}
-
-.brand strong {
-    display: block;
+    gap: 10px;
     font-size: 21px;
-}
-
-.brand span {
-    display: block;
-    font-size: 12px;
-}
-
-.menu-button {
-    display: none;
-    border: none;
-    background: transparent;
-    font-size: 27px;
-}
-
-
-/* ==================== منو ==================== */
-
-.main-nav {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 5px;
-    padding: 10px;
-    background: #fff;
-    border-bottom: 1px solid #eee;
-}
-
-.main-nav button {
-    border: none;
-    background: #fff;
-    padding: 11px 15px;
-    border-radius: 10px;
-    transition: 0.2s;
-}
-
-.main-nav button:hover {
-    background: #ffd21c;
-}
-
-
-/* ==================== صفحات ==================== */
-
-.page {
-    display: none;
-    width: min(1100px, 94%);
-    margin: 30px auto;
-    min-height: 500px;
-}
-
-.active-page {
-    display: block;
-}
-
-
-/* ==================== خانه ==================== */
-
-.hero {
-    text-align: center;
-    padding: 65px 20px;
-}
-
-.hero-logo {
-    width: 150px;
-    height: 150px;
-    object-fit: contain;
-    margin-bottom: 20px;
-}
-
-.hero h1 {
-    font-size: 34px;
-    margin-bottom: 15px;
-}
-
-.hero p {
-    color: #666;
-    font-size: 17px;
-    margin-bottom: 30px;
-}
-
-.home-actions {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-.home-actions button {
-    border: 2px solid #ffd21c;
-    background: #ffd21c;
-    border-radius: 12px;
-    padding: 13px 28px;
     font-weight: bold;
 }
 
-.home-actions button:hover {
-    background: #222;
-    color: #ffd21c;
+.brand-logo {
+    width: 43px;
+    height: 43px;
+    object-fit: contain;
 }
 
+.header-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 3px solid #ffd400;
+    background: #fff7b0;
+    overflow: hidden;
 
-/* ==================== عنوان صفحه ==================== */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 25px;
+}
+
+.header-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+nav {
+    max-width: 1200px;
+    margin: auto;
+    padding: 10px 15px;
+
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+}
+
+nav button {
+    border: none;
+    background: #f3f3f3;
+    padding: 10px 15px;
+    border-radius: 12px;
+    white-space: nowrap;
+    transition: .2s;
+}
+
+nav button:hover {
+    background: #ffd400;
+}
+
+main {
+    max-width: 1200px;
+    margin: auto;
+    padding: 25px 15px 50px;
+}
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
 
 .page-title {
+    margin-bottom: 20px;
+}
+
+.card {
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 5px 20px rgba(0,0,0,.04);
+}
+
+.home-profile {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
+    gap: 22px;
 }
 
-.small-button {
-    border: none;
-    background: #ffd21c;
-    padding: 10px 15px;
-    border-radius: 10px;
+.home-avatar {
+    width: 115px;
+    height: 115px;
+    border-radius: 50%;
+    border: 4px solid #ffd400;
+    background: #fff7b0;
+    overflow: hidden;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 50px;
+    flex-shrink: 0;
+}
+
+.home-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-info p {
+    margin-bottom: 10px;
 }
 
 
-/* ==================== محصولات ==================== */
+/* =========================
+   بازار
+========================= */
 
-.products-container {
+.filters {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+    gap: 10px;
+}
+
+.filters input,
+.filters select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(230px,1fr));
+    gap: 15px;
 }
 
 .product-card {
     border: 1px solid #eee;
     border-radius: 18px;
+    padding: 17px;
+    background: white;
     overflow: hidden;
-    background: #fff;
-    box-shadow: 0 5px 20px rgba(0,0,0,.06);
 }
 
 .product-image {
     width: 100%;
     height: 190px;
     object-fit: cover;
+    border-radius: 14px;
     background: #f5f5f5;
+    display: block;
+    margin-bottom: 12px;
 }
 
-.product-body {
-    padding: 17px;
+.no-image {
+    width: 100%;
+    height: 190px;
+    border-radius: 14px;
+    background: #fff7b0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 45px;
+    margin-bottom: 12px;
 }
 
-.product-body h3 {
+.product-card h3 {
     margin-bottom: 10px;
 }
 
 .product-price {
     font-weight: bold;
-    margin-bottom: 8px;
+    margin: 10px 0;
 }
 
-.product-seller {
-    color: #777;
-    font-size: 13px;
-    margin-bottom: 15px;
+.gift {
+    color: #16852b;
+    font-weight: bold;
 }
 
-.product-body button {
-    width: 100%;
-    border: none;
-    background: #ffd21c;
-    padding: 10px;
-    border-radius: 10px;
-    margin-top: 7px;
-}
-
-.product-body button:hover {
-    background: #222;
-    color: #ffd21c;
+.product-card button {
+    margin-top: 10px;
 }
 
 
-/* ==================== فرم ==================== */
+/* =========================
+   عکس کالا
+========================= */
 
-.form-box {
-    width: min(650px, 100%);
-    margin: auto;
-    padding: 30px;
-    border-radius: 20px;
-    box-shadow: 0 7px 25px rgba(0,0,0,.08);
-}
-
-.form-box h2 {
-    margin-bottom: 20px;
-}
-
-.file-label {
+.product-image-picker {
     display: block;
+    padding: 15px;
     border: 2px dashed #ddd;
-    border-radius: 12px;
-    padding: 18px;
+    border-radius: 14px;
     text-align: center;
-    margin-bottom: 15px;
     cursor: pointer;
 }
 
-.file-label:hover {
-    border-color: #ffd21c;
+.product-image-picker:hover {
+    border-color: #ffd400;
+    background: #fffdf0;
 }
 
-.file-label input {
-    display: none;
+.product-preview {
+    margin-top: 15px;
+    text-align: center;
 }
 
-.image-preview img {
+.product-preview img {
     max-width: 250px;
     max-height: 220px;
     border-radius: 15px;
-    margin-bottom: 15px;
+    object-fit: cover;
 }
 
 
-/* ==================== سبد ==================== */
+/* =========================
+   سبد
+========================= */
 
 .cart-item {
-    padding: 20px;
-    border: 1px solid #eee;
-    border-radius: 15px;
-    margin-bottom: 12px;
-}
-
-.cart-item h3 {
-    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding: 15px 0;
 }
 
 .cart-summary {
-    padding: 20px;
-    border-radius: 15px;
-    background: #fff8c9;
+    background: #fff8b5;
+    border-radius: 16px;
+    padding: 18px;
     margin-top: 20px;
-}
-
-.discount-box {
-    margin-top: 15px;
-}
-
-.discount-box button {
-    border: none;
-    background: #ffd21c;
-    padding: 10px 18px;
-    border-radius: 10px;
+    line-height: 2;
 }
 
 
-/* ==================== پیام‌رسان ==================== */
+/* =========================
+   پیام‌ها
+========================= */
 
-.messenger-box {
-    max-width: 700px;
-    margin: auto;
-}
-
-.chat-area {
-    margin-top: 20px;
-    border: 1px solid #ddd;
-    border-radius: 18px;
-    overflow: hidden;
-}
-
-.chat-messages {
-    height: 350px;
-    overflow-y: auto;
-    padding: 15px;
-    background: #fafafa;
-}
-
-.message {
-    padding: 10px 14px;
-    margin-bottom: 10px;
+.message-item {
+    padding: 14px;
     border-radius: 12px;
-    background: #ffd21c;
-    max-width: 80%;
+    background: #f4f4f4;
+    margin-bottom: 10px;
 }
 
-.message.mine {
-    margin-right: auto;
+.message-item.mine {
+    background: #fff3a0;
 }
 
-.message.other {
-    margin-left: auto;
-    background: #eee;
-}
-
-.chat-input-row {
-    display: flex;
-    gap: 8px;
-    padding: 10px;
-}
-
-.chat-input-row input {
-    margin: 0;
-}
-
-.chat-input-row button {
-    border: none;
-    background: #ffd21c;
-    border-radius: 10px;
-    padding: 0 18px;
-}
-
-
-/* ==================== وضعیت ==================== */
-
-.status {
-    margin-top: 15px;
-    padding: 10px;
-    border-radius: 10px;
-    line-height: 1.8;
-}
-
-.loading {
-    text-align: center;
+.message-meta {
+    font-size: 12px;
     color: #777;
+    margin-top: 7px;
 }
 
 
-/* ==================== درباره ==================== */
+/* =========================
+   وضعیت
+========================= */
 
-.about-box {
-    text-align: center;
-    padding: 60px 20px;
+.success {
+    color: #16852b;
 }
 
-.about-logo {
-    width: 130px;
-    height: 130px;
-    object-fit: contain;
-    margin-bottom: 20px;
-}
-
-.about-box p {
-    margin-top: 15px;
-    color: #666;
+.error {
+    color: #d32f2f;
 }
 
 
-/* ==================== فوتر ==================== */
+/* =========================
+   فوتر
+========================= */
 
 footer {
+    border-top: 1px solid #eee;
     text-align: center;
     padding: 25px;
-    border-top: 1px solid #eee;
     color: #777;
 }
 
 
-/* ==================== موبایل ==================== */
+@media (max-width: 600px) {
 
-@media (max-width: 700px) {
-
-    .menu-button {
-        display: block;
+    .avatar-options {
+        grid-template-columns: repeat(4,1fr);
     }
 
-    .main-nav {
-        display: none;
+    .home-profile {
         flex-direction: column;
+        text-align: center;
     }
 
-    .main-nav.open {
-        display: flex;
+    .profile-box {
+        padding: 22px;
     }
 
-    .main-nav button {
-        width: 100%;
-    }
-
-    .welcome-box {
-        padding: 35px 20px;
+    .welcome-buttons {
+        grid-template-columns: 1fr;
     }
 
     .welcome-box h1 {
         font-size: 30px;
     }
 
-    .hero h1 {
-        font-size: 27px;
-    }
-
-    .top-header {
-        padding: 10px 15px;
-    }
-
-    .form-box {
-        padding: 20px;
-    }
-
-    .chat-input-row {
-        flex-direction: column;
-    }
-
-    .chat-input-row button {
-        padding: 12px;
+    .welcome-box h2 {
+        font-size: 20px;
     }
 }
