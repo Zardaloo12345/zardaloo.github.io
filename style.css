@@ -1,393 +1,661 @@
-import { createClient } from "npm:@supabase/supabase-js@2";
-
-const corsHeaders = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers":
-        "authorization, x-client-info, apikey, content-type",
-    "Access-Control-Allow-Methods":
-        "GET, POST, DELETE, OPTIONS",
-};
-
-const supabaseUrl: string =
-    Deno.env.get("SUPABASE_URL") ?? "";
-
-const secretKeysText: string =
-    Deno.env.get("SUPABASE_SECRET_KEYS") ?? "{}";
-
-let secretKeys: Record<string, string> = {};
-
-try {
-    secretKeys =
-        JSON.parse(secretKeysText);
-} catch {
-    secretKeys = {};
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-const secretKey: string =
-    secretKeys["default"] ?? "";
+body {
+    font-family: Tahoma, Arial, sans-serif;
+    direction: rtl;
+    background: #fff;
+    color: #222;
+}
 
-const supabase =
-    createClient(
-        supabaseUrl,
-        secretKey
-    );
+button,
+input,
+textarea,
+select {
+    font-family: inherit;
+}
 
+button {
+    cursor: pointer;
+}
 
-function response(
-    data: Record<string, unknown>,
-    status: number = 200
-): Response {
-
-    return new Response(
-        JSON.stringify(data),
-        {
-            status: status,
-            headers: {
-                ...corsHeaders,
-                "Content-Type":
-                    "application/json",
-            },
-        }
-    );
+.hidden {
+    display: none !important;
 }
 
 
-Deno.serve(
-    async (
-        request: Request
-    ): Promise<Response> => {
+/* صفحه اول */
 
-        if (
-            request.method ===
-            "OPTIONS"
-        ) {
+.welcome-screen {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #fff;
+    padding: 20px;
+}
 
-            return new Response(
-                "ok",
-                {
-                    headers:
-                        corsHeaders,
-                }
-            );
-        }
+.welcome-box {
+    width: min(520px, 100%);
+    text-align: center;
+    padding: 45px 30px;
+    border: 1px solid #eee;
+    border-radius: 28px;
+    background: #fff;
+    box-shadow: 0 15px 45px rgba(0,0,0,.08);
+}
 
-        try {
+.welcome-logo,
+.small-logo,
+.header-logo,
+.hero-logo,
+.about-logo {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: #ffd21c;
+    margin: 0 auto 22px;
+}
 
-            /* =========================
-               GET
-            ========================= */
+.welcome-box h1 {
+    font-size: 38px;
+    margin-bottom: 8px;
+}
 
-            if (
-                request.method ===
-                "GET"
-            ) {
+.welcome-box h2 {
+    font-size: 21px;
+    margin-bottom: 15px;
+}
 
-                const result =
-                    await supabase
-                        .from("products")
-                        .select("*")
-                        .order(
-                            "created_at",
-                            {
-                                ascending:
-                                    false,
-                            }
-                        );
+.welcome-box p {
+    color: #777;
+    margin-bottom: 30px;
+}
 
-                if (result.error) {
+.welcome-buttons,
+.hero-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+}
 
-                    console.error(
-                        "GET PRODUCTS ERROR:",
-                        result.error
-                    );
+.welcome-buttons button,
+.hero-buttons button {
+    border: 2px solid #ffd21c;
+    background: #ffd21c;
+    color: #222;
+    padding: 14px 22px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: .2s;
+}
 
-                    return response(
-                        {
-                            ok: false,
-                            error:
-                                "دریافت کالاها انجام نشد.",
-                            details:
-                                result.error.message,
-                        },
-                        500
-                    );
-                }
-
-                return response({
-                    ok: true,
-                    products:
-                        result.data ?? [],
-                });
-            }
-
-
-            /* =========================
-               POST
-            ========================= */
-
-            if (
-                request.method ===
-                "POST"
-            ) {
-
-                const body:
-                    Record<string, unknown> =
-                    await request.json();
-
-                const name: string =
-                    String(
-                        body["name"] ??
-                        ""
-                    ).trim();
-
-                const price: string =
-                    String(
-                        body["price"] ??
-                        ""
-                    ).trim();
-
-                const seller: string =
-                    String(
-                        body["seller"] ??
-                        ""
-                    ).trim();
-
-                const zardalooNumber:
-                    string =
-                    String(
-                        body[
-                            "zardaloo_number"
-                        ] ?? ""
-                    ).trim();
-
-                const phone: string =
-                    String(
-                        body["phone"] ??
-                        ""
-                    ).trim();
-
-                const description:
-                    string =
-                    String(
-                        body[
-                            "description"
-                        ] ?? ""
-                    ).trim();
-
-                const isGift: boolean =
-                    Boolean(
-                        body["is_gift"] ??
-                        false
-                    );
-
-                const giftDescription:
-                    string =
-                    String(
-                        body[
-                            "gift_description"
-                        ] ?? ""
-                    ).trim();
+.welcome-buttons button:hover,
+.hero-buttons button:hover {
+    background: #222;
+    color: #ffd21c;
+    transform: translateY(-3px);
+}
 
 
-                if (
-                    name === "" ||
-                    price === "" ||
-                    seller === "" ||
-                    zardalooNumber === "" ||
-                    phone === ""
-                ) {
+/* پروفایل */
 
-                    return response(
-                        {
-                            ok: false,
-                            error:
-                                "اطلاعات کالا کامل نیست.",
-                        },
-                        400
-                    );
-                }
+.profile-screen {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
 
+.profile-box,
+.form-card,
+.messenger-card,
+.about-card {
+    width: min(650px, 100%);
+    margin: auto;
+    padding: 30px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 22px;
+    box-shadow: 0 10px 35px rgba(0,0,0,.05);
+}
 
-                const result =
-                    await supabase
-                        .from("products")
-                        .insert({
-                            name:
-                                name,
+.profile-box h2,
+.form-card h2,
+.messenger-card h2,
+.about-card h2 {
+    margin-bottom: 10px;
+}
 
-                            price:
-                                price,
+.muted {
+    color: #777;
+}
 
-                            seller:
-                                seller,
+.profile-box > .muted {
+    text-align: center;
+    margin-bottom: 20px;
+}
 
-                            zardaloo_number:
-                                zardalooNumber,
+.profile-preview {
+    width: 100px;
+    height: 100px;
+    margin: 20px auto;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background: #fff4bd;
+    font-size: 45px;
+}
 
-                            phone:
-                                phone,
+.profile-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 
-                            description:
-                                description,
+.avatar-list {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
 
-                            is_gift:
-                                isGift,
+.avatar-list button {
+    width: 45px;
+    height: 45px;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 12px;
+    font-size: 23px;
+}
 
-                            gift_description:
-                                giftDescription,
-                        })
-                        .select()
-                        .single();
+label {
+    display: block;
+    margin: 15px 0 7px;
+    font-weight: bold;
+}
 
+input,
+textarea,
+select {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    outline: none;
+    background: #fff;
+    font-size: 15px;
+}
 
-                if (result.error) {
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #ffd21c;
+}
 
-                    console.error(
-                        "ADD PRODUCT ERROR:",
-                        result.error
-                    );
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
 
-                    return response(
-                        {
-                            ok: false,
-                            error:
-                                "ثبت کالا در سرور انجام نشد.",
-                            details:
-                                result.error.message,
-                            code:
-                                result.error.code ??
-                                "",
-                            hint:
-                                result.error.hint ??
-                                "",
-                        },
-                        500
-                    );
-                }
+.main-button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: #ffd21c;
+    font-weight: bold;
+    font-size: 16px;
+}
 
-
-                return response({
-                    ok: true,
-                    message:
-                        "کالا با موفقیت ثبت شد.",
-                    product:
-                        result.data,
-                });
-            }
-
-
-            /* =========================
-               DELETE
-            ========================= */
-
-            if (
-                request.method ===
-                "DELETE"
-            ) {
-
-                const url =
-                    new URL(
-                        request.url
-                    );
-
-                const idText:
-                    string =
-                    url.searchParams
-                        .get("id") ??
-                    "";
-
-                const id: number =
-                    Number(idText);
-
-
-                if (
-                    !Number.isInteger(id) ||
-                    id <= 0
-                ) {
-
-                    return response(
-                        {
-                            ok: false,
-                            error:
-                                "شناسه کالا نامعتبر است.",
-                        },
-                        400
-                    );
-                }
+.main-button:hover {
+    background: #222;
+    color: #ffd21c;
+}
 
 
-                const result =
-                    await supabase
-                        .from("products")
-                        .delete()
-                        .eq(
-                            "id",
-                            id
-                        );
+/* هدر */
+
+.top-header {
+    min-height: 78px;
+    padding: 12px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-logo {
+    width: 50px;
+    height: 50px;
+    margin: 0;
+}
+
+.brand strong {
+    display: block;
+    font-size: 21px;
+}
+
+.brand span {
+    display: block;
+    font-size: 12px;
+    color: #777;
+}
+
+.profile-mini {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #fafafa;
+    border-radius: 12px;
+}
 
 
-                if (result.error) {
+/* منو */
 
-                    console.error(
-                        "DELETE PRODUCT ERROR:",
-                        result.error
-                    );
+.navigation {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px 5%;
+    border-bottom: 1px solid #eee;
+}
 
-                    return response(
-                        {
-                            ok: false,
-                            error:
-                                "حذف کالا انجام نشد.",
-                            details:
-                                result.error.message,
-                            code:
-                                result.error.code ??
-                                "",
-                        },
-                        500
-                    );
-                }
+.navigation button {
+    padding: 10px 16px;
+    border: 1px solid #eee;
+    background: #fff;
+    border-radius: 11px;
+    transition: .2s;
+}
 
-
-                return response({
-                    ok: true,
-                    message:
-                        "کالا حذف شد.",
-                });
-            }
+.navigation button:hover {
+    background: #ffd21c;
+    border-color: #ffd21c;
+    transform: translateY(-2px);
+}
 
 
-            return response(
-                {
-                    ok: false,
-                    error:
-                        "Method پشتیبانی نمی‌شود.",
-                },
-                405
-            );
+/* صفحات */
 
-        } catch (error) {
+.page {
+    display: none;
+    width: min(1200px, 92%);
+    min-height: 500px;
+    margin: 30px auto;
+}
 
-            console.error(
-                "INTERNAL SERVER ERROR:",
-                error
-            );
+.page.active {
+    display: block;
+}
 
-            const errorText =
-                error instanceof Error
-                    ? error.message
-                    : String(error);
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+}
 
-            return response(
-                {
-                    ok: false,
-                    error:
-                        "خطای داخلی سرور.",
-                    details:
-                        errorText,
-                },
-                500
-            );
-        }
+.page-header button,
+.discount-row button,
+.form-card > button:not(.main-button),
+.messenger-card > button:not(.main-button) {
+    border: none;
+    background: #ffd21c;
+    padding: 11px 18px;
+    border-radius: 11px;
+    font-weight: bold;
+}
+
+
+/* خانه */
+
+.hero {
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.hero-logo {
+    width: 120px;
+    height: 120px;
+}
+
+.hero h1 {
+    font-size: clamp(28px, 5vw, 48px);
+    margin-bottom: 15px;
+}
+
+.hero p {
+    color: #777;
+    margin-bottom: 28px;
+}
+
+
+/* بازار */
+
+.market-tools {
+    display: grid;
+    grid-template-columns: 1fr 200px;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 18px;
+}
+
+.product-card {
+    overflow: hidden;
+    border: 1px solid #eee;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 8px 25px rgba(0,0,0,.05);
+}
+
+.product-photo {
+    height: 190px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f7f7f7;
+    overflow: hidden;
+}
+
+.product-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-info {
+    padding: 16px;
+}
+
+.product-info h3 {
+    margin-bottom: 9px;
+}
+
+.product-price {
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.product-seller {
+    color: #777;
+    font-size: 13px;
+    margin-bottom: 12px;
+    line-height: 1.7;
+}
+
+.product-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.product-actions button {
+    flex: 1;
+    border: none;
+    background: #ffd21c;
+    border-radius: 10px;
+    padding: 9px;
+}
+
+.loading {
+    padding: 50px;
+    text-align: center;
+    color: #777;
+}
+
+
+/* تصویر کالا */
+
+.product-image-preview {
+    width: 100%;
+    height: 220px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border-radius: 15px;
+    background: #f6f6f6;
+    color: #888;
+}
+
+.product-image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+
+/* سبد */
+
+.cart-container {
+    display: grid;
+    gap: 12px;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 15px;
+}
+
+.cart-item button {
+    border: none;
+    background: #eee;
+    padding: 9px 12px;
+    border-radius: 10px;
+}
+
+.cart-discounted {
+    font-weight: bold;
+}
+
+.discount-box {
+    margin-top: 25px;
+    padding: 20px;
+    border: 1px solid #eee;
+    border-radius: 18px;
+}
+
+.discount-row {
+    display: flex;
+    gap: 8px;
+}
+
+.discount-row input {
+    flex: 1;
+}
+
+.discount-row button {
+    width: 100px;
+}
+
+.cart-summary {
+    margin-top: 20px;
+    padding: 22px;
+    border-radius: 18px;
+    background: #fff8cf;
+    line-height: 2;
+}
+
+.empty-cart {
+    padding: 60px 20px;
+    text-align: center;
+    color: #777;
+}
+
+
+/* پیام‌رسان */
+
+.chat-box {
+    height: 350px;
+    overflow-y: auto;
+    margin: 20px 0;
+    padding: 15px;
+    background: #f7f7f7;
+    border-radius: 16px;
+}
+
+.message-item {
+    max-width: 80%;
+    margin-bottom: 12px;
+    padding: 12px;
+    border-radius: 14px;
+    background: #fff;
+    border: 1px solid #eee;
+}
+
+.my-message {
+    margin-right: auto;
+    background: #fff1a8;
+}
+
+.other-message {
+    margin-left: auto;
+}
+
+.message-item p {
+    white-space: pre-wrap;
+    line-height: 1.7;
+    margin: 5px 0;
+}
+
+.message-item small {
+    color: #777;
+    font-size: 10px;
+}
+
+
+/* گزارش */
+
+.status-text {
+    margin-top: 12px;
+    line-height: 1.8;
+}
+
+.notice {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 12px;
+    background: #f7f7f7;
+    color: #666;
+    line-height: 1.8;
+}
+
+
+/* مدیریت */
+
+.admin-reports {
+    display: grid;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.report-card {
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 14px;
+    background: #fafafa;
+    line-height: 2;
+}
+
+
+/* درباره */
+
+.about-card {
+    text-align: center;
+    line-height: 2;
+}
+
+.about-logo {
+    width: 100px;
+    height: 100px;
+}
+
+
+/* فوتر */
+
+footer {
+    margin-top: 30px;
+    padding: 30px 20px;
+    text-align: center;
+    color: #777;
+    border-top: 1px solid #eee;
+}
+
+
+/* موبایل */
+
+@media (max-width: 700px) {
+
+    .top-header {
+        flex-direction: column;
     }
-);
+
+    .navigation button {
+        flex: 1 1 30%;
+    }
+
+    .market-tools {
+        grid-template-columns: 1fr;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .cart-item {
+        flex-direction: column;
+    }
+
+    .discount-row {
+        flex-direction: column;
+    }
+
+    .discount-row button {
+        width: 100%;
+    }
+
+    .welcome-box,
+    .profile-box,
+    .form-card,
+    .messenger-card {
+        padding: 22px;
+    }
+}
