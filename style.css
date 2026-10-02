@@ -1972,3 +1972,24 @@ textarea {
     }
 
 }
+/* =========================================================
+   اصلاح لوگوی download.png
+   خود تصویر دارای دایره زرد است؛
+   بنابراین قاب زرد جداگانه نباید روی آن قرار بگیرد.
+   ========================================================= */
+
+.logo-circle,
+.small-logo,
+.header-logo,
+.hero-logo,
+.about-logo {
+    background: transparent !important;
+}
+
+.logo-circle img,
+.small-logo img,
+.header-logo img,
+.hero-logo img,
+.about-logo img {
+    object-fit: contain;
+}
