@@ -1,9 +1,9 @@
 "use strict";
 
 
-/* =====================================================
-   SUPABASE
-===================================================== */
+/* =========================================================
+   تنظیمات
+========================================================= */
 
 const SUPABASE_URL =
     "https://ovqldknqpaiczrddcrxp.supabase.co";
@@ -25,18 +25,6 @@ const ADMIN_REPORTS_URL =
     SUPABASE_URL + "/functions/v1/admin-reports";
 
 
-/* =====================================================
-   ADMIN
-===================================================== */
-
-const ADMIN_NUMBER = "0994051777";
-const ADMIN_PASSWORD = "ERFAN";
-
-
-/* =====================================================
-   LOCAL STORAGE
-===================================================== */
-
 const PROFILE_KEY =
     "zardaloo_profile_final_v9";
 
@@ -47,105 +35,58 @@ const DISCOUNT_KEY =
     "zardaloo_discount_final_v9";
 
 
-/* =====================================================
-   VARIABLES
-===================================================== */
+const ADMIN_NUMBER = "0994051777";
+const ADMIN_PASSWORD = "ERFAN";
+
 
 let profile = null;
-let cart = [];
 let products = [];
+let cart = [];
+let discountPercent = 0;
 
-let selectedAvatar = "👤";
-let profileImageData = "";
+let currentChatNumber = "";
 let productImageData = "";
 
-let discountPercent = 0;
-let currentChatNumber = "";
 
-let adminLoggedIn = false;
+/* =========================================================
+   شروع
+========================================================= */
 
+document.addEventListener("DOMContentLoaded", () => {
 
-/* =====================================================
-   START
-===================================================== */
+    loadLocalData();
 
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-
-        loadLocalData();
-        setupFilters();
-
-        if (profile) {
-            showApp();
-        } else {
-            showWelcome();
-        }
-
-        renderCart();
+    if (profile) {
+        showApp();
+    } else {
+        showWelcome();
     }
-);
+
+});
 
 
-/* =====================================================
-   LOCAL DATA
-===================================================== */
+/* =========================================================
+   ذخیره / دریافت اطلاعات محلی
+========================================================= */
 
 function loadLocalData() {
 
     try {
-
-        const saved =
-            localStorage.getItem(PROFILE_KEY);
-
-        if (saved) {
-            profile = JSON.parse(saved);
-        }
-
-    } catch (error) {
-        console.error(error);
+        profile =
+            JSON.parse(localStorage.getItem(PROFILE_KEY)) || null;
+    } catch {
         profile = null;
     }
 
-
     try {
-
-        const saved =
-            localStorage.getItem(CART_KEY);
-
-        if (saved) {
-
-            cart = JSON.parse(saved);
-
-            if (!Array.isArray(cart)) {
-                cart = [];
-            }
-        }
-
-    } catch (error) {
-
-        console.error(error);
+        cart =
+            JSON.parse(localStorage.getItem(CART_KEY)) || [];
+    } catch {
         cart = [];
     }
 
-
-    try {
-
-        const saved =
-            localStorage.getItem(DISCOUNT_KEY);
-
-        if (saved) {
-            discountPercent =
-                Number(saved) || 0;
-        }
-
-    } catch (error) {
-
-        discountPercent = 0;
-    }
-
-
-    updateProfileUI();
+    discountPercent =
+        Number(localStorage.getItem(DISCOUNT_KEY)) || 0;
 }
 
 
@@ -158,19 +99,28 @@ function saveCart() {
 }
 
 
-/* =====================================================
-   NAVIGATION
-===================================================== */
+function saveProfileData() {
+
+    localStorage.setItem(
+        PROFILE_KEY,
+        JSON.stringify(profile)
+    );
+}
+
+
+/* =========================================================
+   صفحه اول
+========================================================= */
 
 function showWelcome() {
 
     document
         .getElementById("welcomeScreen")
-        .classList.remove("hidden");
+        .classList.add("active");
 
     document
         .getElementById("profileSetup")
-        .classList.add("hidden");
+        .classList.remove("active");
 
     document
         .getElementById("app")
@@ -182,169 +132,65 @@ function openProfileFromWelcome() {
 
     document
         .getElementById("welcomeScreen")
-        .classList.add("hidden");
+        .classList.remove("active");
 
     document
         .getElementById("profileSetup")
-        .classList.remove("hidden");
-
-    document
-        .getElementById("app")
-        .classList.add("hidden");
+        .classList.add("active");
 }
 
 
 function openMarketFromWelcome() {
 
-    document
-        .getElementById("welcomeScreen")
-        .classList.add("hidden");
-
-    document
-        .getElementById("profileSetup")
-        .classList.add("hidden");
-
-    document
-        .getElementById("app")
-        .classList.remove("hidden");
-
-    showPage("market");
-}
-
-
-function showApp() {
-
-    document
-        .getElementById("welcomeScreen")
-        .classList.add("hidden");
-
-    document
-        .getElementById("profileSetup")
-        .classList.add("hidden");
-
-    document
-        .getElementById("app")
-        .classList.remove("hidden");
-
-    updateProfileUI();
-
-    showPage("home");
-}
-
-
-function showPage(pageId) {
-
-    document
-        .querySelectorAll(".page")
-        .forEach(
-            page =>
-                page.classList.remove("active")
-        );
-
-
-    const page =
-        document.getElementById(pageId);
-
-    if (!page) return;
-
-    page.classList.add("active");
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-
-
-    if (pageId === "market") {
-        loadProducts();
-    }
-
-    if (pageId === "cart") {
-        renderCart();
-    }
-
-    if (pageId === "messages") {
-        loadMessages();
-    }
-}
-
-
-/* =====================================================
-   PROFILE
-===================================================== */
-
-function selectAvatar(avatar) {
-
-    selectedAvatar = avatar;
-
-    document
-        .getElementById("profilePreview")
-        .innerHTML = avatar;
-}
-
-
-function previewProfileImage(event) {
-
-    const file =
-        event.target.files?.[0];
-
-    if (!file) return;
-
-
-    const reader =
-        new FileReader();
-
-
-    reader.onload = () => {
-
-        profileImageData =
-            reader.result;
+    if (!profile) {
 
         document
-            .getElementById("profilePreview")
-            .innerHTML =
-                `<img src="${profileImageData}"
-                      alt="پروفایل">`;
-    };
+            .getElementById("welcomeScreen")
+            .classList.remove("active");
 
+        document
+            .getElementById("profileSetup")
+            .classList.add("active");
 
-    reader.readAsDataURL(file);
+        return;
+    }
+
+    showApp();
+
+    showPage("marketPage");
+
 }
 
 
-function enterZardaloo() {
+/* =========================================================
+   پروفایل
+========================================================= */
+
+function saveProfile() {
 
     const name =
         document
-            .getElementById("userName")
+            .getElementById("profileName")
             .value
             .trim();
 
     const phone =
         document
-            .getElementById("userPhone")
+            .getElementById("profilePhone")
             .value
             .trim();
 
-    const number =
+    const zardalooNumber =
         document
-            .getElementById("userZardalooNumber")
+            .getElementById("profileZardalooNumber")
             .value
             .trim();
 
 
-    if (!name) {
-        alert("نام خود را وارد کنید.");
-        return;
-    }
+    if (!name || !phone || !zardalooNumber) {
 
-    if (!phone) {
-        alert("شماره تماس خود را وارد کنید.");
-        return;
-    }
+        alert("لطفاً همه اطلاعات را وارد کنید.");
 
-    if (!number) {
-        alert("شماره زردآلو خود را وارد کنید.");
         return;
     }
 
@@ -352,73 +198,279 @@ function enterZardaloo() {
     profile = {
         name: name,
         phone: phone,
-        zardaloo_number: number,
-        avatar: selectedAvatar,
-        image: profileImageData
+        zardaloo_number: zardalooNumber
     };
 
 
-    localStorage.setItem(
-        PROFILE_KEY,
-        JSON.stringify(profile)
-    );
+    saveProfileData();
 
-
-    updateProfileUI();
     showApp();
 }
 
 
-function updateProfileUI() {
+/* =========================================================
+   نمایش برنامه
+========================================================= */
 
-    if (!profile) return;
+function showApp() {
+
+    document
+        .getElementById("welcomeScreen")
+        .classList.remove("active");
+
+    document
+        .getElementById("profileSetup")
+        .classList.remove("active");
+
+    document
+        .getElementById("app")
+        .classList.remove("hidden");
 
 
-    const name =
-        document.getElementById("headerName");
+    showPage("homePage");
 
-    const avatar =
-        document.getElementById("headerAvatar");
+    loadProducts();
+    renderCart();
+}
 
 
-    if (name) {
-        name.textContent =
-            profile.name || "کاربر";
+/* =========================================================
+   منو
+========================================================= */
+
+function toggleMenu() {
+
+    document
+        .getElementById("mainNav")
+        .classList.toggle("open");
+}
+
+
+function showPage(pageId) {
+
+    document
+        .querySelectorAll(".page")
+        .forEach(page => {
+
+            page.classList.remove("active-page");
+
+        });
+
+
+    const page =
+        document.getElementById(pageId);
+
+    if (page) {
+        page.classList.add("active-page");
     }
 
 
-    if (avatar) {
+    document
+        .getElementById("mainNav")
+        .classList.remove("open");
 
-        if (profile.image) {
 
-            avatar.innerHTML =
-                `<img
-                    src="${profile.image}"
-                    style="
-                        width:30px;
-                        height:30px;
-                        border-radius:50%;
-                        object-fit:cover;
-                    "
-                >`;
+    if (pageId === "marketPage") {
+        loadProducts();
+    }
 
-        } else {
+    if (pageId === "cartPage") {
+        renderCart();
+    }
 
-            avatar.textContent =
-                profile.avatar || "👤";
-        }
+    if (pageId === "messagesPage") {
+        loadMessages();
     }
 }
 
 
-/* =====================================================
-   PRODUCT IMAGE
-===================================================== */
+/* =========================================================
+   هدرهای Supabase
+========================================================= */
+
+function supabaseHeaders() {
+
+    return {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_KEY,
+        "Authorization": "Bearer " + SUPABASE_KEY
+    };
+}
+
+
+/* =========================================================
+   محصولات
+========================================================= */
+
+async function loadProducts() {
+
+    const container =
+        document.getElementById("productsContainer");
+
+    if (!container) return;
+
+
+    container.innerHTML =
+        `<p class="loading">در حال دریافت کالاها...</p>`;
+
+
+    try {
+
+        const response =
+            await fetch(PRODUCTS_URL, {
+                method: "GET",
+                headers: supabaseHeaders()
+            });
+
+
+        const text =
+            await response.text();
+
+
+        let data;
+
+        try {
+            data = JSON.parse(text);
+        } catch {
+            data = text;
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                typeof data === "string"
+                    ? data
+                    : JSON.stringify(data)
+            );
+        }
+
+
+        products =
+            Array.isArray(data)
+                ? data
+                : (data.products || data.data || []);
+
+
+        renderProducts();
+
+    } catch (error) {
+
+        console.error(error);
+
+        container.innerHTML = `
+            <p class="status">
+                دریافت کالاها انجام نشد.<br>
+                ${escapeHtml(error.message)}
+            </p>
+        `;
+    }
+}
+
+
+function renderProducts() {
+
+    const container =
+        document.getElementById("productsContainer");
+
+    if (!container) return;
+
+
+    if (!products.length) {
+
+        container.innerHTML =
+            `<p class="loading">
+                هنوز کالایی ثبت نشده است.
+            </p>`;
+
+        return;
+    }
+
+
+    container.innerHTML =
+        products.map(product => {
+
+            const image =
+                product.image_url ||
+                product.image ||
+                "";
+
+
+            const price =
+                Number(product.price || 0);
+
+
+            const name =
+                product.name ||
+                "کالای بدون نام";
+
+
+            const seller =
+                product.zardaloo_number ||
+                product.seller_number ||
+                "نامشخص";
+
+
+            return `
+                <article class="product-card">
+
+                    ${
+                        image
+                        ? `
+                            <img
+                                class="product-image"
+                                src="${escapeAttribute(image)}"
+                                alt="${escapeAttribute(name)}">
+                          `
+                        : `
+                            <div class="product-image"></div>
+                          `
+                    }
+
+                    <div class="product-body">
+
+                        <h3>
+                            ${escapeHtml(name)}
+                        </h3>
+
+                        <div class="product-price">
+                            ${formatPrice(price)} ریال
+                        </div>
+
+                        <div class="product-seller">
+                            شماره زردآلو فروشنده:
+                            ${escapeHtml(seller)}
+                        </div>
+
+                        <button
+                            onclick="addToCart('${escapeAttribute(product.id || "")}')">
+                            افزودن به سبد
+                        </button>
+
+                        <button
+                            onclick="openReportForSeller('${escapeAttribute(seller)}')">
+                            گزارش فروشنده
+                        </button>
+
+                    </div>
+
+                </article>
+            `;
+
+        }).join("");
+}
+
+
+/* =========================================================
+   ثبت کالا
+========================================================= */
 
 function previewProductImage(event) {
 
     const file =
-        event.target.files?.[0];
+        event.target.files &&
+        event.target.files[0];
+
 
     if (!file) return;
 
@@ -427,18 +479,18 @@ function previewProductImage(event) {
         new FileReader();
 
 
-    reader.onload = () => {
+    reader.onload = function(e) {
 
         productImageData =
-            reader.result;
+            e.target.result;
+
 
         document
-            .getElementById("productImagePreview")
-            .innerHTML =
-                `<img
-                    src="${productImageData}"
-                    alt="تصویر کالا"
-                >`;
+            .getElementById("imagePreview")
+            .innerHTML = `
+                <img src="${escapeAttribute(productImageData)}"
+                     alt="پیش‌نمایش کالا">
+            `;
     };
 
 
@@ -446,334 +498,7 @@ function previewProductImage(event) {
 }
 
 
-/* =====================================================
-   PRODUCTS
-===================================================== */
-
-async function loadProducts() {
-
-    const container =
-        document.getElementById(
-            "productsContainer"
-        );
-
-    if (!container) return;
-
-
-    container.innerHTML =
-        `<div class="loading">
-            در حال دریافت کالاها...
-        </div>`;
-
-
-    try {
-
-        const response =
-            await fetch(
-                PRODUCTS_URL,
-                {
-                    method: "GET",
-
-                    headers: {
-                        "apikey":
-                            SUPABASE_KEY,
-
-                        "Authorization":
-                            "Bearer " +
-                            SUPABASE_KEY
-                    }
-                }
-            );
-
-
-        const text =
-            await response.text();
-
-
-        let result = {};
-
-        try {
-            result = text
-                ? JSON.parse(text)
-                : {};
-        } catch {
-            result = {
-                message: text
-            };
-        }
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                result.error ||
-                result.message ||
-                "دریافت کالاها انجام نشد."
-            );
-        }
-
-
-        if (Array.isArray(result)) {
-            products = result;
-        } else if (
-            Array.isArray(result.products)
-        ) {
-            products = result.products;
-        } else if (
-            Array.isArray(result.data)
-        ) {
-            products = result.data;
-        } else {
-            products = [];
-        }
-
-
-        renderProducts();
-
-
-    } catch (error) {
-
-        console.error(error);
-
-        container.innerHTML =
-            `<div class="loading">
-                دریافت کالاها انجام نشد.
-                <br>
-                ${escapeHtml(
-                    error.message || ""
-                )}
-            </div>`;
-    }
-}
-
-
-function renderProducts() {
-
-    const container =
-        document.getElementById(
-            "productsContainer"
-        );
-
-    if (!container) return;
-
-
-    const search =
-        (
-            document
-                .getElementById("marketSearch")
-                ?.value || ""
-        )
-        .trim()
-        .toLowerCase();
-
-
-    const sort =
-        document
-            .getElementById("marketSort")
-            ?.value || "new";
-
-
-    let list =
-        products.filter(
-            product => {
-
-                const name =
-                    String(
-                        product.name ??
-                        product.title ??
-                        ""
-                    )
-                    .toLowerCase();
-
-                return name.includes(search);
-            }
-        );
-
-
-    list.sort(
-        (a, b) => {
-
-            const pa =
-                Number(a.price || 0);
-
-            const pb =
-                Number(b.price || 0);
-
-
-            if (sort === "low") {
-                return pa - pb;
-            }
-
-            if (sort === "high") {
-                return pb - pa;
-            }
-
-
-            return (
-                new Date(
-                    b.created_at || 0
-                ) -
-                new Date(
-                    a.created_at || 0
-                )
-            );
-        }
-    );
-
-
-    if (list.length === 0) {
-
-        container.innerHTML =
-            `<div class="loading">
-                کالایی پیدا نشد.
-            </div>`;
-
-        return;
-    }
-
-
-    container.innerHTML = "";
-
-
-    list.forEach(product => {
-
-        const name =
-            product.name ??
-            product.title ??
-            "کالا";
-
-        const price =
-            Number(product.price || 0);
-
-        const image =
-            product.image_url ??
-            product.image ??
-            "";
-
-        const seller =
-            product.zardaloo_number ??
-            product.seller_number ??
-            "نامشخص";
-
-
-        const card =
-            document.createElement("article");
-
-        card.className =
-            "product-card";
-
-
-        card.innerHTML = `
-
-            <div class="product-photo">
-
-                ${
-                    image
-                    ?
-                    `<img
-                        src="${escapeAttribute(image)}"
-                        alt="${escapeAttribute(name)}"
-                    >`
-                    :
-                    "📦"
-                }
-
-            </div>
-
-            <div class="product-info">
-
-                <h3>
-                    ${escapeHtml(name)}
-                </h3>
-
-                <div class="product-price">
-                    ${formatPrice(price)} ریال
-                </div>
-
-                <div class="product-seller">
-                    شماره زردآلو فروشنده:
-                    ${escapeHtml(seller)}
-                </div>
-
-                <div class="product-actions">
-
-                    <button
-                        type="button"
-                        onclick="addToCart('${escapeAttribute(
-                            String(product.id || "")
-                        )}')"
-                    >
-                        افزودن به سبد
-                    </button>
-
-                    ${
-                        profile &&
-                        String(seller) ===
-                        String(profile.zardaloo_number)
-                        ?
-                        `<button
-                            type="button"
-                            onclick="deleteProduct('${escapeAttribute(
-                                String(product.id || "")
-                            )}')"
-                        >
-                            حذف
-                        </button>`
-                        :
-                        ""
-                    }
-
-                </div>
-
-            </div>
-        `;
-
-
-        container.appendChild(card);
-    });
-}
-
-
-function setupFilters() {
-
-    const search =
-        document.getElementById(
-            "marketSearch"
-        );
-
-    const sort =
-        document.getElementById(
-            "marketSort"
-        );
-
-
-    if (search) {
-        search.addEventListener(
-            "input",
-            renderProducts
-        );
-    }
-
-    if (sort) {
-        sort.addEventListener(
-            "change",
-            renderProducts
-        );
-    }
-}
-
-
-/* =====================================================
-   REGISTER PRODUCT
-===================================================== */
-
 async function registerProduct() {
-
-    if (!profile) {
-        alert("ابتدا وارد حساب شوید.");
-        return;
-    }
-
 
     const name =
         document
@@ -781,12 +506,11 @@ async function registerProduct() {
             .value
             .trim();
 
-    const price =
-        Number(
-            document
-                .getElementById("productPrice")
-                .value
-        );
+    const priceText =
+        document
+            .getElementById("productPrice")
+            .value
+            .trim();
 
     const description =
         document
@@ -795,22 +519,57 @@ async function registerProduct() {
             .trim();
 
     const status =
-        document.getElementById(
-            "registerStatus"
-        );
+        document
+            .getElementById("registerStatus");
 
 
-    if (!name) {
+    if (!profile) {
+
         status.textContent =
-            "نام کالا را وارد کنید.";
+            "ابتدا وارد حساب خود شوید.";
+
         return;
     }
 
-    if (!Number.isFinite(price) || price < 0) {
+
+    if (!name || !priceText) {
+
         status.textContent =
-            "قیمت معتبر وارد کنید.";
+            "نام و قیمت کالا را وارد کنید.";
+
         return;
     }
+
+
+    if (!/^\d+$/.test(priceText)) {
+
+        status.textContent =
+            "قیمت فقط باید شامل عدد باشد.";
+
+        return;
+    }
+
+
+    const product = {
+
+        name: name,
+
+        price: Number(priceText),
+
+        description: description,
+
+        image_url: productImageData,
+
+        zardaloo_number:
+            profile.zardaloo_number,
+
+        seller_number:
+            profile.zardaloo_number,
+
+        seller_name:
+            profile.name
+
+    };
 
 
     status.textContent =
@@ -820,293 +579,163 @@ async function registerProduct() {
     try {
 
         const response =
-            await fetch(
-                PRODUCTS_URL,
-                {
-                    method: "POST",
+            await fetch(PRODUCTS_URL, {
 
-                    headers: {
-                        "Content-Type":
-                            "application/json",
+                method: "POST",
 
-                        "apikey":
-                            SUPABASE_KEY,
+                headers:
+                    supabaseHeaders(),
 
-                        "Authorization":
-                            "Bearer " +
-                            SUPABASE_KEY
-                    },
+                body:
+                    JSON.stringify(product)
 
-                    body: JSON.stringify({
-
-                        name: name,
-
-                        price: price,
-
-                        description:
-                            description,
-
-                        image_url:
-                            productImageData,
-
-                        zardaloo_number:
-                            profile.zardaloo_number,
-
-                        seller_number:
-                            profile.zardaloo_number,
-
-                        seller_name:
-                            profile.name
-                    })
-                }
-            );
+            });
 
 
         const text =
             await response.text();
 
-        let result = {};
+
+        let data;
 
         try {
-            result = text
-                ? JSON.parse(text)
-                : {};
+            data = JSON.parse(text);
         } catch {
-            result = { message: text };
+            data = text;
         }
 
 
         if (!response.ok) {
 
             throw new Error(
-                result.error ||
-                result.message ||
-                "ثبت کالا انجام نشد."
+                typeof data === "string"
+                    ? data
+                    : JSON.stringify(data)
             );
         }
 
 
         status.textContent =
-            "کالا با موفقیت ثبت شد. ✅";
+            "کالا با موفقیت ثبت شد.";
 
 
-        document.getElementById(
-            "productName"
-        ).value = "";
+        document
+            .getElementById("productName")
+            .value = "";
 
-        document.getElementById(
-            "productPrice"
-        ).value = "";
+        document
+            .getElementById("productPrice")
+            .value = "";
 
-        document.getElementById(
-            "productDescription"
-        ).value = "";
+        document
+            .getElementById("productDescription")
+            .value = "";
 
+        document
+            .getElementById("productImage")
+            .value = "";
+
+        document
+            .getElementById("imagePreview")
+            .innerHTML = "";
 
         productImageData = "";
 
 
-        document.getElementById(
-            "productImagePreview"
-        ).textContent =
-            "تصویر کالا";
-
-
-        await loadProducts();
-
+        loadProducts();
 
     } catch (error) {
 
         console.error(error);
 
         status.textContent =
-            error.message ||
-            "ثبت کالا انجام نشد.";
+            "ثبت کالا انجام نشد: " +
+            error.message;
     }
 }
 
 
-/* =====================================================
-   DELETE PRODUCT
-===================================================== */
+/* =========================================================
+   سبد خرید
+========================================================= */
 
-async function deleteProduct(id) {
-
-    if (!id || !profile) return;
-
-
-    if (!confirm(
-        "آیا از حذف این کالا مطمئن هستید؟"
-    )) {
-        return;
-    }
-
-
-    try {
-
-        const response =
-            await fetch(
-                PRODUCTS_URL,
-                {
-                    method: "DELETE",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-
-                        "apikey":
-                            SUPABASE_KEY,
-
-                        "Authorization":
-                            "Bearer " +
-                            SUPABASE_KEY
-                    },
-
-                    body: JSON.stringify({
-
-                        id: id,
-
-                        zardaloo_number:
-                            profile.zardaloo_number,
-
-                        seller_number:
-                            profile.zardaloo_number
-                    })
-                }
-            );
-
-
-        const text =
-            await response.text();
-
-        let result = {};
-
-        try {
-            result = text
-                ? JSON.parse(text)
-                : {};
-        } catch {
-            result = { message: text };
-        }
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                result.error ||
-                result.message ||
-                "حذف کالا انجام نشد."
-            );
-        }
-
-
-        alert("کالا حذف شد. ✅");
-
-        await loadProducts();
-
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert(
-            error.message ||
-            "حذف کالا انجام نشد."
-        );
-    }
-}
-
-
-/* =====================================================
-   CART
-===================================================== */
-
-function addToCart(id) {
+function addToCart(productId) {
 
     const product =
         products.find(
-            item =>
-                String(item.id) ===
-                String(id)
+            p => String(p.id) === String(productId)
         );
 
 
     if (!product) {
+
         alert("کالا پیدا نشد.");
+
         return;
     }
 
 
-    const existing =
-        cart.find(
-            item =>
-                String(item.id) ===
-                String(id)
-        );
+    cart.push({
+        id: product.id,
+        name: product.name,
+        price: Number(product.price || 0)
+    });
 
 
-    if (existing) {
+    saveCart();
 
-        existing.quantity =
-            Number(existing.quantity || 1) + 1;
+    renderCart();
+
+    alert("کالا به سبد خرید اضافه شد.");
+}
+
+
+function removeFromCart(index) {
+
+    cart.splice(index, 1);
+
+    saveCart();
+
+    renderCart();
+}
+
+
+function applyDiscount() {
+
+    const input =
+        document.getElementById("discountCode");
+
+
+    if (!input) return;
+
+
+    const code =
+        input.value.trim();
+
+
+    if (code === "50") {
+
+        discountPercent = 50;
+
+    } else if (code === "100") {
+
+        discountPercent = 100;
 
     } else {
 
-        cart.push({
+        discountPercent = 0;
 
-            id: product.id,
+        alert("کد تخفیف نامعتبر است.");
 
-            name:
-                product.name ??
-                product.title ??
-                "کالا",
-
-            price:
-                Number(product.price || 0),
-
-            quantity: 1
-        });
-    }
-
-
-    saveCart();
-    renderCart();
-
-    alert(
-        "کالا به سبد خرید اضافه شد. 🛒"
-    );
-}
-
-
-function removeFromCart(id) {
-
-    cart =
-        cart.filter(
-            item =>
-                String(item.id) !==
-                String(id)
-        );
-
-    saveCart();
-    renderCart();
-}
-
-
-function clearCart() {
-
-    if (!cart.length) return;
-
-
-    if (!confirm(
-        "سبد خرید خالی شود؟"
-    )) {
         return;
     }
 
 
-    cart = [];
+    localStorage.setItem(
+        DISCOUNT_KEY,
+        String(discountPercent)
+    );
 
-    saveCart();
 
     renderCart();
 }
@@ -1115,250 +744,147 @@ function clearCart() {
 function renderCart() {
 
     const container =
-        document.getElementById(
-            "cartContainer"
-        );
+        document.getElementById("cartContainer");
 
-    const summary =
-        document.getElementById(
-            "cartSummary"
-        );
-
-
-    if (!container || !summary) return;
+    if (!container) return;
 
 
     if (!cart.length) {
 
         container.innerHTML =
-            `<div class="empty-cart">
+            `<p class="loading">
                 سبد خرید شما خالی است.
-            </div>`;
-
-        summary.innerHTML = "";
+            </p>`;
 
         return;
     }
 
 
-    let originalTotal = 0;
-    let finalTotal = 0;
+    let totalOriginal = 0;
 
 
-    container.innerHTML = "";
+    const itemsHtml =
+        cart.map((item, index) => {
+
+            const original =
+                Number(item.price || 0);
+
+            const discounted =
+                Math.round(
+                    original *
+                    (1 - discountPercent / 100)
+                );
 
 
-    cart.forEach(item => {
-
-        const price =
-            Number(item.price || 0);
-
-        const quantity =
-            Number(item.quantity || 1);
+            totalOriginal += original;
 
 
-        const original =
-            price * quantity;
+            return `
+                <div class="cart-item">
 
-        const final =
-            calculateDiscountedPrice(
-                original
-            );
+                    <h3>
+                        ${escapeHtml(item.name)}
+                    </h3>
 
+                    <p>
+                        قیمت اصلی:
+                        ${formatPrice(original)}
+                        ریال
+                    </p>
 
-        originalTotal += original;
-        finalTotal += final;
+                    <p>
+                        قیمت با تخفیف:
+                        ${formatPrice(discounted)}
+                        ریال
+                    </p>
 
+                    <button
+                        onclick="removeFromCart(${index})">
+                        حذف از سبد
+                    </button>
 
-        const box =
-            document.createElement("div");
-
-        box.className =
-            "cart-item";
-
-
-        box.innerHTML = `
-
-            <div>
-
-                <h3>
-                    ${escapeHtml(item.name)}
-                </h3>
-
-                <div>
-                    قیمت:
-                    ${formatPrice(price)}
-                    ریال
                 </div>
+            `;
 
-                <div>
-                    تعداد:
-                    ${quantity}
-                </div>
-
-                <div class="cart-discounted">
-                    قیمت بعد تخفیف:
-                    ${formatPrice(
-                        final / quantity
-                    )}
-                    ریال
-                </div>
-
-            </div>
-
-            <button
-                type="button"
-                onclick="removeFromCart('${escapeAttribute(
-                    String(item.id)
-                )}')"
-            >
-                حذف
-            </button>
-        `;
-
-
-        container.appendChild(box);
-    });
+        }).join("");
 
 
     const discountAmount =
-        originalTotal - finalTotal;
+        Math.round(
+            totalOriginal *
+            discountPercent / 100
+        );
 
 
-    summary.innerHTML = `
+    const finalAmount =
+        totalOriginal -
+        discountAmount;
 
-        <div>
-            مجموع قیمت:
-            <strong>
-                ${formatPrice(originalTotal)}
-                ریال
-            </strong>
-        </div>
 
-        <div>
-            مقدار تخفیف:
-            <strong>
-                ${formatPrice(discountAmount)}
-                ریال
-            </strong>
-        </div>
+    container.innerHTML = `
 
-        <div>
-            مبلغ نهایی:
-            <strong>
-                ${formatPrice(finalTotal)}
-                ریال
-            </strong>
-        </div>
+        ${itemsHtml}
 
-        <div>
-            درصد تخفیف:
-            <strong>
-                ${discountPercent}٪
-            </strong>
+        <div class="cart-summary">
+
+            <p>
+                مجموع قیمت اصلی:
+                <strong>
+                    ${formatPrice(totalOriginal)}
+                    ریال
+                </strong>
+            </p>
+
+            <p>
+                میزان تخفیف:
+                <strong>
+                    ${formatPrice(discountAmount)}
+                    ریال
+                </strong>
+            </p>
+
+            <p>
+                مبلغ نهایی:
+                <strong>
+                    ${formatPrice(finalAmount)}
+                    ریال
+                </strong>
+            </p>
+
+            <div class="discount-box">
+
+                <input
+                    id="discountCode"
+                    type="text"
+                    placeholder="کد تخفیف: 50 یا 100">
+
+                <button onclick="applyDiscount()">
+                    اعمال تخفیف
+                </button>
+
+            </div>
+
         </div>
     `;
 }
 
 
-function calculateDiscountedPrice(price) {
+/* =========================================================
+   پیام‌رسان
+========================================================= */
 
-    if (discountPercent >= 100) {
-        return 0;
-    }
-
-    if (discountPercent <= 0) {
-        return price;
-    }
-
-    return Math.round(
-        price *
-        (1 - discountPercent / 100)
-    );
-}
-
-
-function applyDiscount() {
-
-    const code =
-        document
-            .getElementById("discountCode")
-            .value
-            .trim();
-
-    const status =
-        document.getElementById(
-            "discountStatus"
-        );
-
-
-    if (code === "50") {
-
-        discountPercent = 50;
-
-        localStorage.setItem(
-            DISCOUNT_KEY,
-            "50"
-        );
-
-        status.textContent =
-            "کد تخفیف ۵۰٪ اعمال شد. ✅";
-
-        renderCart();
-
-        return;
-    }
-
-
-    if (code === "100") {
-
-        discountPercent = 100;
-
-        localStorage.setItem(
-            DISCOUNT_KEY,
-            "100"
-        );
-
-        status.textContent =
-            "کد تخفیف ۱۰۰٪ اعمال شد. ✅";
-
-        renderCart();
-
-        return;
-    }
-
-
-    discountPercent = 0;
-
-    localStorage.removeItem(
-        DISCOUNT_KEY
-    );
-
-    status.textContent =
-        "کد تخفیف معتبر نیست.";
-}
-
-
-/* =====================================================
-   MESSENGER
-===================================================== */
-
-function startConversation() {
+function startChat() {
 
     const number =
         document
-            .getElementById(
-                "messageReceiver"
-            )
+            .getElementById("chatNumber")
             .value
             .trim();
 
 
     if (!number) {
 
-        alert(
-            "ابتدا شماره زردآلو را وارد کنید."
-        );
+        alert("شماره زردآلو را وارد کنید.");
 
         return;
     }
@@ -1366,157 +892,27 @@ function startConversation() {
 
     currentChatNumber = number;
 
+
+    document
+        .getElementById("chatArea")
+        .classList.remove("hidden");
+
+
     loadMessages();
-}
-
-
-async function sendMessage() {
-
-    if (!profile) {
-
-        alert(
-            "ابتدا وارد حساب کاربری شوید."
-        );
-
-        return;
-    }
-
-
-    const receiver =
-        (
-            currentChatNumber ||
-            document
-                .getElementById(
-                    "messageReceiver"
-                )
-                .value
-        )
-        .trim();
-
-
-    const message =
-        document
-            .getElementById(
-                "messageText"
-            )
-            .value
-            .trim();
-
-
-    if (!receiver) {
-
-        alert(
-            "شماره گیرنده را وارد کنید."
-        );
-
-        return;
-    }
-
-
-    if (!message) {
-
-        alert(
-            "متن پیام را وارد کنید."
-        );
-
-        return;
-    }
-
-
-    try {
-
-        const response =
-            await fetch(
-                MESSAGES_URL,
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-
-                        "apikey":
-                            SUPABASE_KEY,
-
-                        "Authorization":
-                            "Bearer " +
-                            SUPABASE_KEY
-                    },
-
-                    body: JSON.stringify({
-
-                        sender_number:
-                            profile.zardaloo_number,
-
-                        receiver_number:
-                            receiver,
-
-                        message:
-                            message
-                    })
-                }
-            );
-
-
-        const text =
-            await response.text();
-
-        let result = {};
-
-        try {
-            result = text
-                ? JSON.parse(text)
-                : {};
-        } catch {
-            result = { message: text };
-        }
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                result.error ||
-                result.message ||
-                "ارسال پیام انجام نشد."
-            );
-        }
-
-
-        document
-            .getElementById(
-                "messageText"
-            )
-            .value = "";
-
-
-        await loadMessages();
-
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert(
-            error.message ||
-            "ارسال پیام انجام نشد."
-        );
-    }
 }
 
 
 async function loadMessages() {
 
-    const box =
-        document.getElementById(
-            "chatBox"
-        );
+    if (!profile) return;
+
+    if (!currentChatNumber) return;
 
 
-    if (!box || !profile) return;
+    const container =
+        document.getElementById("chatMessages");
 
-
-    box.innerHTML =
-        "<p>در حال دریافت پیام‌ها...</p>";
+    if (!container) return;
 
 
     try {
@@ -1530,164 +926,268 @@ async function loadMessages() {
 
 
         const response =
-            await fetch(
-                url,
-                {
-                    method: "GET",
+            await fetch(url, {
 
-                    headers: {
-                        "apikey":
-                            SUPABASE_KEY,
+                method: "GET",
 
-                        "Authorization":
-                            "Bearer " +
-                            SUPABASE_KEY
-                    }
-                }
-            );
+                headers:
+                    supabaseHeaders()
+
+            });
 
 
         const text =
             await response.text();
 
-        let result = {};
+
+        let data;
 
         try {
-            result = text
-                ? JSON.parse(text)
-                : {};
+            data = JSON.parse(text);
         } catch {
-            result = { message: text };
+            data = text;
         }
 
 
         if (!response.ok) {
 
             throw new Error(
-                result.error ||
-                result.message ||
-                "دریافت پیام‌ها انجام نشد."
+                typeof data === "string"
+                    ? data
+                    : JSON.stringify(data)
             );
         }
 
 
         const messages =
-            Array.isArray(result)
-                ? result
-                : Array.isArray(result.messages)
-                    ? result.messages
-                    : Array.isArray(result.data)
-                        ? result.data
-                        : [];
+            Array.isArray(data)
+                ? data
+                : (data.messages || data.data || []);
 
 
-        if (!messages.length) {
-
-            box.innerHTML =
-                "<p>هنوز پیامی وجود ندارد.</p>";
-
-            return;
-        }
-
-
-        box.innerHTML = "";
-
-
-        messages.forEach(item => {
-
-            const div =
-                document.createElement("div");
-
-            div.className =
-                "message-item";
-
-
-            const mine =
-                String(
-                    item.sender_number
-                ) ===
-                String(
-                    profile.zardaloo_number
-                );
-
-
-            if (mine) {
-                div.classList.add(
-                    "my-message"
-                );
-            } else {
-                div.classList.add(
-                    "other-message"
-                );
-            }
-
-
-            div.innerHTML = `
-
-                <strong>
-                    ${mine
-                        ? "شما"
-                        : escapeHtml(
-                            item.sender_number || ""
-                        )}
-                </strong>
-
-                <p>
-                    ${escapeHtml(
-                        item.message || ""
-                    )}
-                </p>
-
-                <small>
-                    ${
-                        item.created_at
-                        ?
-                        new Date(
-                            item.created_at
-                        ).toLocaleString("fa-IR")
-                        :
-                        ""
-                    }
-                </small>
-            `;
-
-
-            box.appendChild(div);
-        });
+        renderMessages(messages);
 
 
     } catch (error) {
 
         console.error(error);
 
-        box.innerHTML =
-            `<p>
-                دریافت پیام‌ها انجام نشد.
-                <br>
-                ${escapeHtml(
-                    error.message || ""
-                )}
-            </p>`;
+        const status =
+            document.getElementById(
+                "messageStatus"
+            );
+
+        if (status) {
+
+            status.textContent =
+                "دریافت پیام‌ها انجام نشد: " +
+                error.message;
+        }
     }
 }
 
 
-/* =====================================================
-   گزارش فروشنده - نسخه اصلاح‌شده
-===================================================== */
+function renderMessages(messages) {
 
-async function submitReport() {
+    const container =
+        document.getElementById("chatMessages");
+
+
+    if (!container) return;
+
+
+    const filtered =
+        messages.filter(message => {
+
+            const sender =
+                String(
+                    message.sender_number || ""
+                );
+
+            const receiver =
+                String(
+                    message.receiver_number || ""
+                );
+
+
+            const me =
+                String(
+                    profile.zardaloo_number
+                );
+
+            const other =
+                String(currentChatNumber);
+
+
+            return (
+                (sender === me &&
+                 receiver === other) ||
+
+                (sender === other &&
+                 receiver === me)
+            );
+
+        });
+
+
+    if (!filtered.length) {
+
+        container.innerHTML =
+            `<p class="loading">
+                هنوز پیامی در این مکالمه وجود ندارد.
+            </p>`;
+
+        return;
+    }
+
+
+    container.innerHTML =
+        filtered.map(message => {
+
+            const mine =
+                String(message.sender_number) ===
+                String(profile.zardaloo_number);
+
+
+            return `
+                <div class="message ${
+                    mine ? "mine" : "other"
+                }">
+
+                    ${escapeHtml(
+                        message.message || ""
+                    )}
+
+                </div>
+            `;
+
+        }).join("");
+
+
+    container.scrollTop =
+        container.scrollHeight;
+}
+
+
+async function sendMessage() {
+
+    if (!profile) return;
+
+
+    const input =
+        document.getElementById("chatInput");
+
+
+    const message =
+        input.value.trim();
+
+
+    if (!currentChatNumber) {
+
+        alert("ابتدا مکالمه جدید ایجاد کنید.");
+
+        return;
+    }
+
+
+    if (!message) return;
+
 
     const status =
         document.getElementById(
-            "reportStatus"
+            "messageStatus"
         );
 
 
-    if (!profile) {
+    try {
+
+        const response =
+            await fetch(MESSAGES_URL, {
+
+                method: "POST",
+
+                headers:
+                    supabaseHeaders(),
+
+                body:
+                    JSON.stringify({
+
+                        sender_number:
+                            profile.zardaloo_number,
+
+                        receiver_number:
+                            currentChatNumber,
+
+                        message:
+                            message
+
+                    })
+
+            });
+
+
+        const text =
+            await response.text();
+
+
+        let data;
+
+        try {
+            data = JSON.parse(text);
+        } catch {
+            data = text;
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                typeof data === "string"
+                    ? data
+                    : JSON.stringify(data)
+            );
+        }
+
+
+        input.value = "";
 
         status.textContent =
-            "ابتدا وارد حساب کاربری شوید.";
+            "پیام ارسال شد.";
+
+
+        loadMessages();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        status.textContent =
+            "ارسال پیام انجام نشد: " +
+            error.message;
+    }
+}
+
+
+/* =========================================================
+   گزارش فروشنده
+========================================================= */
+
+function openReportForSeller(number) {
+
+    showPage("reportPage");
+
+    document
+        .getElementById("reportSellerNumber")
+        .value = number;
+}
+
+
+async function submitReport() {
+
+    if (!profile) {
+
+        alert("ابتدا وارد حساب شوید.");
 
         return;
     }
@@ -1695,29 +1195,27 @@ async function submitReport() {
 
     const sellerNumber =
         document
-            .getElementById(
-                "reportSellerNumber"
-            )
+            .getElementById("reportSellerNumber")
             .value
             .trim();
 
 
     const reason =
         document
-            .getElementById(
-                "reportReason"
-            )
-            .value
-            .trim();
+            .getElementById("reportReason")
+            .value;
 
 
     const description =
         document
-            .getElementById(
-                "reportDescription"
-            )
+            .getElementById("reportDescription")
             .value
             .trim();
+
+
+    const status =
+        document
+            .getElementById("reportStatus");
 
 
     if (!sellerNumber) {
@@ -1738,16 +1236,6 @@ async function submitReport() {
     }
 
 
-    status.textContent =
-        "در حال ارسال گزارش...";
-
-
-    /*
-     * این قسمت مهم است:
-     * اطلاعات را با چند نام رایج می‌فرستیم
-     * تا Function فعلی راحت‌تر با آن هماهنگ شود.
-     */
-
     const reportData = {
 
         seller_number:
@@ -1767,107 +1255,69 @@ async function submitReport() {
 
         description:
             description
+
     };
+
+
+    status.textContent =
+        "در حال ارسال گزارش...";
 
 
     try {
 
         const response =
-            await fetch(
-                REPORT_URL,
-                {
-                    method: "POST",
+            await fetch(REPORT_URL, {
 
-                    mode: "cors",
+                method: "POST",
 
-                    headers: {
+                mode: "cors",
 
-                        "Content-Type":
-                            "application/json",
+                headers: {
+                    "Content-Type":
+                        "application/json",
 
-                        "apikey":
-                            SUPABASE_KEY,
+                    "apikey":
+                        SUPABASE_KEY,
 
-                        "Authorization":
-                            "Bearer " +
-                            SUPABASE_KEY
-                    },
+                    "Authorization":
+                        "Bearer " + SUPABASE_KEY
+                },
 
-                    body:
-                        JSON.stringify(
-                            reportData
-                        )
-                }
-            );
+                body:
+                    JSON.stringify(reportData)
+
+            });
 
 
-        /*
-         * قبلاً مستقیماً response.json()
-         * انجام می‌شد.
-         *
-         * اگر Function متن خالی یا متن غیر JSON
-         * برگرداند، همان‌جا خطا ایجاد می‌شد.
-         *
-         * این نسخه اول text می‌گیرد.
-         */
-
-        const responseText =
+        const text =
             await response.text();
 
 
-        let result = {};
+        let data;
 
         try {
-
-            result =
-                responseText
-                    ? JSON.parse(
-                        responseText
-                    )
-                    : {};
-
+            data = JSON.parse(text);
         } catch {
-
-            result = {
-                message:
-                    responseText
-            };
+            data = text;
         }
-
-
-        console.log(
-            "REPORT RESPONSE:",
-            response.status,
-            result
-        );
 
 
         if (!response.ok) {
 
             throw new Error(
-                result.error ||
-                result.message ||
-                result.detail ||
-                `خطای سرور: ${response.status}`
+                typeof data === "string"
+                    ? data
+                    : JSON.stringify(data)
             );
         }
 
 
         status.textContent =
-            "گزارش با موفقیت ارسال شد. ✅";
+            "گزارش با موفقیت ارسال شد.";
 
 
         document
-            .getElementById(
-                "reportDescription"
-            )
-            .value = "";
-
-
-        document
-            .getElementById(
-                "reportSellerNumber"
-            )
+            .getElementById("reportDescription")
             .value = "";
 
 
@@ -1879,38 +1329,31 @@ async function submitReport() {
         );
 
 
-        status.innerHTML =
-            `ارسال گزارش انجام نشد.<br>
-             <small>
-             ${escapeHtml(
-                 error.message ||
-                 "خطای نامشخص"
-             )}
-             </small>`;
+        status.textContent =
+            "گزارش ارسال نشد: " +
+            error.message;
     }
 }
 
 
-/* =====================================================
-   ADMIN
-===================================================== */
+/* =========================================================
+   مدیریت
+========================================================= */
 
-function adminLogin() {
+async function adminLogin() {
 
     const number =
         document
-            .getElementById(
-                "adminNumber"
-            )
+            .getElementById("adminNumber")
             .value
             .trim();
 
+
     const password =
         document
-            .getElementById(
-                "adminPassword"
-            )
+            .getElementById("adminPassword")
             .value;
+
 
     const status =
         document.getElementById(
@@ -1919,28 +1362,27 @@ function adminLogin() {
 
 
     if (
-        number === ADMIN_NUMBER &&
-        password === ADMIN_PASSWORD
+        number !== ADMIN_NUMBER ||
+        password !== ADMIN_PASSWORD
     ) {
-
-        adminLoggedIn = true;
-
-        document
-            .getElementById(
-                "adminPanel"
-            )
-            .classList.remove(
-                "hidden"
-            );
-
-        status.textContent =
-            "ورود موفق بود. ✅";
-
-    } else {
 
         status.textContent =
             "شماره یا رمز مدیریت اشتباه است.";
+
+        return;
     }
+
+
+    status.textContent =
+        "ورود موفق بود.";
+
+
+    document
+        .getElementById("adminReports")
+        .classList.remove("hidden");
+
+
+    await loadAdminReports();
 }
 
 
@@ -1952,13 +1394,6 @@ async function loadAdminReports() {
         );
 
 
-    if (!adminLoggedIn) return;
-
-
-    container.innerHTML =
-        "<p>در حال دریافت گزارش‌ها...</p>";
-
-
     try {
 
         const response =
@@ -1966,15 +1401,8 @@ async function loadAdminReports() {
                 ADMIN_REPORTS_URL,
                 {
                     method: "GET",
-
-                    headers: {
-                        "apikey":
-                            SUPABASE_KEY,
-
-                        "Authorization":
-                            "Bearer " +
-                            SUPABASE_KEY
-                    }
+                    headers:
+                        supabaseHeaders()
                 }
             );
 
@@ -1982,132 +1410,116 @@ async function loadAdminReports() {
         const text =
             await response.text();
 
-        let result = {};
+
+        let data;
 
         try {
-            result = text
-                ? JSON.parse(text)
-                : {};
+            data = JSON.parse(text);
         } catch {
-            result = {
-                message: text
-            };
+            data = text;
         }
 
 
         if (!response.ok) {
 
             throw new Error(
-                result.error ||
-                result.message ||
-                "دریافت گزارش‌ها انجام نشد."
+                typeof data === "string"
+                    ? data
+                    : JSON.stringify(data)
             );
         }
 
 
         const reports =
-            Array.isArray(result)
-                ? result
-                : Array.isArray(result.reports)
-                    ? result.reports
-                    : [];
+            Array.isArray(data)
+                ? data
+                : (data.reports || data.data || []);
 
 
         if (!reports.length) {
 
             container.innerHTML =
-                "<p>گزارشی وجود ندارد.</p>";
+                "<p>گزارشی ثبت نشده است.</p>";
 
             return;
         }
 
 
-        container.innerHTML = "";
+        container.innerHTML =
+            reports.map(report => `
 
+                <div class="cart-item">
 
-        reports.forEach(report => {
+                    <strong>
+                        فروشنده:
+                    </strong>
 
-            const card =
-                document.createElement("div");
-
-            card.className =
-                "report-card";
-
-
-            card.innerHTML = `
-
-                <strong>
-                    گزارش فروشنده
-                </strong>
-
-                <div>
-                    فروشنده:
                     ${escapeHtml(
-                        report.seller_number ||
-                        report.seller_zardaloo_number ||
-                        ""
+                        report.seller_number || ""
                     )}
-                </div>
 
-                <div>
-                    گزارش‌دهنده:
+                    <br>
+
+                    <strong>
+                        گزارش‌دهنده:
+                    </strong>
+
                     ${escapeHtml(
-                        report.reporter_number ||
-                        report.reporter_zardaloo_number ||
-                        ""
+                        report.reporter_number || ""
                     )}
-                </div>
 
-                <div>
-                    دلیل:
+                    <br>
+
+                    <strong>
+                        دلیل:
+                    </strong>
+
                     ${escapeHtml(
                         report.reason || ""
                     )}
-                </div>
 
-                <div>
-                    توضیحات:
+                    <br>
+
+                    <strong>
+                        توضیحات:
+                    </strong>
+
                     ${escapeHtml(
                         report.description || ""
                     )}
+
                 </div>
-            `;
 
-
-            container.appendChild(card);
-        });
+            `).join("");
 
 
     } catch (error) {
 
-        console.error(error);
-
         container.innerHTML =
-            `<p>
-                ${escapeHtml(
-                    error.message ||
-                    "دریافت گزارش‌ها انجام نشد."
-                )}
-            </p>`;
+            `
+            <p class="status">
+                دریافت گزارش‌ها انجام نشد:<br>
+                ${escapeHtml(error.message)}
+            </p>
+            `;
     }
 }
 
 
-/* =====================================================
-   HELPERS
-===================================================== */
+/* =========================================================
+   ابزارها
+========================================================= */
 
-function formatPrice(value) {
+function formatPrice(number) {
 
-    return Number(
-        value || 0
-    ).toLocaleString("fa-IR");
+    return Number(number || 0)
+        .toLocaleString("fa-IR");
 }
 
 
 function escapeHtml(value) {
 
-    return String(value)
+    return String(value ?? "")
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
@@ -2118,8 +1530,9 @@ function escapeHtml(value) {
 
 function escapeAttribute(value) {
 
-    return String(value)
-        .replaceAll("\\", "\\\\")
-        .replaceAll("'", "\\'")
-        .replaceAll('"', "&quot;");
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
 }
