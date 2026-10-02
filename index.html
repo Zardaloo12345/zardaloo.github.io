@@ -4,34 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>زردآلو</title>
+    <title>زردآلو | با زردآلو خرید راحته!</title>
 
-    <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="download.png">
 </head>
 
 <body>
 
-<!-- صفحه اول -->
-<section id="welcomeScreen" class="welcome-screen">
+<!-- ==================== صفحه اول ==================== -->
+
+<section id="welcomeScreen" class="screen active">
 
     <div class="welcome-box">
 
-        <div class="welcome-logo"></div>
+        <img src="logo.png"
+             alt="لوگوی زردآلو"
+             class="welcome-logo">
 
         <h1>زردآلو</h1>
 
         <h2>با زردآلو خرید راحته!</h2>
 
-        <p>خرید و فروش ساده، سریع و راحت</p>
-
         <div class="welcome-buttons">
 
-            <button type="button" onclick="openProfileFromWelcome()">
+            <button class="main-button"
+                    onclick="openProfileFromWelcome()">
                 ورود به فروشگاه
             </button>
 
-            <button type="button" onclick="openMarketFromWelcome()">
+            <button class="main-button"
+                    onclick="openMarketFromWelcome()">
                 بازار
             </button>
 
@@ -42,44 +45,39 @@
 </section>
 
 
-<!-- پروفایل -->
-<section id="profileSetup" class="profile-screen hidden">
+<!-- ==================== ثبت مشخصات ==================== -->
+
+<section id="profileSetup" class="screen">
 
     <div class="profile-box">
 
-        <div class="small-logo"></div>
+        <img src="logo.png"
+             alt="زردآلو"
+             class="profile-logo">
 
-        <h2>ورود به زردآلو</h2>
+        <h2>اطلاعات شما</h2>
 
-        <p class="muted">اطلاعات خود را وارد کنید</p>
+        <p class="small-text">
+            برای استفاده از زردآلو اطلاعات زیر را وارد کنید.
+        </p>
 
-        <div id="profilePreview" class="profile-preview">👤</div>
+        <input
+            id="profileName"
+            type="text"
+            placeholder="نام و نام خانوادگی">
 
-        <div class="avatar-list">
-            <button type="button" onclick="selectAvatar('👤')">👤</button>
-            <button type="button" onclick="selectAvatar('🙂')">🙂</button>
-            <button type="button" onclick="selectAvatar('😎')">😎</button>
-            <button type="button" onclick="selectAvatar('🧑')">🧑</button>
-            <button type="button" onclick="selectAvatar('👨')">👨</button>
-            <button type="button" onclick="selectAvatar('👩')">👩</button>
-        </div>
+        <input
+            id="profilePhone"
+            type="tel"
+            placeholder="شماره تماس">
 
-        <label>عکس پروفایل</label>
-        <input id="profileImage" type="file" accept="image/*"
-               onchange="previewProfileImage(event)">
+        <input
+            id="profileZardalooNumber"
+            type="text"
+            placeholder="شماره زردآلو">
 
-        <label>نام و نام خانوادگی</label>
-        <input id="userName" type="text" placeholder="نام شما">
-
-        <label>شماره تماس</label>
-        <input id="userPhone" type="tel" placeholder="شماره تماس">
-
-        <label>شماره زردآلو</label>
-        <input id="userZardalooNumber" type="tel"
-               placeholder="شماره زردآلو">
-
-        <button type="button" class="main-button"
-                onclick="enterZardaloo()">
+        <button class="yellow-button"
+                onclick="saveProfile()">
             ورود به زردآلو
         </button>
 
@@ -88,60 +86,63 @@
 </section>
 
 
-<!-- برنامه -->
+<!-- ==================== برنامه ==================== -->
+
 <div id="app" class="hidden">
 
     <header class="top-header">
 
         <div class="brand">
-            <div class="header-logo"></div>
+
+            <img src="logo.png"
+                 alt="زردآلو">
 
             <div>
                 <strong>زردآلو</strong>
                 <span>با زردآلو خرید راحته!</span>
             </div>
+
         </div>
 
-        <div class="profile-mini">
-            <span id="headerAvatar">👤</span>
-            <span id="headerName">کاربر</span>
-        </div>
+        <button class="menu-button"
+                onclick="toggleMenu()">
+            ☰
+        </button>
 
     </header>
 
 
-    <!-- منو -->
-    <nav class="navigation">
+    <nav id="mainNav" class="main-nav">
 
-        <button type="button" onclick="showPage('home')">
+        <button onclick="showPage('homePage')">
             خانه
         </button>
 
-        <button type="button" onclick="showPage('market')">
+        <button onclick="showPage('marketPage')">
             بازار
         </button>
 
-        <button type="button" onclick="showPage('register')">
+        <button onclick="showPage('registerPage')">
             ثبت کالا
         </button>
 
-        <button type="button" onclick="showPage('cart')">
+        <button onclick="showPage('cartPage')">
             سبد خرید
         </button>
 
-        <button type="button" onclick="showPage('messages')">
+        <button onclick="showPage('messagesPage')">
             پیام‌رسان
         </button>
 
-        <button type="button" onclick="showPage('report')">
+        <button onclick="showPage('reportPage')">
             گزارش فروشنده
         </button>
 
-        <button type="button" onclick="showPage('admin')">
+        <button onclick="showPage('adminPage')">
             مدیریت
         </button>
 
-        <button type="button" onclick="showPage('about')">
+        <button onclick="showPage('aboutPage')">
             درباره
         </button>
 
@@ -151,27 +152,31 @@
     <main>
 
         <!-- خانه -->
-        <section id="home" class="page active">
+
+        <section id="homePage" class="page active-page">
 
             <div class="hero">
 
-                <div class="hero-logo"></div>
+                <img src="logo.png"
+                     alt="زردآلو"
+                     class="hero-logo">
 
                 <h1>با زردآلو خرید راحته!</h1>
 
                 <p>
-                    بازار آنلاین زردآلو؛ ساده، سریع و راحت
+                    خرید، فروش و ارتباط با فروشندگان
+                    در یک محیط ساده و راحت.
                 </p>
 
-                <div class="hero-buttons">
+                <div class="home-actions">
 
-                    <button type="button"
-                            onclick="showPage('market')">
+                    <button
+                        onclick="showPage('marketPage')">
                         ورود به بازار
                     </button>
 
-                    <button type="button"
-                            onclick="showPage('register')">
+                    <button
+                        onclick="showPage('registerPage')">
                         ثبت کالا
                     </button>
 
@@ -183,43 +188,27 @@
 
 
         <!-- بازار -->
-        <section id="market" class="page">
 
-            <div class="page-header">
+        <section id="marketPage" class="page">
 
-                <div>
-                    <h2>بازار زردآلو</h2>
-                    <p>کالاهای ثبت‌شده در زردآلو</p>
-                </div>
+            <div class="page-title">
 
-                <button type="button" onclick="loadProducts()">
+                <h2>بازار زردآلو</h2>
+
+                <button
+                    class="small-button"
+                    onclick="loadProducts()">
                     دریافت کالاها
                 </button>
 
             </div>
 
-            <div class="market-tools">
-
-                <input id="marketSearch"
-                       type="search"
-                       placeholder="جستجوی کالا...">
-
-                <select id="marketSort">
-
-                    <option value="new">جدیدترین</option>
-                    <option value="low">ارزان‌ترین</option>
-                    <option value="high">گران‌ترین</option>
-
-                </select>
-
-            </div>
-
             <div id="productsContainer"
-                 class="products-grid">
+                 class="products-container">
 
-                <div class="loading">
+                <p class="loading">
                     در حال دریافت کالاها...
-                </div>
+                </p>
 
             </div>
 
@@ -227,183 +216,137 @@
 
 
         <!-- ثبت کالا -->
-        <section id="register" class="page">
 
-            <div class="form-card">
+        <section id="registerPage" class="page">
+
+            <div class="form-box">
 
                 <h2>ثبت کالا</h2>
 
-                <p class="muted">
-                    کالای خود را در بازار زردآلو ثبت کنید.
-                </p>
+                <input
+                    id="productName"
+                    type="text"
+                    placeholder="نام کالا">
 
-                <label>عکس کالا</label>
+                <input
+                    id="productPrice"
+                    type="text"
+                    inputmode="numeric"
+                    placeholder="قیمت به ریال">
 
-                <input id="productImage"
-                       type="file"
-                       accept="image/*"
-                       onchange="previewProductImage(event)">
+                <textarea
+                    id="productDescription"
+                    placeholder="توضیحات کالا"></textarea>
 
-                <div id="productImagePreview"
-                     class="product-image-preview">
-                    تصویر کالا
-                </div>
+                <label class="file-label">
+                    انتخاب عکس کالا
 
-                <label>نام کالا</label>
+                    <input
+                        id="productImage"
+                        type="file"
+                        accept="image/*"
+                        onchange="previewProductImage(event)">
+                </label>
 
-                <input id="productName"
-                       type="text"
-                       placeholder="نام کالا">
+                <div id="imagePreview"
+                     class="image-preview"></div>
 
-                <label>قیمت به ریال</label>
-
-                <input id="productPrice"
-                       type="number"
-                       min="0"
-                       inputmode="numeric"
-                       placeholder="قیمت">
-
-                <label>توضیحات</label>
-
-                <textarea id="productDescription"
-                          placeholder="توضیحات کالا..."></textarea>
-
-                <button type="button"
-                        class="main-button"
-                        onclick="registerProduct()">
+                <button
+                    class="yellow-button"
+                    onclick="registerProduct()">
                     ثبت کالا
                 </button>
 
-                <p id="registerStatus"
-                   class="status-text"></p>
+                <div id="registerStatus"
+                     class="status"></div>
 
             </div>
 
         </section>
 
 
-        <!-- سبد -->
-        <section id="cart" class="page">
+        <!-- سبد خرید -->
 
-            <div class="page-header">
+        <section id="cartPage" class="page">
 
-                <div>
-                    <h2>سبد خرید</h2>
-                    <p>کالاهای انتخاب‌شده</p>
-                </div>
+            <div class="page-title">
 
-                <button type="button" onclick="clearCart()">
-                    خالی کردن سبد
-                </button>
+                <h2>سبد خرید</h2>
 
             </div>
 
-            <div id="cartContainer"
-                 class="cart-container"></div>
-
-            <div class="discount-box">
-
-                <h3>کد تخفیف</h3>
-
-                <p>
-                    کد 50 = پنجاه درصد تخفیف
-                    <br>
-                    کد 100 = صد درصد تخفیف
-                </p>
-
-                <div class="discount-row">
-
-                    <input id="discountCode"
-                           type="text"
-                           inputmode="numeric"
-                           placeholder="کد تخفیف">
-
-                    <button type="button"
-                            onclick="applyDiscount()">
-                        اعمال
-                    </button>
-
-                </div>
-
-                <p id="discountStatus"
-                   class="status-text"></p>
-
-            </div>
-
-            <div id="cartSummary"
-                 class="cart-summary"></div>
+            <div id="cartContainer"></div>
 
         </section>
 
 
         <!-- پیام‌رسان -->
-        <section id="messages" class="page">
 
-            <div class="messenger-card">
+        <section id="messagesPage" class="page">
+
+            <div class="messenger-box">
 
                 <h2>پیام‌رسان زردآلو</h2>
 
-                <p class="muted">
-                    با شماره زردآلو با دیگر کاربران گفتگو کنید.
-                </p>
+                <input
+                    id="chatNumber"
+                    type="text"
+                    placeholder="شماره زردآلو طرف مقابل">
 
-                <label>
-                    شماره زردآلو
-                </label>
-
-                <input id="messageReceiver"
-                       type="text"
-                       inputmode="numeric"
-                       placeholder="شماره زردآلو گیرنده">
-
-                <button type="button"
-                        onclick="startConversation()">
+                <button
+                    class="yellow-button"
+                    onclick="startChat()">
                     مکالمه جدید
                 </button>
 
-                <div id="chatBox"
-                     class="chat-box">
-                    هنوز مکالمه‌ای انتخاب نشده است.
+                <div id="chatArea"
+                     class="chat-area hidden">
+
+                    <div id="chatMessages"
+                         class="chat-messages">
+                    </div>
+
+                    <div class="chat-input-row">
+
+                        <input
+                            id="chatInput"
+                            type="text"
+                            placeholder="پیام خود را بنویسید...">
+
+                        <button onclick="sendMessage()">
+                            ارسال
+                        </button>
+
+                    </div>
+
                 </div>
 
-                <textarea id="messageText"
-                          placeholder="پیام خود را بنویسید..."></textarea>
-
-                <button type="button"
-                        class="main-button"
-                        onclick="sendMessage()">
-                    ارسال پیام
-                </button>
-
-                <button type="button"
-                        onclick="loadMessages()">
-                    دریافت پیام‌ها
-                </button>
+                <div id="messageStatus"
+                     class="status"></div>
 
             </div>
 
         </section>
 
 
-        <!-- گزارش -->
-        <section id="report" class="page">
+        <!-- گزارش فروشنده -->
 
-            <div class="form-card">
+        <section id="reportPage" class="page">
+
+            <div class="form-box">
 
                 <h2>گزارش فروشنده</h2>
 
-                <label>
-                    شماره زردآلو فروشنده
-                </label>
-
-                <input id="reportSellerNumber"
-                       type="text"
-                       inputmode="numeric"
-                       placeholder="شماره زردآلو فروشنده">
-
-                <label>دلیل گزارش</label>
+                <input
+                    id="reportSellerNumber"
+                    type="text"
+                    placeholder="شماره زردآلو فروشنده">
 
                 <select id="reportReason">
+
+                    <option value="">
+                        دلیل گزارش را انتخاب کنید
+                    </option>
 
                     <option value="کلاهبرداری">
                         کلاهبرداری
@@ -427,23 +370,18 @@
 
                 </select>
 
-                <label>توضیحات</label>
+                <textarea
+                    id="reportDescription"
+                    placeholder="توضیحات گزارش"></textarea>
 
-                <textarea id="reportDescription"
-                          placeholder="توضیحات گزارش..."></textarea>
-
-                <button type="button"
-                        class="main-button"
-                        onclick="submitReport()">
+                <button
+                    class="yellow-button"
+                    onclick="submitReport()">
                     ارسال گزارش
                 </button>
 
-                <p id="reportStatus"
-                   class="status-text"></p>
-
-                <div class="notice">
-                    گزارش‌ها برای بررسی ذخیره می‌شوند.
-                </div>
+                <div id="reportStatus"
+                     class="status"></div>
 
             </div>
 
@@ -451,48 +389,34 @@
 
 
         <!-- مدیریت -->
-        <section id="admin" class="page">
 
-            <div class="form-card">
+        <section id="adminPage" class="page">
+
+            <div class="form-box">
 
                 <h2>مدیریت</h2>
 
-                <div id="adminLogin">
+                <input
+                    id="adminNumber"
+                    type="text"
+                    placeholder="شماره مدیریت">
 
-                    <label>شماره مدیریت</label>
+                <input
+                    id="adminPassword"
+                    type="password"
+                    placeholder="رمز مدیریت">
 
-                    <input id="adminNumber"
-                           type="text">
+                <button
+                    class="yellow-button"
+                    onclick="adminLogin()">
+                    ورود
+                </button>
 
-                    <label>رمز مدیریت</label>
+                <div id="adminStatus"
+                     class="status"></div>
 
-                    <input id="adminPassword"
-                           type="password">
-
-                    <button type="button"
-                            class="main-button"
-                            onclick="adminLogin()">
-                        ورود مدیریت
-                    </button>
-
-                    <p id="adminStatus"
-                       class="status-text"></p>
-
-                </div>
-
-                <div id="adminPanel"
-                     class="hidden">
-
-                    <h3>پنل مدیریت زردآلو</h3>
-
-                    <button type="button"
-                            onclick="loadAdminReports()">
-                        دریافت گزارش‌ها
-                    </button>
-
-                    <div id="adminReports"
-                         class="admin-reports"></div>
-
+                <div id="adminReports"
+                     class="admin-reports hidden">
                 </div>
 
             </div>
@@ -501,18 +425,24 @@
 
 
         <!-- درباره -->
-        <section id="about" class="page">
 
-            <div class="about-card">
+        <section id="aboutPage" class="page">
 
-                <div class="about-logo"></div>
+            <div class="about-box">
 
-                <h2>زردآلو</h2>
+                <img src="logo.png"
+                     alt="زردآلو"
+                     class="about-logo">
 
-                <h3>با زردآلو خرید راحته!</h3>
+                <h2>درباره زردآلو</h2>
 
                 <p>
-                    زردآلو یک بازار آنلاین برای خرید و فروش کالاهاست.
+                    زردآلو یک بازار آنلاین برای خرید،
+                    فروش و ارتباط راحت‌تر کاربران است.
+                </p>
+
+                <p>
+                    با زردآلو خرید راحته!
                 </p>
 
             </div>
@@ -523,7 +453,11 @@
 
 
     <footer>
-        زردآلو | با زردآلو خرید راحته!
+
+        <p>
+            © زردآلو
+        </p>
+
     </footer>
 
 </div>
