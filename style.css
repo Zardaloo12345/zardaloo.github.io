@@ -1900,3 +1900,75 @@ textarea {
     }
 
 }
+/* =========================================================
+   اصلاح نمایش عکس در موبایل
+   جلوگیری از حالت «عکس داخل عکس»
+   ========================================================= */
+
+@media (max-width: 650px) {
+
+    /* لوگوی صفحه خوش‌آمدگویی */
+    .logo-circle {
+        background: transparent;
+        overflow: visible;
+    }
+
+    .logo-circle img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+
+    /* لوگوی صفحه ورود */
+    .small-logo {
+        background: transparent;
+        overflow: visible;
+    }
+
+    .small-logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+
+    /* لوگوی هدر */
+    .header-logo {
+        background: transparent;
+        overflow: visible;
+    }
+
+    .header-logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+
+    /* عکس داخل صفحه خانه */
+    .hero-logo {
+        background: transparent;
+        overflow: visible;
+    }
+
+    .hero-logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+
+    /* لوگوی درباره ما */
+    .about-logo {
+        background: transparent;
+        overflow: visible;
+    }
+
+    .about-logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+}
