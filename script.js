@@ -539,19 +539,98 @@ function showPage(pageId) {
 
     if (pageId === "messages") {
 
-        loadMessages();
-
+     async function loadMessages() {
+    if (!profile || !profile.zardaloo_number || !currentChatNumber) {
+        return;
     }
 
+    const chatBox = document.getElementById("chatBox");
 
-    if (pageId === "admin" && adminLoggedIn) {
+    chatBox.innerHTML = `
+        <div class="empty-state">
+            در حال دریافت پیام‌ها...
+        </div>
+    `;
 
-        loadAdminData();
+    try {
+        const url =
+            MESSAGES_URL +
+            "?user_zardaloo_number=" +
+            encodeURIComponent(profile.zardaloo_number) +
+            "&other_zardaloo_number=" +
+            encodeURIComponent(currentChatNumber);
 
+        const response = await fetch(url, {
+            method: "GET",
+            headers: supabaseHeaders()
+        });
+
+        const data = await readResponse(response);
+
+        let messages = [];
+
+        if (Array.isArray(data)) {
+            messages = data;
+        } else if (Array.isArray(data.messages)) {
+            messages = data.messages;
+        } else if (Array.isArray(data.data)) {
+            messages = data.data;
+        }
+
+        messages.sort((a, b) => {
+            return new Date(a.created_at || 0) -
+                   new Date(b.created_at || 0);
+        });
+
+        if (messages.length === 0) {
+            chatBox.innerHTML = `
+                <div class="empty-state">
+                    هنوز پیامی در این مکالمه وجود ندارد.
+                </div>
+            `;
+            return;
+        }
+
+        chatBox.innerHTML = messages.map(message => {
+
+            const sender =
+                String(
+                    message.sender_zardaloo_number ||
+                    message.sender_number ||
+                    ""
+                );
+
+            const text =
+                message.message ||
+                message.text ||
+                "";
+
+            const mine =
+                sender === String(profile.zardaloo_number);
+
+            return `
+                <div class="message-row ${mine ? "mine" : "theirs"}">
+                    <div class="message-bubble">
+                        ${escapeHtml(text)}
+                    </div>
+                </div>
+            `;
+        }).join("");
+
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+    } catch (error) {
+        console.error("خطا در دریافت پیام‌ها:", error);
+
+        chatBox.innerHTML = `
+            <div class="empty-state">
+                دریافت پیام‌ها ناموفق بود.
+                <br>
+                ${escapeHtml(error.message)}
+            </div>
+        `;
     }
-
 }
-
 
 /* =========================================================
    Supabase Headers
